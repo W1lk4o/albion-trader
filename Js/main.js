@@ -1,38 +1,36 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('loginBtn');
+    const emailInput = document.getElementById('email');
+    const senhaInput = document.getElementById('senha');
+    const msg = document.getElementById('msg');
 
-function login() {
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
-    const msg = document.getElementById("msg");
-    
-    if(!email.endsWith("@gmail.com")) {
-        msg.innerText = "Use um email @gmail.com";
-        return;
-    }
-    if(senha.length < 4) {
-        msg.innerText = "Senha muito curta";
-        return;
-    }
-    
-    // Simula login
-    localStorage.setItem("usuario", email);
-    window.location.href = "dashboard.html";
-}
+    loginBtn.addEventListener('click', async () => {
+        try {
+            // Pega o JSON de usuários
+            const response = await fetch('Data/users.json'); // Corrigido: "Data" maiúsculo
+            const users = await response.json();
 
-function abrir(pagina) {
-    window.location.href = pagina;
-}
+            // Verifica se o usuário existe
+            const user = users.find(u => u.email === emailInput.value && u.senha === senhaInput.value);
 
-document.addEventListener("DOMContentLoaded", () => {
-    const lucros = document.getElementById("lucros");
-    if(lucros) {
-        fetch("data/items.json")
-        .then(res => res.json())
-        .then(data => {
-            data.slice(0,5).forEach(item => {
-                const li = document.createElement("li");
-                li.innerText = `${item.nome_pt} - Lucro: ${item.lucro_est}% - Cidade: ${item.cidade}`;
-                lucros.appendChild(li);
-            });
-        });
-    }
+            if (user) {
+                msg.style.color = 'green';
+                msg.textContent = 'Login efetuado com sucesso!';
+
+                // Redireciona para admin ou dashboard
+                if (user.admin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                msg.style.color = 'red';
+                msg.textContent = 'E-mail ou senha incorretos!';
+            }
+        } catch (error) {
+            msg.style.color = 'red';
+            msg.textContent = 'Erro ao acessar os dados dos usuários!';
+            console.error(error);
+        }
+    });
 });
