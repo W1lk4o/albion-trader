@@ -1,0 +1,11 @@
+{
+  "name": "albion-trader-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Albion Trader - versão pronta para Vercel",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

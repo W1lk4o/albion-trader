@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Albion Trader | Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="app-body" data-page="dashboard">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <p class="eyebrow">Albion Trader</p>
+        <h2 class="sidebar-title">Painel</h2>
+      </div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-target="overview">Dashboard</button>
+        <button class="nav-item" data-target="craft">Craft</button>
+        <button class="nav-item" data-target="refino">Refino</button>
+        <button class="nav-item" data-target="ilhas">Ilhas</button>
+        <button class="nav-item" data-target="transporte">Transporte</button>
+        <button class="nav-item" data-target="mercado">Mercado</button>
+        <button class="nav-item" data-target="riqueza">Planejador</button>
+      </nav>
+      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <p class="muted">Bem-vindo</p>
+          <h1 id="welcomeTitle">Carregando...</h1>
+        </div>
+        <div class="status-pill">Licença ativa</div>
+      </header>
+
+      <section id="overview" class="page-section active">
+        <div class="stats-grid">
+          <article class="card stat-card">
+            <span class="stat-label">Módulos prontos</span>
+            <strong>7</strong>
+            <p>Base visual e navegação prontas para expandir.</p>
+          </article>
+          <article class="card stat-card">
+            <span class="stat-label">API Albion</span>
+            <strong>Online</strong>
+            <p>Consulta inicial de preços via proxy em `/api/albion-prices`.</p>
+          </article>
+          <article class="card stat-card">
+            <span class="stat-label">Licença</span>
+            <strong id="licenseDate">—</strong>
+            <p>Controle simples por sessão.</p>
+          </article>
+        </div>
+
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Radar rápido</h3>
+            <p>Consulte um item do Albion e compare preços por cidade.</p>
+            <div class="inline-form">
+              <input id="marketItem" type="text" value="T4_BAG" placeholder="Ex: T4_BAG" />
+              <button id="loadMarketBtn" class="btn btn-primary">Buscar</button>
+            </div>
+            <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
+          </article>
+
+          <article class="card">
+            <h3>Módulos planejados</h3>
+            <div class="tag-grid">
+              <span class="tag">Craft</span>
+              <span class="tag">Refino</span>
+              <span class="tag">Ilhas</span>
+              <span class="tag">Agricultura</span>
+              <span class="tag">Animais</span>
+              <span class="tag">Trabalhadores</span>
+              <span class="tag">Transporte</span>
+              <span class="tag">Mercado</span>
+              <span class="tag">Radar de guerra</span>
+              <span class="tag">Rotas Avalon</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="craft" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de Craft</h2>
+          <div class="form-grid">
+            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
+            <label><span>Cidade</span>
+              <select id="craftCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
+              </select>
+            </label>
+            <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
+            <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
+          <div id="craftResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="refino" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de Refino</h2>
+          <div class="form-grid">
+            <label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label>
+            <label><span>Cidade</span>
+              <select id="refineCity">
+                <option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option>
+                <option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option>
+              </select>
+            </label>
+            <label><span>Usa foco?</span>
+              <select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+            <label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label>
+            <label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button>
+          <div id="refineResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="ilhas" class="page-section">
+        <div class="card module-card">
+          <h2>Simulador de Ilhas</h2>
+          <div class="form-grid">
+            <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
+            <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
+            <label><span>Pastos</span><input id="islandPastures" type="number" value="2" /></label>
+            <label><span>Usa foco?</span>
+              <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
+          <div id="islandResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="transporte" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de Transporte</h2>
+          <div class="form-grid">
+            <label><span>Cidade de compra</span><input id="transportBuyCity" type="text" value="Bridgewatch" /></label>
+            <label><span>Cidade de venda</span><input id="transportSellCity" type="text" value="Caerleon" /></label>
+            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9800" /></label>
+            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="14200" /></label>
+            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="600" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button>
+          <div id="transportResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="mercado" class="page-section">
+        <div class="card module-card">
+          <h2>Mercado e Guerra</h2>
+          <p class="muted">Módulo inicial para identificar demanda, cidades quentes e janelas de oportunidade.</p>
+          <div class="insight-list">
+            <div class="insight-item">Equipamentos de mobilidade e PvP costumam girar mais em centros de guerra.</div>
+            <div class="insight-item">Caerleon tende a concentrar spreads interessantes para arbitragem em certos itens.</div>
+            <div class="insight-item">O ideal é ligar este módulo depois a preços, volume e histórico.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="riqueza" class="page-section">
+        <div class="card module-card">
+          <h2>Planejador de Riqueza</h2>
+          <div class="form-grid">
+            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="10000" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
+            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+          <div id="wealthResult" class="result-box"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Albion Trader | Login</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-body">
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-row">
+        <div>
+          <p class="eyebrow">Sistema privado</p>
+          <h1>Albion Trader</h1>
+          <p class="muted">Análise econômica para Albion Online com foco em craft, refino, ilhas, transporte e riqueza.</p>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-panel">
+          <h2>O que já tem nessa versão</h2>
+          <ul class="feature-list">
+            <li>Login funcional com API</li>
+            <li>Dashboard completo com módulos</li>
+            <li>Painel admin</li>
+            <li>Integração inicial com preços do Albion</li>
+            <li>Base pronta para crescer no Vercel</li>
+          </ul>
+          <div class="demo-box">
+            <strong>Login admin</strong>
+            <span>wilkeringracio@gmail.com</span>
+            <span>Wilker12@</span>
+          </div>
+        </div>
+
+        <form id="loginForm" class="login-panel">
+          <h2>Entrar</h2>
+          <label>
+            <span>Email</span>
+            <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
+          </label>
+          <label>
+            <span>Senha</span>
+            <input type="password" id="senha" placeholder="••••••••" required />
+          </label>
+          <button type="submit" class="btn btn-primary btn-full">Entrar no sistema</button>
+          <p id="loginMessage" class="form-message"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
