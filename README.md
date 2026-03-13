@@ -1,14 +1,20 @@
-# Albion Trader v5
+# Albion Trader - Parte 1
 
-Projeto pronto para Vercel com frontend estático + funções em `api/`.
+Projeto Vercel-ready para o Albion Trader.
 
-## Variáveis de ambiente
-- `OPENAI_API_KEY` — opcional. Se não existir, a IA usa um modo local heurístico.
-- `OPENAI_MODEL` — opcional. Ex.: `gpt-4.1-mini`
+## O que já funciona
+- Login simples em JavaScript
+- Dashboard com menu lateral e módulos abrindo
+- Mercado automático básico
+- Histórico de mercado local (neste navegador)
+- Radar rápido
+- Craft e refino guiados com preços puxados da API
+- Ilhas e criações com análise inicial
+- Planejador de riqueza diário e semanal
+- Radar de guerra inicial
+- Análise de loot
+- Rotas e fama
 
-## Deploy
-1. Apague o conteúdo antigo do projeto local.
-2. Copie tudo desta pasta.
-3. Commit no GitHub Desktop.
-4. Push.
-5. Aguarde o Vercel redeployar.
+## Login admin
+- email: wilkeringracio@gmail.com
+- senha: Wilker12@

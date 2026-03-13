@@ -1,42 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Albion Trader - Login</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Albion Trader | Login</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="login-body">
   <div class="login-shell">
     <div class="login-card glass">
-      <div class="brand-line">
-        <div class="brand-logo">AT</div>
+      <div class="brand-block">
+        <div class="brand-mark">AT</div>
         <div>
           <h1>Albion Trader</h1>
-          <p>Scanner econômico para Albion Online</p>
+          <p>Entre para acessar o painel econômico.</p>
         </div>
-      </div>
-
-      <div class="hero-copy">
-        <h2>Ganhe prata com mais inteligência</h2>
-        <p>Mercado automático, análise de loot, rotas, guerra, ilhas, craft, refino e IA contextual no mesmo painel.</p>
       </div>
 
       <form id="loginForm" class="login-form">
         <label>Email</label>
-        <input type="email" id="email" placeholder="seuemail@exemplo.com" required>
-
+        <input type="email" id="email" placeholder="seu@email.com" required />
         <label>Senha</label>
-        <input type="password" id="senha" placeholder="••••••••" required>
-
-        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-        <p id="loginStatus" class="status-text"></p>
+        <input type="password" id="senha" placeholder="••••••••" required />
+        <button type="submit" class="btn btn-primary">Entrar</button>
+        <p class="muted">Login local para uso privado inicial.</p>
+        <div id="loginMessage" class="message"></div>
       </form>
-
-      <div class="login-footer">
-        <div class="badge">Servidor padrão: Americas</div>
-        <div class="badge">Vercel Ready</div>
-      </div>
     </div>
   </div>
   <script src="js/users.js"></script>

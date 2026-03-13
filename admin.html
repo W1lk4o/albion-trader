@@ -1,76 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Albion Trader - Admin</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Albion Trader | Admin</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="app-body">
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="brand-logo">AT</div>
-        <div>
-          <h2>Albion Trader</h2>
-          <p>Painel Admin</p>
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <button class="nav-btn active" data-admin-section="overview">Admin</button>
-        <button class="nav-btn" data-admin-section="users">Usuários</button>
-        <button class="nav-btn" data-admin-section="licenses">Licenças</button>
-        <button class="nav-btn" data-admin-section="settings">Configurações</button>
-      </nav>
-      <button id="logoutBtn" class="btn btn-outline btn-block">Sair</button>
-    </aside>
-
-    <main class="content admin-content">
-      <header class="page-header">
-        <div>
-          <h1>Painel Administrativo</h1>
-          <p id="adminWelcome">Gerencie usuários, licenças e servidor padrão.</p>
-        </div>
-      </header>
-
-      <section class="admin-section" data-admin-panel="overview">
-        <div class="grid-3">
-          <div class="card"><h3>Usuários ativos</h3><p id="statUsers">0</p></div>
-          <div class="card"><h3>Licenças válidas</h3><p id="statLicenses">0</p></div>
-          <div class="card"><h3>Servidor padrão</h3><p id="statServer">Americas</p></div>
-        </div>
-      </section>
-
-      <section class="admin-section hidden" data-admin-panel="users">
-        <div class="card">
-          <div class="section-head">
-            <h3>Usuários</h3>
-            <button id="seedUsersBtn" class="btn btn-secondary">Criar usuários de exemplo</button>
-          </div>
-          <div id="usersTableWrap"></div>
-        </div>
-      </section>
-
-      <section class="admin-section hidden" data-admin-panel="licenses">
-        <div class="card">
-          <h3>Licenças</h3>
-          <div id="licensesTableWrap"></div>
-        </div>
-      </section>
-
-      <section class="admin-section hidden" data-admin-panel="settings">
-        <div class="card">
-          <h3>Configurações</h3>
-          <label>Servidor padrão</label>
-          <select id="defaultServerSelect">
-            <option value="west">Americas</option>
-            <option value="europe">Europe</option>
-            <option value="east">Asia</option>
-          </select>
-          <p class="muted">O usuário pode trocar depois no próprio painel.</p>
-        </div>
-      </section>
-    </main>
+<body>
+  <div class="admin-shell">
+    <div class="card admin-card">
+      <h1>Painel Admin</h1>
+      <p class="muted">Gerenciamento local inicial de usuários.</p>
+      <div id="adminUsers"></div>
+      <button class="btn btn-danger" id="adminLogoutBtn">Sair</button>
+    </div>
   </div>
   <script src="js/users.js"></script>
   <script src="js/main.js"></script>
