@@ -6,29 +6,51 @@
   <title>Albion Trader | Login</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="login-body">
-  <div class="login-shell">
-    <div class="login-card glass">
-      <div class="brand-block">
-        <div class="brand-mark">AT</div>
+<body class="auth-body">
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-row">
         <div>
+          <p class="eyebrow">Sistema privado</p>
           <h1>Albion Trader</h1>
-          <p>Entre para acessar o painel econômico.</p>
+          <p class="muted">Análise econômica para Albion Online com foco em craft, refino, ilhas, transporte e riqueza.</p>
         </div>
       </div>
 
-      <form id="loginForm" class="login-form">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="seu@email.com" required />
-        <label>Senha</label>
-        <input type="password" id="senha" placeholder="••••••••" required />
-        <button type="submit" class="btn btn-primary">Entrar</button>
-        <p class="muted">Login local para uso privado inicial.</p>
-        <div id="loginMessage" class="message"></div>
-      </form>
+      <div class="hero-grid">
+        <div class="hero-panel">
+          <h2>O que já tem nessa versão</h2>
+          <ul class="feature-list">
+            <li>Login funcional com API</li>
+            <li>Dashboard completo com módulos</li>
+            <li>Painel admin</li>
+            <li>Integração inicial com preços do Albion</li>
+            <li>Base pronta para crescer no Vercel</li>
+          </ul>
+          <div class="demo-box">
+            <strong>Login admin</strong>
+            <span>wilkeringracio@gmail.com</span>
+            <span>Wilker12@</span>
+          </div>
+        </div>
+
+        <form id="loginForm" class="login-panel">
+          <h2>Entrar</h2>
+          <label>
+            <span>Email</span>
+            <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
+          </label>
+          <label>
+            <span>Senha</span>
+            <input type="password" id="senha" placeholder="••••••••" required />
+          </label>
+          <button type="submit" class="btn btn-primary btn-full">Entrar no sistema</button>
+          <p id="loginMessage" class="form-message"></p>
+        </form>
+      </div>
     </div>
   </div>
-  <script src="js/users.js"></script>
+
   <script src="js/main.js"></script>
 </body>
 </html>

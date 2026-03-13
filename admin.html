@@ -6,16 +6,78 @@
   <title>Albion Trader | Admin</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
-  <div class="admin-shell">
-    <div class="card admin-card">
-      <h1>Painel Admin</h1>
-      <p class="muted">Gerenciamento local inicial de usuários.</p>
-      <div id="adminUsers"></div>
-      <button class="btn btn-danger" id="adminLogoutBtn">Sair</button>
-    </div>
+<body class="app-body" data-page="admin">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <p class="eyebrow">Albion Trader</p>
+        <h2 class="sidebar-title">Admin</h2>
+      </div>
+      <nav class="nav-list">
+        <button class="nav-item active">Usuários</button>
+        <button class="nav-item">Licenças</button>
+        <button class="nav-item">Configurações</button>
+      </nav>
+      <a href="/dashboard" class="btn btn-outline btn-full">Ir para dashboard</a>
+      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <p class="muted">Administrador</p>
+          <h1 id="adminTitle">Painel de controle</h1>
+        </div>
+        <div class="status-pill">Modo Vercel</div>
+      </header>
+
+      <div class="cards-grid admin-grid">
+        <article class="card">
+          <h3>Resumo</h3>
+          <p class="muted">Base pronta para Vercel. Nesta versão, o gerenciamento de usuários é de demonstração sem banco persistente.</p>
+          <div class="mini-stats">
+            <div><strong id="adminUserCount">0</strong><span>Usuários</span></div>
+            <div><strong>3</strong><span>Idiomas planejados</span></div>
+            <div><strong>10+</strong><span>Módulos futuros</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Próximo upgrade sério</h3>
+          <ul class="feature-list compact">
+            <li>Banco de dados persistente</li>
+            <li>Criação real de usuários</li>
+            <li>Licença com expiração automática real</li>
+            <li>Travamento forte por dispositivo</li>
+            <li>Logs e histórico</li>
+          </ul>
+        </article>
+      </div>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <h2>Usuários do sistema</h2>
+            <p id="adminNotice" class="muted">Carregando...</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Perfil</th>
+                <th>Licença</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
-  <script src="js/users.js"></script>
+
   <script src="js/main.js"></script>
 </body>
 </html>

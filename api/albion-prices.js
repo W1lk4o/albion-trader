@@ -1,26 +1,42 @@
 module.exports = async (req, res) => {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Método não permitido.' });
+  }
+
   try {
-    const { itemIds = '', locations = '', qualities = '1', server = 'west' } = req.query;
+    const {
+      items = 'T4_BAG',
+      item,
+      locations = 'Caerleon,Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford',
+      qualities = '1'
+    } = req.query || {};
+
+    const itemIds = (item || items)
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .join(',');
+
     if (!itemIds) {
-      res.status(400).json({ error: 'itemIds é obrigatório' });
-      return;
+      return res.status(400).json({ error: 'Informe ao menos um item.' });
     }
 
-    const hostMap = {
-      west: 'west',
-      east: 'east',
-      asia: 'asia'
-    };
+    const endpoint = `https://west.albion-online-data.com/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
 
-    const host = hostMap[server] || 'west';
-    const path = `https://${host}.albion-online-data.com/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
-    const response = await fetch(path, { headers: { 'User-Agent': 'AlbionTrader/6.0' } });
-    const text = await response.text();
+    const response = await fetch(endpoint, {
+      headers: {
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br'
+      }
+    });
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=300');
-    res.status(response.status).send(text);
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'Falha ao consultar a API do Albion.' });
+    }
+
+    const data = await response.json();
+    return res.status(200).json({ ok: true, data, meta: { source: 'albion-data', itemCount: itemIds.split(',').length } });
   } catch (error) {
-    res.status(500).json({ error: 'Falha ao consultar Albion Data', details: String(error) });
+    return res.status(500).json({ error: 'Erro ao buscar preços do Albion.' });
   }
 };

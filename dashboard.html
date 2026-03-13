@@ -6,458 +6,205 @@
   <title>Albion Trader | Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="app-body" data-page="dashboard">
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="brand-mark small">AT</div>
-        <div>
-          <strong>Albion Trader</strong>
-          <small>Parte 1</small>
-        </div>
+      <div>
+        <p class="eyebrow">Albion Trader</p>
+        <h2 class="sidebar-title">Painel</h2>
       </div>
-
-      <nav class="side-nav" id="sideNav">
-        <button class="nav-item active" data-section="dashboard">Dashboard</button>
-        <button class="nav-item" data-section="mercado">Mercado Automático</button>
-        <button class="nav-item" data-section="radar">Radar Rápido</button>
-        <button class="nav-item" data-section="craft">Craft</button>
-        <button class="nav-item" data-section="refino">Refino</button>
-        <button class="nav-item" data-section="ilhas">Ilhas & Criações</button>
-        <button class="nav-item" data-section="guerra">Radar de Guerra</button>
-        <button class="nav-item" data-section="loot">Análise de Loot</button>
-        <button class="nav-item" data-section="rotas">Rotas</button>
-        <button class="nav-item" data-section="fama">Calculadora de Fama</button>
-        <button class="nav-item" data-section="riqueza">Planejador de Riqueza</button>
-        <button class="nav-item" data-section="historico">Histórico de Mercado</button>
+      <nav class="nav-list">
+        <button class="nav-item active" data-target="overview">Dashboard</button>
+        <button class="nav-item" data-target="craft">Craft</button>
+        <button class="nav-item" data-target="refino">Refino</button>
+        <button class="nav-item" data-target="ilhas">Ilhas</button>
+        <button class="nav-item" data-target="transporte">Transporte</button>
+        <button class="nav-item" data-target="mercado">Mercado</button>
+        <button class="nav-item" data-target="riqueza">Planejador</button>
       </nav>
-
-      <div class="sidebar-footer">
-        <div id="sessionUser" class="muted"></div>
-        <button class="btn btn-danger btn-block" id="logoutBtn">Sair</button>
-      </div>
+      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
     <main class="content">
-      <header class="topbar glass">
+      <header class="topbar">
         <div>
-          <h1 id="welcomeTitle">Bem-vindo</h1>
-          <p class="muted">Servidor padrão: <strong id="serverLabel">Americas</strong></p>
+          <p class="muted">Bem-vindo</p>
+          <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="topbar-actions">
-          <label class="select-inline">Servidor
-            <select id="serverSelect">
-              <option value="west">Americas</option>
-              <option value="east">Europe</option>
-              <option value="asia">Asia</option>
-            </select>
-          </label>
-        </div>
+        <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
       </header>
 
-      <section id="section-dashboard" class="section active">
-        <div class="grid-4">
-          <div class="card stat-card">
-            <span>Top oportunidade</span>
-            <strong id="topOpportunity">Carregando...</strong>
-          </div>
-          <div class="card stat-card">
-            <span>Lucro potencial</span>
-            <strong id="topProfit">-</strong>
-          </div>
-          <div class="card stat-card">
-            <span>Mercado quente</span>
-            <strong id="warHotItem">-</strong>
-          </div>
-          <div class="card stat-card">
-            <span>Tendência geral</span>
-            <strong id="marketTrend">Aguardando dados</strong>
-          </div>
+      <section id="overview" class="page-section active">
+        <div class="stats-grid">
+          <article class="card stat-card">
+            <span class="stat-label">Módulos ativos</span>
+            <strong>7</strong>
+            <p>Agora com navegação funcional e lógica melhorada.</p>
+          </article>
+          <article class="card stat-card">
+            <span class="stat-label">Radar de oportunidades</span>
+            <strong>Ao vivo</strong>
+            <p id="opportunitySummary">Lendo oportunidades do mercado...</p>
+          </article>
+          <article class="card stat-card">
+            <span class="stat-label">Licença</span>
+            <strong id="licenseDate">—</strong>
+            <p>Controle simples por sessão.</p>
+          </article>
         </div>
 
-        <div class="card">
-          <div class="card-header-row">
-            <h2>Oportunidades agora</h2>
-            <button class="btn" id="refreshDashboardBtn">Atualizar</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Comprar</th>
-                  <th>Vender</th>
-                  <th>Lucro</th>
-                  <th>Margem</th>
-                </tr>
-              </thead>
-              <tbody id="dashboardOpportunities"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="section-mercado" class="section">
-        <div class="card">
-          <h2>Mercado Automático</h2>
-          <div class="form-grid three">
-            <label>Cidade de compra
-              <select id="buyCity"></select>
-            </label>
-            <label>Cidade de venda
-              <select id="sellCity"></select>
-            </label>
-            <label>Capital disponível
-              <input type="number" id="capitalInput" value="1000000" min="0" step="10000" />
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="scanMarketBtn">Escanear mercado</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Comprar em</th>
-                  <th>Vender em</th>
-                  <th>Compra</th>
-                  <th>Venda</th>
-                  <th>Lucro</th>
-                  <th>Margem</th>
-                </tr>
-              </thead>
-              <tbody id="marketScanTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="section-radar" class="section">
-        <div class="card">
-          <h2>Radar Rápido</h2>
-          <div class="form-grid four">
-            <label>Categoria
-              <select id="radarCategory"></select>
-            </label>
-            <label>Subcategoria
-              <select id="radarSubcategory"></select>
-            </label>
-            <label>Item
-              <select id="radarItem"></select>
-            </label>
-            <label>Tier
-              <select id="radarTier"></select>
-            </label>
-            <label>Encantamento
-              <select id="radarEnchant"></select>
-            </label>
-            <label>Cidade
-              <select id="radarCity"></select>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="radarSearchBtn">Analisar item</button>
-          </div>
-          <div id="radarResult" class="result-box muted">Escolha um item para começar.</div>
-        </div>
-      </section>
-
-      <section id="section-craft" class="section">
-        <div class="card">
-          <h2>Craft</h2>
-          <div class="form-grid three">
-            <label>Cidade
-              <select id="craftCity"></select>
-            </label>
-            <label>Categoria
-              <select id="craftCategory">
-                <option value="armor">Armaduras</option>
-                <option value="weapons">Armas</option>
-                <option value="bags">Bolsas & Capas</option>
-              </select>
-            </label>
-            <label>Tier máximo
-              <select id="craftTierLimit">
-                <option value="4">T4</option>
-                <option value="5">T5</option>
-                <option value="6" selected>T6</option>
-                <option value="7">T7</option>
-                <option value="8">T8</option>
-              </select>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="craftAnalyzeBtn">Buscar melhor craft</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Custo insumos</th>
-                  <th>Venda</th>
-                  <th>Lucro</th>
-                </tr>
-              </thead>
-              <tbody id="craftTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="section-refino" class="section">
-        <div class="card">
-          <h2>Refino</h2>
-          <div class="form-grid three">
-            <label>Cidade
-              <select id="refineCity"></select>
-            </label>
-            <label>Recurso
-              <select id="refineResource">
-                <option value="hide">Couro</option>
-                <option value="ore">Minério</option>
-                <option value="fiber">Fibra</option>
-                <option value="wood">Madeira</option>
-                <option value="stone">Pedra</option>
-              </select>
-            </label>
-            <label>Tier alvo
-              <select id="refineTier">
-                <option value="4">T4</option>
-                <option value="5">T5</option>
-                <option value="6" selected>T6</option>
-                <option value="7">T7</option>
-                <option value="8">T8</option>
-              </select>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="refineAnalyzeBtn">Buscar melhor refino</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item refinado</th>
-                  <th>Custo base</th>
-                  <th>Venda</th>
-                  <th>Lucro</th>
-                </tr>
-              </thead>
-              <tbody id="refineTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="section-ilhas" class="section">
-        <div class="card">
-          <h2>Ilhas & Criações</h2>
-          <div class="form-grid four">
-            <label>Quantas contas
-              <input type="number" id="accountsCount" value="1" min="1" max="10" />
-            </label>
-            <label>Quantas ilhas
-              <input type="number" id="islandsCount" value="1" min="1" max="50" />
-            </label>
-            <label>Plots de plantação totais
-              <input type="number" id="farmPlots" value="9" min="1" />
-            </label>
-            <label>Pastos totais
-              <input type="number" id="pasturePlots" value="3" min="0" />
-            </label>
-            <label>Comprar comida?
-              <select id="buyFeed">
-                <option value="yes">Sim</option>
-                <option value="no">Não, vou plantar</option>
-              </select>
-            </label>
-            <label>Usa foco?
-              <select id="useFocus">
-                <option value="yes">Sim</option>
-                <option value="no">Não</option>
-              </select>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="islandsAnalyzeBtn">Analisar ilhas</button>
-          </div>
-          <div id="islandsResult" class="result-box muted">Preencha e analise.</div>
-        </div>
-      </section>
-
-      <section id="section-guerra" class="section">
-        <div class="card">
-          <h2>Radar de Guerra</h2>
-          <p class="muted">Itens com maior giro aparente entre builds PvP populares, cruzados com diferença de preço entre cidades.</p>
-          <div class="form-grid two">
-            <label>Cidade de compra
-              <select id="warBuyCity"></select>
-            </label>
-            <label>Cidade de venda
-              <select id="warSellCity"></select>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="warScanBtn">Escanear radar de guerra</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Tier</th>
-                  <th>Compra</th>
-                  <th>Venda</th>
-                  <th>Lucro</th>
-                </tr>
-              </thead>
-              <tbody id="warTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="section-loot" class="section">
-        <div class="card">
-          <h2>Análise de Loot</h2>
-          <div class="form-grid two">
-            <label>Cidade atual
-              <select id="lootCity"></select>
-            </label>
-            <label>Texto do loot
-              <textarea id="lootText" rows="8" placeholder="Exemplo:
-T5_COOKEDBEEF 20
-T5_HIDE 120
-T6_RUNE 40"></textarea>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="lootAnalyzeBtn">Analisar loot</button>
-          </div>
-          <div id="lootResult" class="result-box muted">Cole o loot e faça a análise.</div>
-        </div>
-      </section>
-
-      <section id="section-rotas" class="section">
-        <div class="card">
-          <h2>Rotas</h2>
-          <div class="form-grid three">
-            <label>Mapa/Cidade atual
-              <input id="routeStart" placeholder="Ex: Martlock" />
-            </label>
-            <label>Mapa/Cidade destino
-              <input id="routeEnd" placeholder="Ex: Caerleon" />
-            </label>
-            <label>Perfil
-              <select id="routeMode">
-                <option value="safe">Mais safe</option>
-                <option value="fast">Mais rápida</option>
-                <option value="mixed">Equilibrada</option>
-              </select>
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="routeAnalyzeBtn">Traçar rota</button>
-          </div>
-          <div id="routeResult" class="result-box muted">Informe origem e destino.</div>
-        </div>
-      </section>
-
-      <section id="section-fama" class="section">
-        <div class="card">
-          <h2>Calculadora de Fama</h2>
-          <div class="form-grid four">
-            <label>Fama inicial
-              <input type="number" id="fameStart" value="0" min="0" />
-            </label>
-            <label>Horário inicial
-              <input type="time" id="timeStart" value="19:00" />
-            </label>
-            <label>Fama final
-              <input type="number" id="fameEnd" value="0" min="0" />
-            </label>
-            <label>Horário final
-              <input type="time" id="timeEnd" value="20:00" />
-            </label>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="fameCalcBtn">Calcular fama/hora</button>
-          </div>
-          <div id="fameResult" class="result-box muted">Preencha para calcular.</div>
-        </div>
-      </section>
-
-      <section id="section-riqueza" class="section">
-        <div class="card">
-          <h2>Planejador de Riqueza</h2>
-          <div class="form-grid four">
-            <label>Prata atual
-              <input type="number" id="moneyNow" value="1000000" min="0" />
-            </label>
-            <label>Meta
-              <input type="number" id="moneyGoal" value="100000000" min="1" />
-            </label>
-            <label>Horas por dia
-              <input type="number" id="hoursPerDay" value="3" min="1" max="24" />
-            </label>
-            <label>Perfil
-              <select id="riskProfile">
-                <option value="safe">Safe</option>
-                <option value="mixed" selected>Misto</option>
-                <option value="aggressive">Agressivo</option>
-              </select>
-            </label>
-          </div>
-          <div class="form-grid two">
-            <label>O que você gosta de fazer?
-              <div class="checkbox-grid" id="activityChoices">
-                <label><input type="checkbox" value="mercado" checked /> Mercado</label>
-                <label><input type="checkbox" value="transporte" checked /> Transporte</label>
-                <label><input type="checkbox" value="craft" /> Craft</label>
-                <label><input type="checkbox" value="refino" /> Refino</label>
-                <label><input type="checkbox" value="coleta" /> Coleta</label>
-                <label><input type="checkbox" value="dg" /> DG</label>
+        <div class="cards-grid">
+          <article class="card">
+            <div class="section-header">
+              <div>
+                <h3>Radar rápido de item</h3>
+                <p class="muted">Digite um item do Albion e compare preços por cidade.</p>
               </div>
+            </div>
+            <div class="inline-form">
+              <input id="marketItem" type="text" value="T4_BAG" placeholder="Ex: T4_BAG" />
+              <button id="loadMarketBtn" class="btn btn-primary">Buscar</button>
+            </div>
+            <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
+          </article>
+
+          <article class="card">
+            <div class="section-header">
+              <div>
+                <h3>Módulos planejados</h3>
+                <p class="muted">Agora você pode clicar para abrir os módulos que já existem.</p>
+              </div>
+            </div>
+            <div class="tag-grid">
+              <button class="tag tag-button" data-target="craft">Craft</button>
+              <button class="tag tag-button" data-target="refino">Refino</button>
+              <button class="tag tag-button" data-target="ilhas">Ilhas</button>
+              <button class="tag tag-button" data-target="transporte">Transporte</button>
+              <button class="tag tag-button" data-target="mercado">Mercado</button>
+              <button class="tag tag-button" data-target="riqueza">Planejador</button>
+              <span class="tag">Agricultura</span>
+              <span class="tag">Animais</span>
+              <span class="tag">Trabalhadores</span>
+              <span class="tag">Radar de guerra</span>
+              <span class="tag">Rotas Avalon</span>
+            </div>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="section-header">
+            <div>
+              <h3>Radar de oportunidades</h3>
+              <p class="muted">Busca spreads entre cidades usando a API de preços.</p>
+            </div>
+            <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar radar</button>
+          </div>
+          <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
+        </article>
+      </section>
+
+      <section id="craft" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de Craft</h2>
+          <div class="form-grid">
+            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
+            <label><span>Cidade</span>
+              <select id="craftCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
+              </select>
             </label>
+            <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
+            <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
           </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="wealthPlanBtn">Gerar plano</button>
-          </div>
-          <div id="wealthResult" class="result-box muted">Monte seu plano diário e semanal.</div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
+          <div id="craftResult" class="result-box"></div>
         </div>
       </section>
 
-      <section id="section-historico" class="section">
-        <div class="card">
-          <div class="card-header-row">
-            <h2>Histórico de Mercado</h2>
-            <button class="btn" id="historyClearBtn">Limpar histórico local</button>
+      <section id="refino" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de Refino</h2>
+          <div class="form-grid">
+            <label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label>
+            <label><span>Cidade</span>
+              <select id="refineCity">
+                <option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option>
+                <option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option>
+              </select>
+            </label>
+            <label><span>Usa foco?</span>
+              <select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+            <label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label>
+            <label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label>
           </div>
-          <p class="muted">Histórico básico salvo neste navegador enquanto você usa o sistema.</p>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Cidade</th>
-                  <th>Último preço</th>
-                  <th>Anterior</th>
-                  <th>Variação</th>
-                  <th>Tendência</th>
-                </tr>
-              </thead>
-              <tbody id="historyTable"></tbody>
-            </table>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button>
+          <div id="refineResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="ilhas" class="page-section">
+        <div class="card module-card">
+          <h2>Simulador de Ilhas</h2>
+          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
+          <div class="form-grid">
+            <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
+            <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
+            <label><span>Pastos</span><input id="islandPastures" type="number" value="2" /></label>
+            <label><span>Usa foco?</span>
+              <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
           </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
+          <div id="islandResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="transporte" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de Transporte</h2>
+          <div class="form-grid">
+            <label><span>Cidade de compra</span><input id="transportBuyCity" type="text" value="Bridgewatch" /></label>
+            <label><span>Cidade de venda</span><input id="transportSellCity" type="text" value="Caerleon" /></label>
+            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9800" /></label>
+            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="14200" /></label>
+            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="600" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button>
+          <div id="transportResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="mercado" class="page-section">
+        <div class="card module-card">
+          <h2>Mercado e Guerra</h2>
+          <p class="muted">Esse módulo agora exibe o radar legível e uma leitura rápida do que fazer.</p>
+          <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
+          <div class="insight-list">
+            <div class="insight-item">Itens com melhor spread tendem a funcionar melhor em rotas curtas e com capital girando rápido.</div>
+            <div class="insight-item">Mercado bom não é só lucro unitário: é lucro unitário + velocidade de venda.</div>
+            <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="riqueza" class="page-section">
+        <div class="card module-card">
+          <h2>Planejador de Riqueza</h2>
+          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
+          <div class="form-grid">
+            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
+            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+          <div id="wealthResult" class="result-box"></div>
         </div>
       </section>
     </main>
   </div>
 
-  <script src="js/users.js"></script>
-  <script src="js/catalog.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
