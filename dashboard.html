@@ -57,23 +57,33 @@
           <article class="card">
             <div class="section-header">
               <div>
-                <h3>Radar rápido</h3>
-                <p class="muted">Pesquise um item só, com tier, encantamento e qualidade, e veja onde comprar barato e vender melhor.</p>
+                <h3>Radar de item</h3>
+                <p class="muted">Pesquise um item específico e veja onde comprar barato e onde vender melhor.</p>
               </div>
             </div>
-            <div class="form-grid compact-grid">
+            <div class="form-grid compact-grid radar-grid">
               <label><span>Categoria</span>
                 <select id="radarCategory">
-                  <option value="bolsas">Bolsas</option>
-                  <option value="capas">Capas</option>
+                  <option value="all">Todas</option>
+                  <option value="utilitarios">Utilitários</option>
                   <option value="recursoBruto">Recursos brutos</option>
                   <option value="recursoRefinado">Recursos refinados</option>
+                  <option value="armaduras">Armaduras</option>
+                  <option value="montarias">Montarias</option>
                 </select>
               </label>
-              <label><span>Item</span><select id="radarItem"></select></label>
+              <label class="item-search-field"><span>Item</span>
+                <input id="radarItemSearch" list="radarItemList" placeholder="Digite o nome do item" />
+                <datalist id="radarItemList"></datalist>
+              </label>
               <label><span>Tier</span>
                 <select id="radarTier">
-                  <option value="T4">T4</option><option value="T5">T5</option><option value="T6">T6</option><option value="T7">T7</option><option value="T8">T8</option>
+                  <option value="T3">T3</option>
+                  <option value="T4" selected>T4</option>
+                  <option value="T5">T5</option>
+                  <option value="T6">T6</option>
+                  <option value="T7">T7</option>
+                  <option value="T8">T8</option>
                 </select>
               </label>
               <label><span>Encantamento</span>
@@ -94,6 +104,7 @@
                 </select>
               </label>
             </div>
+            <p class="muted small-text">Dica: você pode digitar o nome do item em português. Se preferir, também aceita o ID do item do Albion.</p>
             <div class="inline-form top-gap">
               <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
             </div>
@@ -127,7 +138,7 @@
           <div class="section-header">
             <div>
               <h3>Radar de oportunidades</h3>
-              <p class="muted">Aqui ficam as melhores oportunidades do mercado inteiro, classificadas por lucro líquido.</p>
+              <p class="muted">Mostra as melhores oportunidades do mercado inteiro. Clique nas colunas para ordenar.</p>
             </div>
             <div class="button-row">
               <button id="loadOpportunityBtn" class="btn btn-primary">Itens populares</button>
@@ -206,13 +217,13 @@
 
       <section id="transporte" class="page-section">
         <div class="card module-card">
-          <h2>Calculadora de Transporte</h2>
+          <h2>Planejamento de Transporte</h2>
           <div class="form-grid">
-            <label><span>Cidade de compra</span><input id="transportBuyCity" type="text" value="Bridgewatch" /></label>
-            <label><span>Cidade de venda</span><input id="transportSellCity" type="text" value="Caerleon" /></label>
-            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9800" /></label>
-            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="14200" /></label>
-            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="600" /></label>
+            <label><span>Cidade de compra</span><select id="transportBuyCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label>
+            <label><span>Cidade de venda</span><select id="transportSellCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label>
+            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9000" /></label>
+            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="13000" /></label>
+            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="1200" /></label>
           </div>
           <button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button>
           <div id="transportResult" class="result-box"></div>
@@ -221,33 +232,25 @@
 
       <section id="mercado" class="page-section">
         <div class="card module-card">
-          <h2>Mercado e Guerra</h2>
-          <p class="muted">Esse módulo agora exibe o radar legível e uma leitura rápida do que fazer.</p>
-          <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
-          <div class="insight-list">
-            <div class="insight-item">Itens com melhor spread tendem a funcionar melhor em rotas curtas e com capital girando rápido.</div>
-            <div class="insight-item">Mercado bom não é só lucro unitário: é lucro unitário + velocidade de venda.</div>
-            <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
-          </div>
+          <h2>Mercado</h2>
+          <p class="muted">Use o Radar de Oportunidades na dashboard para ver o que está pagando melhor agora.</p>
         </div>
       </section>
 
       <section id="riqueza" class="page-section">
         <div class="card module-card">
           <h2>Planejador de Riqueza</h2>
-          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
           <div class="form-grid">
             <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
-            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
-            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label>
+            <label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano</button>
           <div id="wealthResult" class="result-box"></div>
         </div>
       </section>
     </main>
   </div>
-
   <script src="js/main.js"></script>
 </body>
 </html>

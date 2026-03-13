@@ -3,20 +3,76 @@
   const DEFAULT_LOCATIONS = ['Caerleon', 'Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford'];
   const MARKET_FEE_DEFAULT = 6.5;
   const QUALITY_LABELS = {'1':'Normal','2':'Bom','3':'Excepcional','4':'Excelente','5':'Obra-prima'};
-  const ITEM_CATALOG = {
-    bolsas:{label:'Bolsas',entries:[{value:'BAG',label:'Bolsa'}]},
-    capas:{label:'Capas',entries:[{value:'CAPE',label:'Capa'}]},
-    recursoBruto:{label:'Recursos brutos',entries:[{value:'WOOD',label:'Madeira bruta'},{value:'ORE',label:'Minério bruto'},{value:'FIBER',label:'Fibra bruta'},{value:'HIDE',label:'Couro bruto'},{value:'ROCK',label:'Pedra bruta'}]},
-    recursoRefinado:{label:'Recursos refinados',entries:[{value:'PLANKS',label:'Tábuas'},{value:'METALBAR',label:'Barra de metal'},{value:'CLOTH',label:'Tecido'},{value:'LEATHER',label:'Couro refinado'},{value:'STONEBLOCK',label:'Bloco de pedra'}]}
+  const CATEGORY_LABELS = {
+    all: 'Todas', utilitarios: 'Utilitários', recursoBruto: 'Recursos brutos', recursoRefinado: 'Recursos refinados', armaduras: 'Armaduras', montarias: 'Montarias'
   };
+  const ITEM_ENTRIES = [
+    {base:'BAG',label:'Bolsa',category:'utilitarios'},
+    {base:'CAPE',label:'Capa',category:'utilitarios'},
+    {base:'WOOD',label:'Madeira bruta',category:'recursoBruto'},
+    {base:'ORE',label:'Minério bruto',category:'recursoBruto'},
+    {base:'FIBER',label:'Fibra bruta',category:'recursoBruto'},
+    {base:'HIDE',label:'Couro bruto',category:'recursoBruto'},
+    {base:'ROCK',label:'Pedra bruta',category:'recursoBruto'},
+    {base:'PLANKS',label:'Tábuas',category:'recursoRefinado'},
+    {base:'METALBAR',label:'Barra de metal',category:'recursoRefinado'},
+    {base:'CLOTH',label:'Tecido',category:'recursoRefinado'},
+    {base:'LEATHER',label:'Couro refinado',category:'recursoRefinado'},
+    {base:'STONEBLOCK',label:'Bloco de pedra',category:'recursoRefinado'},
+    {base:'MOUNT_OX',label:'Boi de montaria',category:'montarias'},
+    {base:'MOUNT_HORSE',label:'Cavalo de montaria',category:'montarias'},
+    {base:'HEAD_CLOTH_SET1',label:'Capuz de estudioso',category:'armaduras'},
+    {base:'ARMOR_CLOTH_SET1',label:'Túnica de estudioso',category:'armaduras'},
+    {base:'SHOES_CLOTH_SET1',label:'Sandálias de estudioso',category:'armaduras'},
+    {base:'HEAD_CLOTH_SET2',label:'Capuz clerical',category:'armaduras'},
+    {base:'ARMOR_CLOTH_SET2',label:'Manto clerical',category:'armaduras'},
+    {base:'SHOES_CLOTH_SET2',label:'Sandálias clericais',category:'armaduras'},
+    {base:'HEAD_CLOTH_SET3',label:'Capuz de mago',category:'armaduras'},
+    {base:'ARMOR_CLOTH_SET3',label:'Manto de mago',category:'armaduras'},
+    {base:'SHOES_CLOTH_SET3',label:'Sandálias de mago',category:'armaduras'},
+    {base:'HEAD_LEATHER_SET1',label:'Capuz de mercenário',category:'armaduras'},
+    {base:'ARMOR_LEATHER_SET1',label:'Casaco de mercenário',category:'armaduras'},
+    {base:'SHOES_LEATHER_SET1',label:'Sapatos de mercenário',category:'armaduras'},
+    {base:'HEAD_LEATHER_SET2',label:'Capuz de caçador',category:'armaduras'},
+    {base:'ARMOR_LEATHER_SET2',label:'Casaco de caçador',category:'armaduras'},
+    {base:'SHOES_LEATHER_SET2',label:'Sapatos de caçador',category:'armaduras'},
+    {base:'HEAD_LEATHER_SET3',label:'Capuz de assassino',category:'armaduras'},
+    {base:'ARMOR_LEATHER_SET3',label:'Casaco de assassino',category:'armaduras'},
+    {base:'SHOES_LEATHER_SET3',label:'Sapatos de assassino',category:'armaduras'},
+    {base:'HEAD_PLATE_SET1',label:'Capacete de soldado',category:'armaduras'},
+    {base:'ARMOR_PLATE_SET1',label:'Armadura de soldado',category:'armaduras'},
+    {base:'SHOES_PLATE_SET1',label:'Botas de soldado',category:'armaduras'},
+    {base:'HEAD_PLATE_SET2',label:'Capacete de cavaleiro',category:'armaduras'},
+    {base:'ARMOR_PLATE_SET2',label:'Armadura de cavaleiro',category:'armaduras'},
+    {base:'SHOES_PLATE_SET2',label:'Botas de cavaleiro',category:'armaduras'},
+    {base:'HEAD_PLATE_SET3',label:'Capacete de guardião',category:'armaduras'},
+    {base:'ARMOR_PLATE_SET3',label:'Armadura de guardião',category:'armaduras'},
+    {base:'SHOES_PLATE_SET3',label:'Botas de guardião',category:'armaduras'}
+  ];
+  const ITEM_BY_LABEL = new Map(ITEM_ENTRIES.map(entry => [entry.label.toLowerCase(), entry]));
+  const ITEM_BY_BASE = new Map(ITEM_ENTRIES.map(entry => [entry.base.toUpperCase(), entry]));
   const POPULAR_ITEMS = [
-    'T4_BAG','T4_BAG@1','T4_BAG@2','T5_BAG','T5_BAG@1','T5_BAG@2','T6_BAG','T6_BAG@1',
-    'T4_CAPE','T4_CAPE@1','T5_CAPE','T5_CAPE@1','T6_CAPE','T6_CAPE@1',
+    'T4_BAG','T4_BAG@1','T5_BAG','T5_BAG@1','T6_BAG','T6_BAG@1','T7_BAG','T8_BAG',
+    'T4_CAPE','T5_CAPE','T6_CAPE','T7_CAPE','T8_CAPE',
     'T4_WOOD','T5_WOOD','T6_WOOD','T7_WOOD','T8_WOOD','T4_ORE','T5_ORE','T6_ORE','T7_ORE','T8_ORE',
     'T4_FIBER','T5_FIBER','T6_FIBER','T7_FIBER','T8_FIBER','T4_HIDE','T5_HIDE','T6_HIDE','T7_HIDE','T8_HIDE',
-    'T4_ROCK','T5_ROCK','T6_ROCK','T7_ROCK','T8_ROCK','T4_PLANKS','T5_PLANKS','T6_PLANKS',
-    'T4_METALBAR','T5_METALBAR','T6_METALBAR','T4_CLOTH','T5_CLOTH','T6_CLOTH','T4_LEATHER','T5_LEATHER','T6_LEATHER',
-    'T4_STONEBLOCK','T5_STONEBLOCK','T6_STONEBLOCK','T4_MOUNT_OX','T5_MOUNT_OX','T6_MOUNT_OX'
+    'T4_ROCK','T5_ROCK','T6_ROCK','T7_ROCK','T8_ROCK','T4_PLANKS','T5_PLANKS','T6_PLANKS','T7_PLANKS','T8_PLANKS',
+    'T4_METALBAR','T5_METALBAR','T6_METALBAR','T7_METALBAR','T8_METALBAR','T4_CLOTH','T5_CLOTH','T6_CLOTH','T7_CLOTH','T8_CLOTH',
+    'T4_LEATHER','T5_LEATHER','T6_LEATHER','T7_LEATHER','T8_LEATHER','T4_STONEBLOCK','T5_STONEBLOCK','T6_STONEBLOCK','T7_STONEBLOCK','T8_STONEBLOCK',
+    'T3_MOUNT_OX','T4_MOUNT_OX','T5_MOUNT_OX','T6_MOUNT_OX','T7_MOUNT_OX','T8_MOUNT_OX',
+    'T3_MOUNT_HORSE','T4_MOUNT_HORSE','T5_MOUNT_HORSE','T6_MOUNT_HORSE','T7_MOUNT_HORSE','T8_MOUNT_HORSE',
+    'T4_ARMOR_LEATHER_SET1','T4_ARMOR_LEATHER_SET2','T4_ARMOR_LEATHER_SET3','T5_ARMOR_LEATHER_SET1','T5_ARMOR_LEATHER_SET2','T5_ARMOR_LEATHER_SET3',
+    'T6_ARMOR_LEATHER_SET1','T6_ARMOR_LEATHER_SET2','T6_ARMOR_LEATHER_SET3','T7_ARMOR_LEATHER_SET1','T7_ARMOR_LEATHER_SET2','T7_ARMOR_LEATHER_SET3',
+    'T4_ARMOR_CLOTH_SET1','T4_ARMOR_CLOTH_SET2','T4_ARMOR_CLOTH_SET3','T5_ARMOR_CLOTH_SET1','T5_ARMOR_CLOTH_SET2','T5_ARMOR_CLOTH_SET3',
+    'T6_ARMOR_CLOTH_SET1','T6_ARMOR_CLOTH_SET2','T6_ARMOR_CLOTH_SET3','T7_ARMOR_CLOTH_SET1','T7_ARMOR_CLOTH_SET2','T7_ARMOR_CLOTH_SET3',
+    'T4_ARMOR_PLATE_SET1','T4_ARMOR_PLATE_SET2','T4_ARMOR_PLATE_SET3','T5_ARMOR_PLATE_SET1','T5_ARMOR_PLATE_SET2','T5_ARMOR_PLATE_SET3',
+    'T6_ARMOR_PLATE_SET1','T6_ARMOR_PLATE_SET2','T6_ARMOR_PLATE_SET3','T7_ARMOR_PLATE_SET1','T7_ARMOR_PLATE_SET2','T7_ARMOR_PLATE_SET3',
+    'T4_HEAD_LEATHER_SET1','T4_HEAD_LEATHER_SET2','T4_HEAD_LEATHER_SET3','T5_HEAD_LEATHER_SET1','T5_HEAD_LEATHER_SET2','T5_HEAD_LEATHER_SET3',
+    'T4_HEAD_CLOTH_SET1','T4_HEAD_CLOTH_SET2','T4_HEAD_CLOTH_SET3','T5_HEAD_CLOTH_SET1','T5_HEAD_CLOTH_SET2','T5_HEAD_CLOTH_SET3',
+    'T4_HEAD_PLATE_SET1','T4_HEAD_PLATE_SET2','T4_HEAD_PLATE_SET3','T5_HEAD_PLATE_SET1','T5_HEAD_PLATE_SET2','T5_HEAD_PLATE_SET3',
+    'T4_SHOES_LEATHER_SET1','T4_SHOES_LEATHER_SET2','T4_SHOES_LEATHER_SET3','T5_SHOES_LEATHER_SET1','T5_SHOES_LEATHER_SET2','T5_SHOES_LEATHER_SET3',
+    'T4_SHOES_CLOTH_SET1','T4_SHOES_CLOTH_SET2','T4_SHOES_CLOTH_SET3','T5_SHOES_CLOTH_SET1','T5_SHOES_CLOTH_SET2','T5_SHOES_CLOTH_SET3',
+    'T4_SHOES_PLATE_SET1','T4_SHOES_PLATE_SET2','T4_SHOES_PLATE_SET3','T5_SHOES_PLATE_SET1','T5_SHOES_PLATE_SET2','T5_SHOES_PLATE_SET3'
   ];
   const ISLAND_CROPS=[
     {name:'Cenoura',tier:'T3',profit:12000,note:'boa para começar e gira rápido'},
@@ -30,6 +86,8 @@
     {name:'Cavalo',tier:'T5',profit:28000,feed:12000,note:'bom para quem já tem mais giro'},
     {name:'Boi',tier:'T6',profit:30000,feed:14000,note:'mais capital preso, mas pode render bem'}
   ];
+  let lastOpportunities = [];
+  let opportunitySort = { key: 'profit', dir: 'desc' };
 
   function getDeviceId(){let d=localStorage.getItem('albionTraderDeviceId');if(!d){d='device-'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('albionTraderDeviceId',d);}return d;}
   function saveSession(payload){localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));}
@@ -44,19 +102,74 @@
   function bindNav(){document.querySelectorAll('[data-target]').forEach(item=>item.addEventListener('click',()=>activateSection(item.dataset.target)));}
   function formatSilver(v){return new Intl.NumberFormat('pt-BR').format(Math.round(v||0));}
   function setHtml(id,html){const el=document.getElementById(id); if(el) el.innerHTML=html;}
-  function prettyItemName(itemId){const tier=(itemId.match(/^T(\d+)/)||[])[1]; const enchant=(itemId.match(/@(\d)$/)||[])[1]; const clean=itemId.replace(/^T\d_/,'').replace(/@\d$/,''); const map={BAG:'Bolsa',CAPE:'Capa',WOOD:'Madeira bruta',ORE:'Minério bruto',FIBER:'Fibra bruta',HIDE:'Couro bruto',ROCK:'Pedra bruta',PLANKS:'Tábuas',METALBAR:'Barra de metal',CLOTH:'Tecido',LEATHER:'Couro refinado',STONEBLOCK:'Bloco de pedra',MOUNT_OX:'Boi de montaria'}; const base=map[clean]||clean.split('_').map(w=>w[0]+w.slice(1).toLowerCase()).join(' '); return `${base} ${tier?`T${tier}`:''}${enchant && enchant!=='0'?'.'+enchant:''}`.trim();}
-  function itemIdFromSelection(){const base=document.getElementById('radarItem').value; const tier=document.getElementById('radarTier').value; const enchant=document.getElementById('radarEnchant').value; if(!base||!tier) return ''; return `${tier}_${base}${enchant!=='0'?`@${enchant}`:''}`;}
-  function populateRadarItems(){const catEl=document.getElementById('radarCategory'); const itemEl=document.getElementById('radarItem'); if(!catEl||!itemEl) return; const cfg=ITEM_CATALOG[catEl.value]; itemEl.innerHTML=(cfg?.entries||[]).map(e=>`<option value="${e.value}">${e.label}</option>`).join('');}
+  function getItemEntryFromRaw(raw){if(!raw) return null; const trimmed=String(raw).trim(); return ITEM_BY_LABEL.get(trimmed.toLowerCase()) || ITEM_BY_BASE.get(trimmed.toUpperCase()) || null;}
+  function prettyItemName(itemId){
+    const tier=(itemId.match(/^T(\d+)/)||[])[1];
+    const enchant=(itemId.match(/@(\d)$/)||[])[1];
+    const clean=itemId.replace(/^T\d_/,'').replace(/@\d$/,'');
+    const entry=ITEM_BY_BASE.get(clean.toUpperCase());
+    const base=entry?.label || clean.split('_').map(w=>w[0]+w.slice(1).toLowerCase()).join(' ');
+    return `${base}${tier?` T${tier}`:''}${enchant && enchant!=='0'?'.'+enchant:''}`.trim();
+  }
+  function itemIdFromSelection(){
+    const rawValue=document.getElementById('radarItemSearch').value;
+    const entry=getItemEntryFromRaw(rawValue);
+    const base=(entry?.base || String(rawValue||'').trim().toUpperCase());
+    const tier=document.getElementById('radarTier').value;
+    const enchant=document.getElementById('radarEnchant').value;
+    if(!base||!tier) return '';
+    return `${tier}_${base}${enchant!=='0'?`@${enchant}`:''}`;
+  }
+  function populateRadarItems(){
+    const category = document.getElementById('radarCategory')?.value || 'all';
+    const list = document.getElementById('radarItemList');
+    if(!list) return;
+    const entries = ITEM_ENTRIES.filter(entry => category === 'all' || entry.category === category);
+    list.innerHTML = entries.map(entry => `<option value="${entry.label}"></option>`).join('');
+  }
   function isStale(dateStr){if(!dateStr) return true; const date=new Date(dateStr); if(Number.isNaN(date.getTime())) return true; return (Date.now()-date.getTime())/36e5 > 72;}
   function looksLikePlaceholder(price){return /^9{6,}$/.test(String(price||''));}
   function median(nums){if(!nums.length) return 0; const arr=[...nums].sort((a,b)=>a-b); const mid=Math.floor(arr.length/2); return arr.length%2?arr[mid]:(arr[mid-1]+arr[mid])/2;}
   function sanitizeRows(rows){const valid=rows.filter(r=>{const price=Number(r.sell_price_min||0); return price>0 && !looksLikePlaceholder(price) && !isStale(r.sell_price_min_date);}); if(!valid.length) return []; const med=median(valid.map(r=>Number(r.sell_price_min))); return valid.filter(r=>{const price=Number(r.sell_price_min||0); return med<=0 || (price>=med*0.45 && price<=med*2.2);});}
   function calculateArbitrage(rows){const cleaned=sanitizeRows(rows); if(cleaned.length<2) return null; const sorted=[...cleaned].sort((a,b)=>a.sell_price_min-b.sell_price_min); const bestBuy=sorted[0]; const bestSell=[...sorted].sort((a,b)=>b.sell_price_min-a.sell_price_min)[0]; if(!bestBuy||!bestSell||bestBuy.city===bestSell.city) return null; const buyPrice=Number(bestBuy.sell_price_min||0); const sellPrice=Number(bestSell.sell_price_min||0); const tax=Math.round(sellPrice*(MARKET_FEE_DEFAULT/100)); const transport=Math.round(buyPrice*0.04); const profit=sellPrice-buyPrice-tax-transport; const margin=buyPrice>0?(profit/buyPrice)*100:0; if(profit<=0) return null; return {buyCity:bestBuy.city,sellCity:bestSell.city,buyPrice,sellPrice,profit,margin,tax,transport,quality:QUALITY_LABELS[String(bestBuy.quality||1)]||'Normal',rows:cleaned};}
-  async function loadMarket(){const itemId=itemIdFromSelection(); const quality=document.getElementById('radarQuality').value; const box=document.getElementById('marketResult'); if(!itemId){box.textContent='Escolha categoria, item, tier e qualidade.'; return;} box.innerHTML='<div class="muted">Buscando preços do item...</div>'; try{const params=new URLSearchParams({items:itemId,locations:DEFAULT_LOCATIONS.join(','),qualities:quality,server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); const rows=data.data||[]; const arb=calculateArbitrage(rows); if(!arb){box.innerHTML=`<div class="muted">Não encontrei arbitragem confiável agora para <strong>${prettyItemName(itemId)}</strong>. Os preços vieram muito velhos, inconsistentes ou sem spread útil.</div>`; return;} const tableRows=sanitizeRows(rows).sort((a,b)=>a.sell_price_min-b.sell_price_min).map(row=>`<tr><td>${row.city}</td><td>${formatSilver(row.sell_price_min)}</td><td>${QUALITY_LABELS[String(row.quality||quality)]||'Normal'}</td><td>${new Date(row.sell_price_min_date).toLocaleString('pt-BR')}</td></tr>`).join(''); box.innerHTML=`<div class="mini-grid"><div class="mini-card"><span>Item</span><strong>${prettyItemName(itemId)}</strong></div><div class="mini-card"><span>Melhor compra</span><strong>${arb.buyCity}</strong><small>${formatSilver(arb.buyPrice)} prata</small></div><div class="mini-card"><span>Melhor venda</span><strong>${arb.sellCity}</strong><small>${formatSilver(arb.sellPrice)} prata</small></div><div class="mini-card"><span>Lucro líquido</span><strong>${formatSilver(arb.profit)}</strong><small>${arb.margin.toFixed(1)}% de margem</small></div></div><div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>Cidade</th><th>Venda mínima</th><th>Qualidade</th><th>Atualizado em</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;}catch(error){box.textContent=error.message;}}
+  async function loadMarket(){const itemId=itemIdFromSelection(); const quality=document.getElementById('radarQuality').value; const box=document.getElementById('marketResult'); if(!itemId){box.textContent='Escolha ou digite um item, além de tier e qualidade.'; return;} box.innerHTML='<div class="muted">Buscando preços do item...</div>'; try{const params=new URLSearchParams({items:itemId,locations:DEFAULT_LOCATIONS.join(','),qualities:quality,server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); const rows=data.data||[]; const arb=calculateArbitrage(rows); if(!arb){box.innerHTML=`<div class="muted">Não encontrei arbitragem confiável agora para <strong>${prettyItemName(itemId)}</strong>. Os preços vieram muito velhos, inconsistentes ou sem spread útil.</div>`; return;} const tableRows=sanitizeRows(rows).sort((a,b)=>a.sell_price_min-b.sell_price_min).map(row=>`<tr><td>${row.city}</td><td>${formatSilver(row.sell_price_min)}</td><td>${QUALITY_LABELS[String(row.quality||quality)]||'Normal'}</td><td>${new Date(row.sell_price_min_date).toLocaleString('pt-BR')}</td></tr>`).join(''); box.innerHTML=`<div class="mini-grid"><div class="mini-card"><span>Item</span><strong>${prettyItemName(itemId)}</strong></div><div class="mini-card"><span>Melhor compra</span><strong>${arb.buyCity}</strong><small>${formatSilver(arb.buyPrice)} prata</small></div><div class="mini-card"><span>Melhor venda</span><strong>${arb.sellCity}</strong><small>${formatSilver(arb.sellPrice)} prata</small></div><div class="mini-card"><span>Lucro líquido</span><strong>${formatSilver(arb.profit)}</strong><small>${arb.margin.toFixed(1)}% de margem</small></div></div><div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>Cidade</th><th>Venda mínima</th><th>Qualidade</th><th>Atualizado em</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;}catch(error){box.textContent=error.message;}}
   function setProgress(percent,text){const bar=document.getElementById('marketProgressBar'); const label=document.getElementById('marketProgressText'); if(bar) bar.style.width=`${percent}%`; if(label) label.textContent=text;}
-  function buildOpportunityRows(rows){const byItem=new Map(); rows.forEach(row=>{if(!row.item_id) return; if(!byItem.has(row.item_id)) byItem.set(row.item_id,[]); byItem.get(row.item_id).push(row);}); const opportunities=[]; byItem.forEach((itemRows,itemId)=>{const arb=calculateArbitrage(itemRows); if(!arb) return; opportunities.push({itemId,itemName:prettyItemName(itemId),...arb,confidence:arb.rows.length>=4?'Boa':'Média'});}); return opportunities.sort((a,b)=>b.profit-a.profit).slice(0,20);}
+  function buildOpportunityRows(rows){const byItem=new Map(); rows.forEach(row=>{if(!row.item_id) return; if(!byItem.has(row.item_id)) byItem.set(row.item_id,[]); byItem.get(row.item_id).push(row);}); const opportunities=[]; byItem.forEach((itemRows,itemId)=>{const arb=calculateArbitrage(itemRows); if(!arb) return; opportunities.push({itemId,itemName:prettyItemName(itemId),...arb,confidence:arb.rows.length>=4?'Boa':'Média',confidenceRank:arb.rows.length>=4?2:1});}); return opportunities.sort((a,b)=>b.profit-a.profit).slice(0,20);}
+  function sortOpportunities(list){
+    const {key,dir}=opportunitySort;
+    const signal = dir==='asc' ? 1 : -1;
+    return [...list].sort((a,b)=>{
+      const av = key==='confidence' ? a.confidenceRank : a[key];
+      const bv = key==='confidence' ? b.confidenceRank : b[key];
+      if (typeof av === 'string') return av.localeCompare(bv,'pt-BR') * signal;
+      return ((av||0)-(bv||0)) * signal;
+    });
+  }
+  function sortArrow(key){return opportunitySort.key!==key ? '↕' : (opportunitySort.dir==='asc'?'▲':'▼');}
+  function renderOpportunityTable(){
+    const box=document.getElementById('opportunityResult');
+    if(!box) return;
+    if(!lastOpportunities.length){box.innerHTML='<div class="muted">Nenhuma oportunidade confiável encontrada agora. Tente de novo em alguns minutos.</div>'; return;}
+    const opportunities = sortOpportunities(lastOpportunities);
+    box.innerHTML=`<div class="table-wrap"><table class="data-table sortable-table"><thead><tr>
+      <th>Item</th><th>Qualidade</th><th>Comprar</th><th>Vender</th>
+      <th class="sortable" data-sort="buyPrice">Custo <span>${sortArrow('buyPrice')}</span></th>
+      <th class="sortable" data-sort="sellPrice">Venda <span>${sortArrow('sellPrice')}</span></th>
+      <th class="sortable" data-sort="profit">Lucro <span>${sortArrow('profit')}</span></th>
+      <th class="sortable" data-sort="margin">Margem <span>${sortArrow('margin')}</span></th>
+      <th class="sortable" data-sort="confidence">Confiança <span>${sortArrow('confidence')}</span></th>
+    </tr></thead><tbody>${opportunities.map(op=>`<tr><td>${op.itemName}</td><td>${op.quality}</td><td>${op.buyCity}</td><td>${op.sellCity}</td><td>${formatSilver(op.buyPrice)}</td><td>${formatSilver(op.sellPrice)}</td><td>${formatSilver(op.profit)}</td><td>${op.margin.toFixed(1)}%</td><td>${op.confidence}</td></tr>`).join('')}</tbody></table></div>`;
+    box.querySelectorAll('[data-sort]').forEach(header=>{
+      header.addEventListener('click',()=>{
+        const key = header.dataset.sort;
+        if(opportunitySort.key===key){opportunitySort.dir = opportunitySort.dir==='asc'?'desc':'asc';}
+        else {opportunitySort = {key, dir: key==='confidence' ? 'desc':'desc'};}
+        renderOpportunityTable();
+      });
+    });
+  }
   function chunk(list,size){const out=[]; for(let i=0;i<list.length;i+=size) out.push(list.slice(i,i+size)); return out;}
-  async function loadOpportunityRadar(fullMarket=false){const box=document.getElementById('opportunityResult'); if(!box) return; const list=fullMarket?POPULAR_ITEMS:POPULAR_ITEMS.slice(0,40); const chunks=chunk(list,12); box.innerHTML='<div class="muted">Consultando mercado...</div>'; const status=document.getElementById('apiStatusBadge'); if(status) status.textContent=`AlbionData consultando ${fullMarket?'mercado completo':'itens populares'}...`; try{let allRows=[]; for(let i=0;i<chunks.length;i++){const params=new URLSearchParams({items:chunks[i].join(','),locations:DEFAULT_LOCATIONS.join(','),qualities:'1',server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); allRows=allRows.concat(data.data||[]); const percent=Math.round(((i+1)/chunks.length)*100); setProgress(percent,`Consultando Albion Data: ${percent}%`);} const opportunities=buildOpportunityRows(allRows); const summary=document.getElementById('opportunitySummary'); if(status) status.textContent='AlbionData online'; setProgress(100,`${opportunities.length} oportunidades confiáveis encontradas.`); if(!opportunities.length){box.innerHTML='<div class="muted">Nenhuma oportunidade confiável encontrada agora. Tente de novo em alguns minutos.</div>'; if(summary) summary.textContent='Sem spreads úteis no momento.'; return;} if(summary){const best=opportunities[0]; summary.textContent=`Melhor oportunidade agora: ${best.itemName} comprando em ${best.buyCity} e vendendo em ${best.sellCity}.`;} box.innerHTML=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Item</th><th>Qualidade</th><th>Comprar</th><th>Vender</th><th>Custo</th><th>Venda</th><th>Lucro líquido</th><th>Margem</th><th>Confiança</th></tr></thead><tbody>${opportunities.map(op=>`<tr><td>${op.itemName}</td><td>${op.quality}</td><td>${op.buyCity}</td><td>${op.sellCity}</td><td>${formatSilver(op.buyPrice)}</td><td>${formatSilver(op.sellPrice)}</td><td>${formatSilver(op.profit)}</td><td>${op.margin.toFixed(1)}%</td><td>${op.confidence}</td></tr>`).join('')}</tbody></table></div>`;}catch(error){if(status) status.textContent='AlbionData com falha'; setProgress(0,'Falha ao consultar a API do Albion.'); box.textContent=error.message;}}
+  async function loadOpportunityRadar(fullMarket=false){const box=document.getElementById('opportunityResult'); if(!box) return; const list=fullMarket?POPULAR_ITEMS:POPULAR_ITEMS.slice(0,80); const chunks=chunk(list,12); box.innerHTML='<div class="muted">Consultando mercado...</div>'; const status=document.getElementById('apiStatusBadge'); if(status) status.textContent=`AlbionData consultando ${fullMarket?'mercado completo':'itens populares'}...`; try{let allRows=[]; for(let i=0;i<chunks.length;i++){const params=new URLSearchParams({items:chunks[i].join(','),locations:DEFAULT_LOCATIONS.join(','),qualities:'1',server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); allRows=allRows.concat(data.data||[]); const percent=Math.round(((i+1)/chunks.length)*100); setProgress(percent,`Consultando Albion Data: ${percent}%`);} lastOpportunities=buildOpportunityRows(allRows); const summary=document.getElementById('opportunitySummary'); if(status) status.textContent='AlbionData online'; setProgress(100,`${lastOpportunities.length} oportunidades confiáveis encontradas.`); if(!lastOpportunities.length){renderOpportunityTable(); if(summary) summary.textContent='Sem spreads úteis no momento.'; return;} if(summary){const best=sortOpportunities(lastOpportunities)[0]; summary.textContent=`Melhor oportunidade agora: ${best.itemName} comprando em ${best.buyCity} e vendendo em ${best.sellCity}.`;} renderOpportunityTable();}catch(error){if(status) status.textContent='AlbionData com falha'; setProgress(0,'Falha ao consultar a API do Albion.'); box.textContent=error.message;}}
   async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); bindLogout(); bindNav(); populateRadarItems(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); loadOpportunityRadar(false);}
   async function initAdmin(){const user=await requireAuth(); if(!user) return; const title=document.getElementById('adminTitle'); if(title) title.textContent=`Painel admin — ${user.nome||user.email}`; bindLogout(); try{const data=await api('/api/users'); const tbody=document.getElementById('adminUsersTable'); const count=document.getElementById('adminUserCount'); const notice=document.getElementById('adminNotice'); if(notice) notice.textContent=data.notice||''; if(count) count.textContent=data.users.length; if(tbody) tbody.innerHTML=data.users.map(u=>`<tr><td>${u.nome||'-'}</td><td>${u.email}</td><td>${u.admin?'Admin':'Usuário'}</td><td>${new Date(u.licencaExpiraEm).toLocaleDateString('pt-BR')}</td></tr>`).join('');}catch(error){const notice=document.getElementById('adminNotice'); if(notice) notice.textContent=error.message;}}
   function calcCraft(){const level=Number(document.getElementById('craftLevel').value||0); const city=document.getElementById('craftCity').value; const cost=Number(document.getElementById('craftCost').value||0); const sell=Number(document.getElementById('craftSell').value||0); const bonus=level>=80?1.07:level>=50?1.04:1.01; const fee=Math.round(sell*0.065); const adjustedCost=cost/bonus; const lucro=sell-adjustedCost-fee; const margem=cost>0?(lucro/cost)*100:0; setHtml('craftResult',`<strong>Resultado do craft em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong><br>Margem: <strong>${margem.toFixed(1)}%</strong>`);}

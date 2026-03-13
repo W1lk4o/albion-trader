@@ -145,3 +145,12 @@ button, input, select { font: inherit; }
 @media (max-width: 640px) {
   .compact-grid, .mini-grid { grid-template-columns: 1fr; }
 }
+
+
+.radar-grid { align-items: end; }
+.item-search-field { min-width: 0; }
+#radarItemSearch { width: 100%; }
+.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+.sortable span { margin-left: 6px; font-size: 12px; color: var(--primary); }
+.sortable:hover { color: var(--text); }
+.sortable-table th { position: sticky; top: 0; background: var(--panel); }
