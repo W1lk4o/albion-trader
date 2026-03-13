@@ -7,12 +7,13 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="app-body" data-page="dashboard">
-  <div class="app-shell">
+  <div class="app-shell dashboard-shell">
     <aside class="sidebar">
       <div>
         <p class="eyebrow">Albion Trader</p>
-        <h2 class="sidebar-title">Painel</h2>
+        <h2 class="sidebar-title">Dashboard</h2>
       </div>
+
       <nav class="nav-list">
         <button class="nav-item active" data-target="overview">Dashboard</button>
         <button class="nav-item" data-target="craft">Craft</button>
@@ -20,9 +21,15 @@
         <button class="nav-item" data-target="ilhas">Ilhas</button>
         <button class="nav-item" data-target="transporte">Transporte</button>
         <button class="nav-item" data-target="mercado">Mercado</button>
+        <button class="nav-item" data-target="guerra">Radar de Guerra</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
+        <button class="nav-item" data-target="assistente">IA do Sistema</button>
       </nav>
-      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+
+      <div class="sidebar-footer">
+        <a href="/admin" class="btn btn-outline btn-full">Ir para admin</a>
+        <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+      </div>
     </aside>
 
     <main class="content">
@@ -31,15 +38,18 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+        <div class="topbar-actions">
+          <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+          <div class="status-pill status-accent" id="aiStatusBadge">IA offline</div>
+        </div>
       </header>
 
       <section id="overview" class="page-section active">
         <div class="stats-grid">
           <article class="card stat-card">
-            <span class="stat-label">Módulos ativos</span>
-            <strong>7</strong>
-            <p>Agora com navegação funcional e lógica melhorada.</p>
+            <span class="stat-label">Módulos úteis</span>
+            <strong>9</strong>
+            <p>Agora com radar de guerra e planejador mais guiado.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Radar de oportunidades</span>
@@ -58,11 +68,25 @@
             <div class="section-header">
               <div>
                 <h3>Radar rápido de item</h3>
-                <p class="muted">Digite um item do Albion e compare preços por cidade.</p>
+                <p class="muted">Agora em estilo de mercado do Albion: item, tier e encantamento.</p>
               </div>
             </div>
-            <div class="inline-form">
-              <input id="marketItem" type="text" value="T4_BAG" placeholder="Ex: T4_BAG" />
+            <div class="form-grid compact-grid">
+              <label><span>Categoria</span>
+                <select id="marketCategory"></select>
+              </label>
+              <label><span>Item</span>
+                <select id="marketItemSelect"></select>
+              </label>
+              <label><span>Tier</span>
+                <select id="marketTier"></select>
+              </label>
+              <label><span>Encantamento</span>
+                <select id="marketEnchant"></select>
+              </label>
+            </div>
+            <div class="inline-actions market-quick-actions">
+              <div class="module-pill" id="marketCodePreview">Código: —</div>
               <button id="loadMarketBtn" class="btn btn-primary">Buscar</button>
             </div>
             <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
@@ -72,7 +96,7 @@
             <div class="section-header">
               <div>
                 <h3>Módulos planejados</h3>
-                <p class="muted">Agora você pode clicar para abrir os módulos que já existem.</p>
+                <p class="muted">Clique nos módulos para abrir a seção correspondente.</p>
               </div>
             </div>
             <div class="tag-grid">
@@ -81,11 +105,12 @@
               <button class="tag tag-button" data-target="ilhas">Ilhas</button>
               <button class="tag tag-button" data-target="transporte">Transporte</button>
               <button class="tag tag-button" data-target="mercado">Mercado</button>
+              <button class="tag tag-button" data-target="guerra">Radar de guerra</button>
               <button class="tag tag-button" data-target="riqueza">Planejador</button>
+              <button class="tag tag-button" data-target="assistente">IA do sistema</button>
               <span class="tag">Agricultura</span>
               <span class="tag">Animais</span>
               <span class="tag">Trabalhadores</span>
-              <span class="tag">Radar de guerra</span>
               <span class="tag">Rotas Avalon</span>
             </div>
           </article>
@@ -105,14 +130,40 @@
 
       <section id="craft" class="page-section">
         <div class="card module-card">
-          <h2>Calculadora de Craft</h2>
+          <div class="section-header">
+            <div>
+              <h2>Craft guiado</h2>
+              <p class="muted">Agora mais simples: escolha a linha, informe os custos e o sistema te diz o quão saudável está o craft.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="craft">Perguntar à IA</button>
+          </div>
           <div class="form-grid">
-            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
+            <label><span>Linha de craft</span>
+              <select id="craftLine">
+                <option value="bag">Bolsa</option>
+                <option value="cape">Capa</option>
+                <option value="cloth-armor">Armadura de pano</option>
+                <option value="leather-armor">Armadura de couro</option>
+                <option value="plate-armor">Armadura de placa</option>
+                <option value="food">Comida</option>
+                <option value="potion">Poção</option>
+              </select>
+            </label>
+            <label><span>Tier</span>
+              <select id="craftTier"></select>
+            </label>
+            <label><span>Encantamento</span>
+              <select id="craftEnchant"></select>
+            </label>
+            <label><span>Especialização</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
             <label><span>Cidade</span>
               <select id="craftCity">
                 <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
                 <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
               </select>
+            </label>
+            <label><span>Usa foco?</span>
+              <select id="craftFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
             </label>
             <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
             <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
@@ -124,8 +175,26 @@
 
       <section id="refino" class="page-section">
         <div class="card module-card">
-          <h2>Calculadora de Refino</h2>
+          <div class="section-header">
+            <div>
+              <h2>Refino guiado</h2>
+              <p class="muted">Mesmo raciocínio do craft, mas focado em recurso bruto → refinado, com leitura clara de foco e margem.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="refino">Perguntar à IA</button>
+          </div>
           <div class="form-grid">
+            <label><span>Linha de refino</span>
+              <select id="refineLine">
+                <option value="ore">Minério → Barra</option>
+                <option value="fiber">Fibra → Tecido</option>
+                <option value="wood">Madeira → Tábua</option>
+                <option value="hide">Pele → Couro</option>
+                <option value="stone">Pedra → Bloco</option>
+              </select>
+            </label>
+            <label><span>Tier</span>
+              <select id="refineTier"></select>
+            </label>
             <label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label>
             <label><span>Cidade</span>
               <select id="refineCity">
@@ -136,6 +205,7 @@
             <label><span>Usa foco?</span>
               <select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
             </label>
+            <label><span>Quantidade</span><input id="refineQuantity" type="number" value="100" /></label>
             <label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label>
             <label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label>
           </div>
@@ -146,8 +216,13 @@
 
       <section id="ilhas" class="page-section">
         <div class="card module-card">
-          <h2>Simulador de Ilhas</h2>
-          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
+          <div class="section-header">
+            <div>
+              <h2>Simulador de Ilhas</h2>
+              <p class="muted">Agora recomenda o que plantar, o que criar e separa plano principal e plano reserva.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="ilhas">Perguntar à IA</button>
+          </div>
           <div class="form-grid">
             <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
             <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
@@ -163,7 +238,13 @@
 
       <section id="transporte" class="page-section">
         <div class="card module-card">
-          <h2>Calculadora de Transporte</h2>
+          <div class="section-header">
+            <div>
+              <h2>Calculadora de Transporte</h2>
+              <p class="muted">Conta simples para você ver rápido se a rota tem espaço ou se está apertada.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="transporte">Perguntar à IA</button>
+          </div>
           <div class="form-grid">
             <label><span>Cidade de compra</span><input id="transportBuyCity" type="text" value="Bridgewatch" /></label>
             <label><span>Cidade de venda</span><input id="transportSellCity" type="text" value="Caerleon" /></label>
@@ -178,29 +259,135 @@
 
       <section id="mercado" class="page-section">
         <div class="card module-card">
-          <h2>Mercado e Guerra</h2>
-          <p class="muted">Esse módulo agora exibe o radar legível e uma leitura rápida do que fazer.</p>
+          <div class="section-header">
+            <div>
+              <h2>Mercado e oportunidades</h2>
+              <p class="muted">Leitura rápida do mercado vivo e interpretação do spread encontrado.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="mercado">Perguntar à IA</button>
+          </div>
           <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
           <div class="insight-list">
-            <div class="insight-item">Itens com melhor spread tendem a funcionar melhor em rotas curtas e com capital girando rápido.</div>
-            <div class="insight-item">Mercado bom não é só lucro unitário: é lucro unitário + velocidade de venda.</div>
+            <div class="insight-item">Mercado bom não é só lucro unitário. É lucro unitário + velocidade de venda.</div>
             <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
+            <div class="insight-item">Use a IA para comparar rotas, spreads e decidir se compensa girar capital hoje.</div>
           </div>
+        </div>
+      </section>
+
+      <section id="guerra" class="page-section">
+        <div class="card module-card">
+          <div class="section-header">
+            <div>
+              <h2>Radar de Guerra</h2>
+              <p class="muted">Base curada de builds PvP para você vigiar demanda de mercado por modo de jogo.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="guerra">Perguntar à IA</button>
+          </div>
+          <div class="form-grid compact-grid">
+            <label><span>Modo PvP</span>
+              <select id="warMode"></select>
+            </label>
+            <label><span>Perfil de venda</span>
+              <select id="warFocus">
+                <option value="fast">Giro rápido</option>
+                <option value="margin">Maior margem</option>
+                <option value="stable">Mais estável</option>
+              </select>
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.renderWarMarket()">Atualizar radar de guerra</button>
+          <div id="warResult" class="result-box"></div>
         </div>
       </section>
 
       <section id="riqueza" class="page-section">
         <div class="card module-card">
-          <h2>Planejador de Riqueza</h2>
-          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
+          <div class="section-header">
+            <div>
+              <h2>Planejador de Prata</h2>
+              <p class="muted">Agora ele monta rota, mostra melhor caminho e aceita preferências do jogador.</p>
+            </div>
+            <button class="btn btn-outline ask-ai-btn" data-module="riqueza">Perguntar à IA</button>
+          </div>
           <div class="form-grid">
             <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
             <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
-            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+            <label><span>Dias para atingir</span><input id="wealthDays" type="number" value="30" /></label>
+            <label><span>Modo do planejador</span>
+              <select id="wealthMode">
+                <option value="best">Me mostra o melhor caminho</option>
+                <option value="custom">Quero escolher o que gosto de fazer</option>
+              </select>
+            </label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+
+          <div class="card inner-card">
+            <h3>Atividades que eu gosto</h3>
+            <div class="checkbox-grid" id="wealthActivities">
+              <label class="check-chip"><input type="checkbox" value="hide" /> <span>Coletar pele</span></label>
+              <label class="check-chip"><input type="checkbox" value="ore" /> <span>Garimpar minério</span></label>
+              <label class="check-chip"><input type="checkbox" value="fiber" /> <span>Coletar fibra</span></label>
+              <label class="check-chip"><input type="checkbox" value="wood" /> <span>Coletar madeira</span></label>
+              <label class="check-chip"><input type="checkbox" value="stone" /> <span>Coletar pedra</span></label>
+              <label class="check-chip"><input type="checkbox" value="dg" /> <span>DG</span></label>
+              <label class="check-chip"><input type="checkbox" value="mists" /> <span>Mists</span></label>
+              <label class="check-chip"><input type="checkbox" value="transport" /> <span>Transporte</span></label>
+              <label class="check-chip"><input type="checkbox" value="craft" /> <span>Craft</span></label>
+              <label class="check-chip"><input type="checkbox" value="refine" /> <span>Refino</span></label>
+              <label class="check-chip"><input type="checkbox" value="market" /> <span>Mercado</span></label>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Montar plano</button>
           <div id="wealthResult" class="result-box"></div>
         </div>
+      </section>
+
+      <section id="assistente" class="page-section">
+        <article class="card module-card">
+          <div class="section-header">
+            <div>
+              <h2>Assistente IA do Albion Trader</h2>
+              <p class="muted">Converse com a IA sobre o módulo atual. Ela lê o contexto da tela antes de responder.</p>
+            </div>
+            <div class="module-pill" id="currentAiModule">Módulo atual: Dashboard</div>
+          </div>
+
+          <div class="ai-layout">
+            <div class="ai-chat-box" id="aiChatMessages">
+              <div class="chat-message ai">
+                <strong>IA</strong>
+                <p>Estou pronta. Você pode perguntar, por exemplo: “Na minha ilha vale mais plantar cenoura ou erva?”</p>
+              </div>
+            </div>
+
+            <div class="ai-chat-controls">
+              <label>
+                <span>Módulo</span>
+                <select id="aiModuleSelect">
+                  <option value="overview">Dashboard</option>
+                  <option value="craft">Craft</option>
+                  <option value="refino">Refino</option>
+                  <option value="ilhas">Ilhas</option>
+                  <option value="transporte">Transporte</option>
+                  <option value="mercado">Mercado</option>
+                  <option value="guerra">Radar de guerra</option>
+                  <option value="riqueza">Planejador de riqueza</option>
+                </select>
+              </label>
+              <label>
+                <span>Sua pergunta</span>
+                <textarea id="aiQuestion" rows="5" placeholder="Ex: Tenho 5 plantações, uso foco e estou em dúvida entre cenoura e erva. O que faz mais sentido?"></textarea>
+              </label>
+              <div class="inline-actions">
+                <button id="sendAiBtn" class="btn btn-primary">Perguntar à IA</button>
+                <button id="clearAiBtn" class="btn btn-outline">Limpar conversa</button>
+              </div>
+              <p class="muted small">Para a IA responder de verdade, você precisa configurar a variável <code>OPENAI_API_KEY</code> no Vercel.</p>
+            </div>
+          </div>
+        </article>
       </section>
     </main>
   </div>

@@ -13,13 +13,18 @@
         <p class="eyebrow">Albion Trader</p>
         <h2 class="sidebar-title">Admin</h2>
       </div>
+
       <nav class="nav-list">
-        <button class="nav-item active">Usuários</button>
-        <button class="nav-item">Licenças</button>
-        <button class="nav-item">Configurações</button>
+        <button class="nav-item active" data-target="admin-overview">Admin</button>
+        <button class="nav-item" data-target="admin-users">Usuários</button>
+        <button class="nav-item" data-target="admin-licenses">Licenças</button>
+        <button class="nav-item" data-target="admin-settings">Configurações</button>
       </nav>
-      <a href="/dashboard" class="btn btn-outline btn-full">Ir para dashboard</a>
-      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+
+      <div class="sidebar-footer">
+        <a href="/dashboard" class="btn btn-outline btn-full">Ir para dashboard</a>
+        <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+      </div>
     </aside>
 
     <main class="content">
@@ -31,49 +36,95 @@
         <div class="status-pill">Modo Vercel</div>
       </header>
 
-      <div class="cards-grid admin-grid">
+      <section id="admin-overview" class="page-section active">
+        <div class="cards-grid admin-grid">
+          <article class="card">
+            <h3>Resumo</h3>
+            <p class="muted">Agora as abas da esquerda funcionam de verdade e cada uma abre sua própria área.</p>
+            <div class="mini-stats">
+              <div><strong id="adminUserCount">0</strong><span>Usuários</span></div>
+              <div><strong>4</strong><span>Abas úteis</span></div>
+              <div><strong>IA</strong><span>Pronta para integrar</span></div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>Próximo upgrade sério</h3>
+            <ul class="feature-list compact">
+              <li>Banco persistente</li>
+              <li>Criação real de usuários</li>
+              <li>Expiração automática de licença</li>
+              <li>Logs e histórico de acesso</li>
+              <li>Travamento forte por dispositivo</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="admin-users" class="page-section">
         <article class="card">
-          <h3>Resumo</h3>
-          <p class="muted">Base pronta para Vercel. Nesta versão, o gerenciamento de usuários é de demonstração sem banco persistente.</p>
-          <div class="mini-stats">
-            <div><strong id="adminUserCount">0</strong><span>Usuários</span></div>
-            <div><strong>3</strong><span>Idiomas planejados</span></div>
-            <div><strong>10+</strong><span>Módulos futuros</span></div>
+          <div class="section-header">
+            <div>
+              <h2>Usuários do sistema</h2>
+              <p id="adminNotice" class="muted">Carregando...</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Perfil</th>
+                  <th>Licença</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTable"></tbody>
+            </table>
           </div>
         </article>
+      </section>
 
+      <section id="admin-licenses" class="page-section">
         <article class="card">
-          <h3>Próximo upgrade sério</h3>
-          <ul class="feature-list compact">
-            <li>Banco de dados persistente</li>
-            <li>Criação real de usuários</li>
-            <li>Licença com expiração automática real</li>
-            <li>Travamento forte por dispositivo</li>
-            <li>Logs e histórico</li>
-          </ul>
-        </article>
-      </div>
-
-      <section class="card">
-        <div class="section-header">
-          <div>
-            <h2>Usuários do sistema</h2>
-            <p id="adminNotice" class="muted">Carregando...</p>
+          <div class="section-header">
+            <div>
+              <h2>Licenças</h2>
+              <p class="muted">Leitura rápida das licenças ativas desta versão.</p>
+            </div>
           </div>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Perfil</th>
-                <th>Licença</th>
-              </tr>
-            </thead>
-            <tbody id="adminUsersTable"></tbody>
-          </table>
-        </div>
+          <div id="adminLicenseCards" class="cards-grid"></div>
+        </article>
+      </section>
+
+      <section id="admin-settings" class="page-section">
+        <article class="card">
+          <div class="section-header">
+            <div>
+              <h2>Configurações</h2>
+              <p class="muted">Sem banco, esta tela funciona como centro de leitura e próximos passos.</p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <div class="setting-card">
+              <h3>Autenticação</h3>
+              <p>Login real com token JWT.</p>
+            </div>
+            <div class="setting-card">
+              <h3>Hospedagem</h3>
+              <p>Frontend + API Functions no Vercel.</p>
+            </div>
+            <div class="setting-card">
+              <h3>IA</h3>
+              <p>Ative com <code>OPENAI_API_KEY</code> nas variáveis do projeto.</p>
+            </div>
+            <div class="setting-card">
+              <h3>Albion Data</h3>
+              <p>Consulta de preços via função server-side.</p>
+            </div>
+          </div>
+        </article>
       </section>
     </main>
   </div>

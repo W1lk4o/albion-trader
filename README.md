@@ -1,50 +1,30 @@
-# Albion Trader — Vercel Ready
+# Albion Trader — Vercel
 
-Este projeto foi organizado para rodar no **Vercel** com:
-
-- páginas estáticas (`index.html`, `dashboard.html`, `admin.html`)
-- funções serverless em `api/`
-- visual escuro com sidebar
-- login por API
-- proxy para preços do Albion Data
-
-## Como subir no Vercel
-
-1. Extraia o zip.
-2. Envie todos os arquivos para a raiz do seu repositório GitHub.
-3. No Vercel, conecte o repositório.
-4. Deploy padrão.
-5. Pronto.
+Projeto pronto para Vercel com frontend estático + API Functions.
 
 ## Login padrão
 
 Admin:
-- email: `wilkeringracio@gmail.com`
-- senha: `Wilker12@`
+- email: wilkeringracio@gmail.com
+- senha: Wilker12@
 
-Convidado:
-- email: `convidado@albiontrader.com`
-- senha: `Albion123`
+Teste:
+- email: convidado@albiontrader.com
+- senha: Albion123
 
-## Importante
+## Variáveis de ambiente no Vercel
 
-Esta versão foi pensada para **funcionar bem no Vercel sem banco de dados**.
-Então ela já entrega um painel forte e com integração inicial com a API do Albion,
-mas **cadastro/remoção persistente de usuários ainda depende de banco**.
+Obrigatórias para produção séria:
+- `JWT_SECRET`
 
-Se quiser a próxima etapa profissional, o ideal é ligar:
-- Vercel Postgres / Supabase / Neon
-- autenticação persistente
-- licenças reais
-- logs de uso
+Para ativar a IA:
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` (opcional, padrão: `gpt-4.1-mini`)
 
-## Estrutura
+## Rotas da API
 
-- `index.html` — login
-- `dashboard.html` — painel do usuário
-- `admin.html` — painel admin
-- `api/login.js` — autenticação
-- `api/me.js` — leitura da sessão
-- `api/albion-prices.js` — preços do Albion
-- `api/users.js` — lista de usuários demo
-
+- `/api/login`
+- `/api/me`
+- `/api/users`
+- `/api/albion-prices`
+- `/api/ai-chat`
