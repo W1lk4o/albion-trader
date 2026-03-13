@@ -31,20 +31,20 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-pill">Licença ativa</div>
+        <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
       </header>
 
       <section id="overview" class="page-section active">
         <div class="stats-grid">
           <article class="card stat-card">
-            <span class="stat-label">Módulos prontos</span>
+            <span class="stat-label">Módulos ativos</span>
             <strong>7</strong>
-            <p>Base visual e navegação prontas para expandir.</p>
+            <p>Agora com navegação funcional e lógica melhorada.</p>
           </article>
           <article class="card stat-card">
-            <span class="stat-label">API Albion</span>
-            <strong>Online</strong>
-            <p>Consulta inicial de preços via proxy em `/api/albion-prices`.</p>
+            <span class="stat-label">Radar de oportunidades</span>
+            <strong>Ao vivo</strong>
+            <p id="opportunitySummary">Lendo oportunidades do mercado...</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
@@ -55,8 +55,12 @@
 
         <div class="cards-grid">
           <article class="card">
-            <h3>Radar rápido</h3>
-            <p>Consulte um item do Albion e compare preços por cidade.</p>
+            <div class="section-header">
+              <div>
+                <h3>Radar rápido de item</h3>
+                <p class="muted">Digite um item do Albion e compare preços por cidade.</p>
+              </div>
+            </div>
             <div class="inline-form">
               <input id="marketItem" type="text" value="T4_BAG" placeholder="Ex: T4_BAG" />
               <button id="loadMarketBtn" class="btn btn-primary">Buscar</button>
@@ -65,21 +69,38 @@
           </article>
 
           <article class="card">
-            <h3>Módulos planejados</h3>
+            <div class="section-header">
+              <div>
+                <h3>Módulos planejados</h3>
+                <p class="muted">Agora você pode clicar para abrir os módulos que já existem.</p>
+              </div>
+            </div>
             <div class="tag-grid">
-              <span class="tag">Craft</span>
-              <span class="tag">Refino</span>
-              <span class="tag">Ilhas</span>
+              <button class="tag tag-button" data-target="craft">Craft</button>
+              <button class="tag tag-button" data-target="refino">Refino</button>
+              <button class="tag tag-button" data-target="ilhas">Ilhas</button>
+              <button class="tag tag-button" data-target="transporte">Transporte</button>
+              <button class="tag tag-button" data-target="mercado">Mercado</button>
+              <button class="tag tag-button" data-target="riqueza">Planejador</button>
               <span class="tag">Agricultura</span>
               <span class="tag">Animais</span>
               <span class="tag">Trabalhadores</span>
-              <span class="tag">Transporte</span>
-              <span class="tag">Mercado</span>
               <span class="tag">Radar de guerra</span>
               <span class="tag">Rotas Avalon</span>
             </div>
           </article>
         </div>
+
+        <article class="card">
+          <div class="section-header">
+            <div>
+              <h3>Radar de oportunidades</h3>
+              <p class="muted">Busca spreads entre cidades usando a API de preços.</p>
+            </div>
+            <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar radar</button>
+          </div>
+          <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
+        </article>
       </section>
 
       <section id="craft" class="page-section">
@@ -126,6 +147,7 @@
       <section id="ilhas" class="page-section">
         <div class="card module-card">
           <h2>Simulador de Ilhas</h2>
+          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
           <div class="form-grid">
             <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
             <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
@@ -157,11 +179,12 @@
       <section id="mercado" class="page-section">
         <div class="card module-card">
           <h2>Mercado e Guerra</h2>
-          <p class="muted">Módulo inicial para identificar demanda, cidades quentes e janelas de oportunidade.</p>
+          <p class="muted">Esse módulo agora exibe o radar legível e uma leitura rápida do que fazer.</p>
+          <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
           <div class="insight-list">
-            <div class="insight-item">Equipamentos de mobilidade e PvP costumam girar mais em centros de guerra.</div>
-            <div class="insight-item">Caerleon tende a concentrar spreads interessantes para arbitragem em certos itens.</div>
-            <div class="insight-item">O ideal é ligar este módulo depois a preços, volume e histórico.</div>
+            <div class="insight-item">Itens com melhor spread tendem a funcionar melhor em rotas curtas e com capital girando rápido.</div>
+            <div class="insight-item">Mercado bom não é só lucro unitário: é lucro unitário + velocidade de venda.</div>
+            <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
           </div>
         </div>
       </section>
@@ -169,8 +192,9 @@
       <section id="riqueza" class="page-section">
         <div class="card module-card">
           <h2>Planejador de Riqueza</h2>
+          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
           <div class="form-grid">
-            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="10000" /></label>
+            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
             <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
             <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
           </div>

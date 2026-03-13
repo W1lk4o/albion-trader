@@ -4,12 +4,29 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { item = 'T4_BAG', locations = 'Caerleon,Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford' } = req.query || {};
-    const endpoint = `https://west.albion-online-data.com/api/v2/stats/prices/${encodeURIComponent(item)}.json?locations=${encodeURIComponent(locations)}`;
+    const {
+      items = 'T4_BAG',
+      item,
+      locations = 'Caerleon,Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford',
+      qualities = '1'
+    } = req.query || {};
+
+    const itemIds = (item || items)
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .join(',');
+
+    if (!itemIds) {
+      return res.status(400).json({ error: 'Informe ao menos um item.' });
+    }
+
+    const endpoint = `https://west.albion-online-data.com/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
 
     const response = await fetch(endpoint, {
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br'
       }
     });
 
@@ -18,7 +35,7 @@ module.exports = async (req, res) => {
     }
 
     const data = await response.json();
-    return res.status(200).json({ ok: true, data });
+    return res.status(200).json({ ok: true, data, meta: { source: 'albion-data', itemCount: itemIds.split(',').length } });
   } catch (error) {
     return res.status(500).json({ error: 'Erro ao buscar preços do Albion.' });
   }

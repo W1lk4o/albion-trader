@@ -1,5 +1,30 @@
 (function () {
   const STORAGE_KEY = 'albionTraderSession';
+  const DEFAULT_LOCATIONS = ['Caerleon', 'Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford'];
+  const RADAR_ITEMS = [
+    'T4_BAG','T5_BAG','T6_BAG',
+    'T4_CAPE','T5_CAPE','T6_CAPE',
+    'T4_ORE','T5_ORE','T4_WOOD','T5_WOOD','T4_FIBER','T5_FIBER',
+    'T4_HIDE','T5_HIDE','T4_ROCK','T5_ROCK',
+    'T4_METALBAR','T5_METALBAR','T4_PLANKS','T5_PLANKS',
+    'T4_CLOTH','T5_CLOTH','T4_LEATHER','T5_LEATHER'
+  ];
+
+  const ISLAND_CROPS = [
+    { name: 'Cenoura', profit: 12000, risk: 'Baixo', note: 'ótima para começar e girar rápido' },
+    { name: 'Feijão', profit: 15000, risk: 'Baixo', note: 'boa margem e giro estável' },
+    { name: 'Trigo', profit: 17000, risk: 'Médio', note: 'boa combinação com produção de comida' },
+    { name: 'Erva medicinal', profit: 21000, risk: 'Médio', note: 'mais lucro, mas depende mais do mercado' },
+    { name: 'Abóbora', profit: 19000, risk: 'Médio', note: 'opção equilibrada para quem já tem capital' }
+  ];
+
+  const ISLAND_ANIMALS = [
+    { name: 'Galinha', profit: 14000, feed: 3500, risk: 'Baixo', note: 'simples e boa para começar' },
+    { name: 'Porco', profit: 22000, feed: 7000, risk: 'Médio', note: 'lucro interessante com alimentação barata' },
+    { name: 'Cabra', profit: 24000, feed: 8500, risk: 'Médio', note: 'boa margem quando o mercado está aquecido' },
+    { name: 'Cavalo', profit: 28000, feed: 12000, risk: 'Médio', note: 'bom para quem já tem mais giro' },
+    { name: 'Boi', profit: 30000, feed: 14000, risk: 'Alto', note: 'mais capital preso, mas pode render bem' }
+  ];
 
   function getDeviceId() {
     let deviceId = localStorage.getItem('albionTraderDeviceId');
@@ -28,10 +53,7 @@
 
   async function api(url, options = {}) {
     const session = getSession();
-    const headers = Object.assign(
-      { 'Content-Type': 'application/json' },
-      options.headers || {}
-    );
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
 
     if (session?.token) {
       headers.Authorization = `Bearer ${session.token}`;
@@ -105,17 +127,23 @@
     });
   }
 
-  function bindNav() {
+  function activateSection(targetId) {
     const navItems = document.querySelectorAll('.nav-item[data-target]');
     const sections = document.querySelectorAll('.page-section');
-    navItems.forEach((item) => {
-      item.addEventListener('click', () => {
-        navItems.forEach((i) => i.classList.remove('active'));
-        sections.forEach((s) => s.classList.remove('active'));
-        item.classList.add('active');
-        const target = document.getElementById(item.dataset.target);
-        if (target) target.classList.add('active');
-      });
+
+    navItems.forEach((i) => i.classList.toggle('active', i.dataset.target === targetId));
+    sections.forEach((s) => s.classList.toggle('active', s.id === targetId));
+
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function bindNav() {
+    const targets = document.querySelectorAll('[data-target]');
+    targets.forEach((item) => {
+      item.addEventListener('click', () => activateSection(item.dataset.target));
     });
   }
 
@@ -128,13 +156,25 @@
     if (el) el.innerHTML = html;
   }
 
+  function prettyItemName(itemId) {
+    return itemId
+      .replace(/^T(\d+)_/, 'T$1 ')
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (m) => m.toUpperCase());
+  }
+
+  function sortByProfitDesc(list) {
+    return list.sort((a, b) => b.profit - a.profit);
+  }
+
   async function loadMarket() {
     const item = document.getElementById('marketItem').value.trim() || 'T4_BAG';
     const box = document.getElementById('marketResult');
     box.textContent = 'Buscando preços...';
 
     try {
-      const data = await api(`/api/albion-prices?item=${encodeURIComponent(item)}`);
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(item)}`);
       const rows = (data.data || []).filter((x) => x.sell_price_min || x.buy_price_max);
 
       if (!rows.length) {
@@ -143,14 +183,127 @@
       }
 
       const html = rows
+        .sort((a, b) => (a.sell_price_min || Infinity) - (b.sell_price_min || Infinity))
         .map((row) => `
           <div class="price-row">
             <strong>${row.city || 'Cidade'}</strong>
             <span>Venda mín: ${formatSilver(row.sell_price_min || 0)}</span>
             <span>Compra máx: ${formatSilver(row.buy_price_max || 0)}</span>
+            <span>Qualidade: ${row.quality || '-'}</span>
           </div>
         `)
         .join('');
+
+      box.innerHTML = html;
+    } catch (error) {
+      box.textContent = error.message;
+    }
+  }
+
+  function buildOpportunities(prices) {
+    const byItem = new Map();
+
+    prices.forEach((row) => {
+      if (!row.item_id) return;
+      if (!byItem.has(row.item_id)) byItem.set(row.item_id, []);
+      byItem.get(row.item_id).push(row);
+    });
+
+    const opportunities = [];
+
+    byItem.forEach((rows, itemId) => {
+      const sells = rows.filter((r) => (r.sell_price_min || 0) > 0);
+      const buys = rows.filter((r) => (r.buy_price_max || 0) > 0);
+      if (!sells.length || !buys.length) return;
+
+      const cheapest = sells.reduce((best, row) => ((row.sell_price_min || Infinity) < (best.sell_price_min || Infinity) ? row : best), sells[0]);
+      const highest = buys.reduce((best, row) => ((row.buy_price_max || 0) > (best.buy_price_max || 0) ? row : best), buys[0]);
+
+      const buyPrice = cheapest.sell_price_min || 0;
+      const sellPrice = highest.buy_price_max || 0;
+      const tax = Math.round(sellPrice * 0.065);
+      const transport = Math.round(buyPrice * 0.04);
+      const profit = sellPrice - buyPrice - tax - transport;
+      const margin = buyPrice > 0 ? (profit / buyPrice) * 100 : 0;
+
+      if (profit > 0 && cheapest.city !== highest.city) {
+        opportunities.push({
+          itemId,
+          itemName: prettyItemName(itemId),
+          buyCity: cheapest.city,
+          sellCity: highest.city,
+          buyPrice,
+          sellPrice,
+          profit,
+          margin,
+          tax,
+          transport,
+          confidence: rows.length >= 4 ? 'Boa' : 'Média'
+        });
+      }
+    });
+
+    return sortByProfitDesc(opportunities).slice(0, 10);
+  }
+
+  async function loadOpportunityRadar() {
+    const box = document.getElementById('opportunityResult');
+    if (!box) return;
+    box.textContent = 'Analisando oportunidades...';
+
+    try {
+      const itemIds = RADAR_ITEMS.join(',');
+      const locations = DEFAULT_LOCATIONS.join(',');
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(itemIds)}&locations=${encodeURIComponent(locations)}`);
+      const opportunities = buildOpportunities(data.data || []);
+
+      const summary = document.getElementById('opportunitySummary');
+      const status = document.getElementById('apiStatusBadge');
+      if (status) status.textContent = data.meta?.source === 'albion-data' ? 'AlbionData online' : 'AlbionData em fallback';
+
+      if (!opportunities.length) {
+        box.innerHTML = '<div class="muted">Nenhuma oportunidade clara agora. Tente novamente em alguns minutos.</div>';
+        if (summary) summary.textContent = 'Sem spreads úteis no momento.';
+        return;
+      }
+
+      if (summary) {
+        const best = opportunities[0];
+        summary.textContent = `Melhor spread agora: ${best.itemName} comprando em ${best.buyCity} e vendendo em ${best.sellCity}.`;
+      }
+
+      const html = `
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Comprar</th>
+                <th>Vender</th>
+                <th>Custo</th>
+                <th>Venda</th>
+                <th>Lucro</th>
+                <th>Margem</th>
+                <th>Confiança</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${opportunities.map((op) => `
+                <tr>
+                  <td>${op.itemName}</td>
+                  <td>${op.buyCity}</td>
+                  <td>${op.sellCity}</td>
+                  <td>${formatSilver(op.buyPrice)}</td>
+                  <td>${formatSilver(op.sellPrice)}</td>
+                  <td>${formatSilver(op.profit)}</td>
+                  <td>${op.margin.toFixed(1)}%</td>
+                  <td>${op.confidence}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
 
       box.innerHTML = html;
     } catch (error) {
@@ -172,6 +325,11 @@
 
     const loadBtn = document.getElementById('loadMarketBtn');
     if (loadBtn) loadBtn.addEventListener('click', loadMarket);
+
+    const radarBtn = document.getElementById('loadOpportunityBtn');
+    if (radarBtn) radarBtn.addEventListener('click', loadOpportunityRadar);
+
+    loadOpportunityRadar();
   }
 
   async function initAdmin() {
@@ -216,9 +374,20 @@
     const cost = Number(document.getElementById('craftCost').value || 0);
     const sell = Number(document.getElementById('craftSell').value || 0);
     const bonus = level >= 80 ? 1.07 : level >= 50 ? 1.04 : 1.01;
-    const lucro = sell - cost / bonus;
+    const fee = Math.round(sell * 0.065);
+    const adjustedCost = cost / bonus;
+    const lucro = sell - adjustedCost - fee;
+    const margem = cost > 0 ? (lucro / cost) * 100 : 0;
 
-    setHtml('craftResult', `Lucro estimado em <strong>${city}</strong>: <strong>${formatSilver(lucro)} prata</strong>. Melhor foco inicial: itens com rotação média e baixo custo de entrada.`);
+    setHtml(
+      'craftResult',
+      `
+      <strong>Resultado do craft em ${city}</strong><br>
+      Lucro estimado: <strong>${formatSilver(lucro)} prata</strong><br>
+      Margem: <strong>${margem.toFixed(1)}%</strong><br>
+      Leitura: ${lucro > 0 ? 'vale testar itens de giro rápido, como bolsas e capas.' : 'esse craft está apertado; melhore custo dos materiais ou venda.'}
+      `
+    );
   }
 
   function calcRefine() {
@@ -229,9 +398,17 @@
     const sell = Number(document.getElementById('refineSell').value || 0);
     const efficiency = focus ? 0.86 : 1;
     const xpBonus = level >= 75 ? 0.95 : 1;
-    const lucro = sell - cost * efficiency * xpBonus;
+    const fee = Math.round(sell * 0.065);
+    const lucro = sell - cost * efficiency * xpBonus - fee;
 
-    setHtml('refineResult', `Refino em <strong>${city}</strong>: lucro estimado de <strong>${formatSilver(lucro)} prata</strong> ${focus ? 'com foco' : 'sem foco'}.`);
+    setHtml(
+      'refineResult',
+      `
+      <strong>Resultado do refino em ${city}</strong><br>
+      Lucro estimado: <strong>${formatSilver(lucro)} prata</strong> ${focus ? 'com foco' : 'sem foco'}<br>
+      Melhor leitura: ${focus ? 'aproveite itens com retorno de recursos e venda rápida.' : 'sem foco, prefira spreads maiores e muito giro.'}
+      `
+    );
   }
 
   function calcIsland() {
@@ -239,11 +416,41 @@
     const plots = Number(document.getElementById('islandPlots').value || 0);
     const pastures = Number(document.getElementById('islandPastures').value || 0);
     const focus = document.getElementById('islandFocus').value === 'sim';
-    const farming = plots * 14500 * (focus ? 1.12 : 1);
-    const animals = pastures * 22500 * (focus ? 1.08 : 1);
-    const total = (farming + animals) * (1 + level * 0.02);
 
-    setHtml('islandResult', `Com ilha nível <strong>${level}</strong>, a projeção está em <strong>${formatSilver(total)} prata</strong> por ciclo. Melhor rota inicial: combinar plantação + criação.`);
+    const cropOptions = ISLAND_CROPS.map((crop) => {
+      const factor = (1 + level * 0.03) * (focus ? 1.12 : 1);
+      const totalProfit = Math.round(crop.profit * plots * factor);
+      return { ...crop, totalProfit };
+    });
+
+    const animalOptions = ISLAND_ANIMALS.map((animal) => {
+      const factor = (1 + level * 0.025) * (focus ? 1.08 : 1);
+      const totalProfit = Math.round((animal.profit - animal.feed) * pastures * factor);
+      return { ...animal, totalProfit };
+    });
+
+    const bestCrop = sortByProfitDesc(cropOptions)[0] || { name: 'Nenhuma', totalProfit: 0, note: '-' };
+    const bestAnimal = sortByProfitDesc(animalOptions)[0] || { name: 'Nenhum', totalProfit: 0, note: '-' };
+    const total = bestCrop.totalProfit + bestAnimal.totalProfit;
+
+    const strategy = [];
+    if (plots > 0) strategy.push(`Use as plantações para <strong>${bestCrop.name}</strong>, porque hoje é a melhor linha de giro dentro do modelo do sistema.`);
+    if (pastures > 0) strategy.push(`Nos pastos, priorize <strong>${bestAnimal.name}</strong>, porque sobra mais prata líquida depois da alimentação.`);
+    if (focus) strategy.push('Como você usa foco, vale concentrar a produção no que tiver maior margem em vez de espalhar demais.');
+    else strategy.push('Sem foco, prefira opções estáveis e simples de revender para não travar capital.');
+
+    setHtml(
+      'islandResult',
+      `
+      <strong>Melhor plano para sua ilha</strong><br><br>
+      Melhor plantação: <strong>${bestCrop.name}</strong> — lucro estimado por ciclo: <strong>${formatSilver(bestCrop.totalProfit)}</strong><br>
+      Melhor criação: <strong>${bestAnimal.name}</strong> — lucro estimado por ciclo: <strong>${formatSilver(bestAnimal.totalProfit)}</strong><br>
+      Lucro total estimado: <strong>${formatSilver(total)} prata</strong><br><br>
+      ${strategy.map((line) => `• ${line}`).join('<br>')}<br><br>
+      Observação da plantação: ${bestCrop.note}.<br>
+      Observação do animal: ${bestAnimal.note}.
+      `
+    );
   }
 
   function calcTransport() {
@@ -252,9 +459,18 @@
     const buy = Number(document.getElementById('transportBuyPrice').value || 0);
     const sell = Number(document.getElementById('transportSellPrice').value || 0);
     const cost = Number(document.getElementById('transportCost').value || 0);
-    const lucro = sell - buy - cost;
+    const tax = Math.round(sell * 0.065);
+    const lucro = sell - buy - cost - tax;
 
-    setHtml('transportResult', `Transportando de <strong>${buyCity}</strong> para <strong>${sellCity}</strong>, o lucro estimado é <strong>${formatSilver(lucro)} prata</strong>.`);
+    setHtml(
+      'transportResult',
+      `
+      <strong>Resultado do transporte</strong><br>
+      Rota: <strong>${buyCity} → ${sellCity}</strong><br>
+      Lucro líquido estimado: <strong>${formatSilver(lucro)} prata</strong><br>
+      ${lucro > 0 ? 'Essa rota está saudável. O próximo passo é buscar volume e repetir o ciclo.' : 'Essa rota está fraca. Procure spread maior ou custo logístico menor.'}
+      `
+    );
   }
 
   function calcWealth() {
@@ -263,8 +479,45 @@
     const days = Math.max(1, Number(document.getElementById('wealthDays').value || 1));
     const faltante = Math.max(0, goal - current);
     const porDia = faltante / days;
+    const ratio = current > 0 ? goal / current : Infinity;
 
-    setHtml('wealthResult', `Para sair de <strong>${formatSilver(current)}</strong> e chegar em <strong>${formatSilver(goal)}</strong> em <strong>${days} dias</strong>, você precisa fazer em média <strong>${formatSilver(porDia)} prata por dia</strong>.`);
+    const phases = [];
+
+    if (current < 500000) {
+      phases.push('Fase 1: levantar capital com flipping simples, transporte curto e craft barato de alto giro.');
+      phases.push('Meta dessa fase: sair do capital baixo e chegar pelo menos em 5M a 10M para parar de jogar no limite.');
+    } else if (current < 10000000) {
+      phases.push('Fase 1: usar capital para arbitragem entre cidades, refino com foco e itens com rotação diária.');
+      phases.push('Meta dessa fase: transformar caixa pequeno em capital operacional consistente.');
+    } else {
+      phases.push('Fase 1: operar múltiplas frentes ao mesmo tempo: craft, refino, ilhas e mercado.');
+      phases.push('Meta dessa fase: crescer por escala, não só por margem unitária.');
+    }
+
+    phases.push('Fase 2: estabilizar uma rotina diária com uma fonte segura e uma fonte agressiva de lucro.');
+    phases.push('Fase 3: reinvestir parte fixa do lucro, em vez de sacar tudo, para acelerar o crescimento composto.');
+
+    let verdict = 'É possível, mas exige execução forte.';
+    if (porDia > 30000000) verdict = 'É muito agressivo. Só fica plausível com capital alto, escala e várias frentes ao mesmo tempo.';
+    if (porDia > 100000000) verdict = 'Do jeito que está, a meta está fora da realidade para a maioria dos jogadores.';
+
+    let recommendation = 'Estratégia sugerida: combine mercado + transporte + uma linha de produção previsível.';
+    if (ratio >= 100 && current < 10000000) {
+      recommendation = 'Seu erro seria tentar ficar rico só com uma atividade. Você precisa de escada: caixa curto prazo, produção média e escala longa.';
+    } else if (current >= 50000000) {
+      recommendation = 'Com esse capital, faz sentido diversificar: ilhas para base estável, craft/refino para margem e mercado para giro.';
+    }
+
+    setHtml(
+      'wealthResult',
+      `
+      <strong>Plano para sair de ${formatSilver(current)} e buscar ${formatSilver(goal)}</strong><br><br>
+      Precisa gerar em média: <strong>${formatSilver(porDia)} prata por dia</strong><br>
+      Veredito: <strong>${verdict}</strong><br><br>
+      ${phases.map((phase) => `• ${phase}`).join('<br>')}<br><br>
+      <strong>Estratégia clara:</strong> ${recommendation}
+      `
+    );
   }
 
   window.AlbionTrader = {
@@ -272,7 +525,9 @@
     calcRefine,
     calcIsland,
     calcTransport,
-    calcWealth
+    calcWealth,
+    loadOpportunityRadar,
+    activateSection
   };
 
   document.addEventListener('DOMContentLoaded', () => {

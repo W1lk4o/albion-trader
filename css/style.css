@@ -103,6 +103,8 @@ button, input, select { font: inherit; }
   background: rgba(79,124,255,0.13); color: #d9e4ff; border: 1px solid rgba(79,124,255,0.18);
   border-radius: 999px; padding: 8px 12px; font-size: 14px;
 }
+.tag-button { cursor: pointer; }
+.tag-button:hover { background: rgba(79,124,255,0.22); }
 .price-row, .insight-item {
   display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--stroke);
 }
