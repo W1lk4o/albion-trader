@@ -31,7 +31,10 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+        <div class="status-stack">
+          <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+          <div class="status-small" id="catalogBadge">Catálogo completo do radar</div>
+        </div>
       </header>
 
       <section id="overview" class="page-section active">
@@ -39,12 +42,12 @@
           <article class="card stat-card">
             <span class="stat-label">Módulos ativos</span>
             <strong>7</strong>
-            <p>Agora com navegação funcional e lógica melhorada.</p>
+            <p>Base estável v2.1 preservada.</p>
           </article>
           <article class="card stat-card">
-            <span class="stat-label">Radar de oportunidades</span>
-            <strong>Ao vivo</strong>
-            <p id="opportunitySummary">Lendo oportunidades do mercado...</p>
+            <span class="stat-label">Radar rápido</span>
+            <strong>Completo</strong>
+            <p id="opportunitySummary">Selecione categoria, item, tier e encantamento.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
@@ -54,16 +57,36 @@
         </div>
 
         <div class="cards-grid">
-          <article class="card">
+          <article class="card radar-card">
             <div class="section-header">
               <div>
-                <h3>Radar rápido de item</h3>
-                <p class="muted">Digite um item do Albion e compare preços por cidade.</p>
+                <h3>Radar rápido estilo mercado do Albion</h3>
+                <p class="muted">Fluxo guiado: categoria → item → tier → encantamento. Sem digitar código manual.</p>
               </div>
             </div>
-            <div class="inline-form">
-              <input id="marketItem" type="text" value="T4_BAG" placeholder="Ex: T4_BAG" />
-              <button id="loadMarketBtn" class="btn btn-primary">Buscar</button>
+
+            <div class="form-grid radar-grid">
+              <label>
+                <span>Categoria</span>
+                <select id="radarCategory"></select>
+              </label>
+              <label>
+                <span>Item</span>
+                <select id="radarItem"></select>
+              </label>
+              <label>
+                <span>Tier</span>
+                <select id="radarTier"></select>
+              </label>
+              <label>
+                <span>Encantamento</span>
+                <select id="radarEnchant"></select>
+              </label>
+            </div>
+
+            <div class="radar-actions">
+              <div class="item-preview" id="radarPreview">Escolha um item para ver o código Albion.</div>
+              <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
             </div>
             <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
           </article>
@@ -72,7 +95,7 @@
             <div class="section-header">
               <div>
                 <h3>Módulos planejados</h3>
-                <p class="muted">Agora você pode clicar para abrir os módulos que já existem.</p>
+                <p class="muted">Clique para abrir os módulos que já existem nesta base estável.</p>
               </div>
             </div>
             <div class="tag-grid">
@@ -191,14 +214,13 @@
 
       <section id="riqueza" class="page-section">
         <div class="card module-card">
-          <h2>Planejador de Riqueza</h2>
-          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
+          <h2>Planejador de riqueza</h2>
           <div class="form-grid">
             <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
-            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
-            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label>
+            <label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Montar plano</button>
           <div id="wealthResult" class="result-box"></div>
         </div>
       </section>

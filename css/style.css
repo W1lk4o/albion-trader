@@ -127,3 +127,14 @@ button, input, select { font: inherit; }
   .auth-card, .content, .sidebar { padding: 18px; }
   .topbar { align-items: flex-start; flex-direction: column; }
 }
+
+
+.status-stack { display: grid; gap: 8px; justify-items: end; }
+.status-small { color: var(--muted); font-size: 13px; }
+.radar-card { display: grid; gap: 14px; }
+.radar-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.radar-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.item-preview { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 14px; background: var(--panel-2); border: 1px solid var(--stroke); border-radius: 14px; }
+.result-intro { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+@media (max-width: 980px) { .radar-grid { grid-template-columns: 1fr 1fr; } .status-stack { justify-items: start; } }
+@media (max-width: 640px) { .radar-grid { grid-template-columns: 1fr; } }

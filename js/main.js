@@ -10,6 +10,96 @@
     'T4_CLOTH','T5_CLOTH','T4_LEATHER','T5_LEATHER'
   ];
 
+  const RADAR_CATALOG = {
+    'Recursos': [
+      { name: 'Madeira', code: 'WOOD', tiers: [2,3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Pedra', code: 'ROCK', tiers: [2,3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Fibra', code: 'FIBER', tiers: [2,3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Couro', code: 'HIDE', tiers: [2,3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Minério', code: 'ORE', tiers: [2,3,4,5,6,7,8], enchants: [0,1,2,3,4] }
+    ],
+    'Refinados': [
+      { name: 'Tábuas', code: 'PLANKS', tiers: [3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Blocos de pedra', code: 'STONEBLOCK', tiers: [3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Tecido', code: 'CLOTH', tiers: [3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Couro refinado', code: 'LEATHER', tiers: [3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Barra de metal', code: 'METALBAR', tiers: [3,4,5,6,7,8], enchants: [0,1,2,3,4] }
+    ],
+    'Utilidade': [
+      { name: 'Bolsa', code: 'BAG', tiers: [3,4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capa', code: 'CAPE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] }
+    ],
+    'Poções e Comidas': [
+      { name: 'Poção de veneno', code: 'POTION_POISON', tiers: [4,5,6,7,8], enchants: [0] },
+      { name: 'Poção de cura', code: 'POTION_HEAL', tiers: [4,5,6,7,8], enchants: [0] },
+      { name: 'Poção de energia', code: 'POTION_ENERGY', tiers: [4,5,6,7,8], enchants: [0] },
+      { name: 'Ensopado de boi', code: 'MEAL_BEEF', tiers: [5,7], enchants: [0] },
+      { name: 'Omelete', code: 'OMELETTE', tiers: [5,7], enchants: [0] },
+      { name: 'Sanduíche', code: 'SANDWICH', tiers: [5,7], enchants: [0] },
+      { name: 'Salada', code: 'SALAD', tiers: [5,7], enchants: [0] },
+      { name: 'Sopa', code: 'SOUP', tiers: [5,7], enchants: [0] }
+    ],
+    'Capuzes e Capas de Armadura': [
+      { name: 'Capuz de mercenário', code: 'HEAD_MERCENARY', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Casaco de mercenário', code: 'ARMOR_MERCENARY', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Sapatos de mercenário', code: 'SHOES_MERCENARY', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capuz de caçador', code: 'HEAD_HUNTER', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Casaco de caçador', code: 'ARMOR_HUNTER', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Sapatos de caçador', code: 'SHOES_HUNTER', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capuz de assassino', code: 'HEAD_ASSASSIN', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Jaqueta de assassino', code: 'ARMOR_ASSASSIN', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Sapatos de assassino', code: 'SHOES_ASSASSIN', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capuz de mago', code: 'HEAD_MAGE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Manto de mago', code: 'ARMOR_MAGE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Sandálias de mago', code: 'SHOES_MAGE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capuz de clérigo', code: 'HEAD_CLERIC', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Manto de clérigo', code: 'ARMOR_CLERIC', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Sandálias de clérigo', code: 'SHOES_CLERIC', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capuz de estudioso', code: 'HEAD_SCHOLAR', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Manto de estudioso', code: 'ARMOR_SCHOLAR', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Sandálias de estudioso', code: 'SHOES_SCHOLAR', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capacete de soldado', code: 'HEAD_PLATE_SET1', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Armadura de soldado', code: 'ARMOR_PLATE_SET1', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Botas de soldado', code: 'SHOES_PLATE_SET1', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capacete de cavaleiro', code: 'HEAD_PLATE_SET2', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Armadura de cavaleiro', code: 'ARMOR_PLATE_SET2', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Botas de cavaleiro', code: 'SHOES_PLATE_SET2', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Capacete de guardião', code: 'HEAD_PLATE_SET3', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Armadura de guardião', code: 'ARMOR_PLATE_SET3', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Botas de guardião', code: 'SHOES_PLATE_SET3', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] }
+    ],
+    'Armas básicas': [
+      { name: 'Espada larga', code: 'MAIN_SWORD', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Claymore', code: '2H_CLAYMORE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Arco', code: '2H_BOW', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Besta leve', code: '2H_CROSSBOW', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Machado', code: 'MAIN_AXE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Machado grande', code: '2H_AXE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Martelo', code: 'MAIN_HAMMER', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Martelo grande', code: '2H_HAMMER', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Maça', code: 'MAIN_MACE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Maça pesada', code: '2H_MACE', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Lança', code: 'MAIN_SPEAR', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Lança longa', code: '2H_SPEAR', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado arcano', code: 'MAIN_ARCANESTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado arcano grande', code: '2H_ARCANESTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado de fogo', code: 'MAIN_FIRESTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado de fogo grande', code: '2H_FIRESTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado de gelo', code: 'MAIN_FROSTSTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado de gelo grande', code: '2H_FROSTSTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado sagrado', code: 'MAIN_HOLYSTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado sagrado grande', code: '2H_HOLYSTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado da natureza', code: 'MAIN_NATURESTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado da natureza grande', code: '2H_NATURESTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Adaga', code: 'MAIN_DAGGER', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Adaga dupla', code: '2H_DAGGERPAIR', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado amaldiçoado', code: 'MAIN_CURSEDSTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Cajado amaldiçoado grande', code: '2H_CURSEDSTAFF', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Luva de batalha', code: 'MAIN_KNUCKLES_SET1', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] },
+      { name: 'Luva de batalha grande', code: '2H_KNUCKLES_SET1', tiers: [4,5,6,7,8], enchants: [0,1,2,3,4] }
+    ]
+  };
+
   const ISLAND_CROPS = [
     { name: 'Cenoura', profit: 12000, risk: 'Baixo', note: 'ótima para começar e girar rápido' },
     { name: 'Feijão', profit: 15000, risk: 'Baixo', note: 'boa margem e giro estável' },
@@ -159,22 +249,99 @@
   function prettyItemName(itemId) {
     return itemId
       .replace(/^T(\d+)_/, 'T$1 ')
+      .replace(/@/g, '.')
       .replace(/_/g, ' ')
       .toLowerCase()
-      .replace(/\b\w/g, (m) => m.toUpperCase());
+      .replace(/\w/g, (m) => m.toUpperCase());
   }
 
   function sortByProfitDesc(list) {
     return list.sort((a, b) => b.profit - a.profit);
   }
 
+  function buildAlbionItemId(itemDef, tier, enchant) {
+    const base = `T${tier}_${itemDef.code}`;
+    return Number(enchant) > 0 ? `${base}@${enchant}` : base;
+  }
+
+  function populateRadarSelectors() {
+    const categorySelect = document.getElementById('radarCategory');
+    const itemSelect = document.getElementById('radarItem');
+    const tierSelect = document.getElementById('radarTier');
+    const enchantSelect = document.getElementById('radarEnchant');
+    if (!categorySelect || !itemSelect || !tierSelect || !enchantSelect) return;
+
+    const categories = Object.keys(RADAR_CATALOG);
+    categorySelect.innerHTML = categories.map((name) => `<option value="${name}">${name}</option>`).join('');
+
+    function syncItems() {
+      const currentCategory = categorySelect.value;
+      const items = RADAR_CATALOG[currentCategory] || [];
+      itemSelect.innerHTML = items.map((item, index) => `<option value="${index}">${item.name}</option>`).join('');
+      syncTiers();
+    }
+
+    function syncTiers() {
+      const currentCategory = categorySelect.value;
+      const items = RADAR_CATALOG[currentCategory] || [];
+      const itemDef = items[Number(itemSelect.value)] || items[0];
+      if (!itemDef) return;
+
+      tierSelect.innerHTML = itemDef.tiers.map((tier) => `<option value="${tier}">T${tier}</option>`).join('');
+      enchantSelect.innerHTML = itemDef.enchants.map((ench) => `<option value="${ench}">${ench === 0 ? 'Sem encanto' : `.${ench}`}</option>`).join('');
+      refreshRadarPreview();
+    }
+
+    categorySelect.addEventListener('change', syncItems);
+    itemSelect.addEventListener('change', syncTiers);
+    tierSelect.addEventListener('change', refreshRadarPreview);
+    enchantSelect.addEventListener('change', refreshRadarPreview);
+
+    syncItems();
+  }
+
+  function getCurrentRadarItem() {
+    const categorySelect = document.getElementById('radarCategory');
+    const itemSelect = document.getElementById('radarItem');
+    const tierSelect = document.getElementById('radarTier');
+    const enchantSelect = document.getElementById('radarEnchant');
+    if (!categorySelect || !itemSelect || !tierSelect || !enchantSelect) return null;
+
+    const category = categorySelect.value;
+    const itemDef = (RADAR_CATALOG[category] || [])[Number(itemSelect.value)];
+    if (!itemDef) return null;
+
+    const tier = Number(tierSelect.value);
+    const enchant = Number(enchantSelect.value);
+    const itemId = buildAlbionItemId(itemDef, tier, enchant);
+
+    return { category, itemDef, tier, enchant, itemId };
+  }
+
+  function refreshRadarPreview() {
+    const preview = document.getElementById('radarPreview');
+    const current = getCurrentRadarItem();
+    if (!preview || !current) return;
+    preview.innerHTML = `
+      <strong>${current.itemDef.name}</strong>
+      <span>${current.enchant > 0 ? `T${current.tier}.${current.enchant}` : `T${current.tier}`}</span>
+      <span class="muted">Código Albion: ${current.itemId}</span>
+    `;
+  }
+
   async function loadMarket() {
-    const item = document.getElementById('marketItem').value.trim() || 'T4_BAG';
+    const current = getCurrentRadarItem();
     const box = document.getElementById('marketResult');
+    if (!box) return;
+    if (!current) {
+      box.textContent = 'Escolha um item primeiro.';
+      return;
+    }
+
     box.textContent = 'Buscando preços...';
 
     try {
-      const data = await api(`/api/albion-prices?items=${encodeURIComponent(item)}`);
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(current.itemId)}`);
       const rows = (data.data || []).filter((x) => x.sell_price_min || x.buy_price_max);
 
       if (!rows.length) {
@@ -182,17 +349,23 @@
         return;
       }
 
-      const html = rows
-        .sort((a, b) => (a.sell_price_min || Infinity) - (b.sell_price_min || Infinity))
-        .map((row) => `
-          <div class="price-row">
-            <strong>${row.city || 'Cidade'}</strong>
-            <span>Venda mín: ${formatSilver(row.sell_price_min || 0)}</span>
-            <span>Compra máx: ${formatSilver(row.buy_price_max || 0)}</span>
-            <span>Qualidade: ${row.quality || '-'}</span>
-          </div>
-        `)
-        .join('');
+      const html = `
+        <div class="result-intro">
+          <strong>${current.itemDef.name}</strong>
+          <span>${current.enchant > 0 ? `T${current.tier}.${current.enchant}` : `T${current.tier}`}</span>
+        </div>
+        ${rows
+          .sort((a, b) => (a.sell_price_min || Infinity) - (b.sell_price_min || Infinity))
+          .map((row) => `
+            <div class="price-row">
+              <strong>${row.city || 'Cidade'}</strong>
+              <span>Venda mín: ${formatSilver(row.sell_price_min || 0)}</span>
+              <span>Compra máx: ${formatSilver(row.buy_price_max || 0)}</span>
+              <span>Qualidade: ${row.quality || '-'}</span>
+            </div>
+          `)
+          .join('')}
+      `;
 
       box.innerHTML = html;
     } catch (error) {
@@ -306,6 +479,8 @@
       `;
 
       box.innerHTML = html;
+      const mirror = document.getElementById('opportunityResultCopy');
+      if (mirror) mirror.innerHTML = html;
     } catch (error) {
       box.textContent = error.message;
     }
@@ -322,6 +497,7 @@
 
     bindLogout();
     bindNav();
+    populateRadarSelectors();
 
     const loadBtn = document.getElementById('loadMarketBtn');
     if (loadBtn) loadBtn.addEventListener('click', loadMarket);
@@ -520,21 +696,21 @@
     );
   }
 
+  document.addEventListener('DOMContentLoaded', () => {
+    const page = document.body.dataset.page;
+
+    if (page === 'dashboard') initDashboard();
+    if (page === 'admin') initAdmin();
+
+    const form = document.getElementById('loginForm');
+    if (form) form.addEventListener('submit', handleLogin);
+  });
+
   window.AlbionTrader = {
     calcCraft,
     calcRefine,
     calcIsland,
     calcTransport,
-    calcWealth,
-    loadOpportunityRadar,
-    activateSection
+    calcWealth
   };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('loginForm');
-    if (form) form.addEventListener('submit', handleLogin);
-
-    if (document.body.dataset.page === 'dashboard') initDashboard();
-    if (document.body.dataset.page === 'admin') initAdmin();
-  });
 })();
