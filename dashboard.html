@@ -31,10 +31,7 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-stack">
-          <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
-          <div class="status-small" id="catalogBadge">Patch 2 do radar ativo</div>
-        </div>
+        <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
       </header>
 
       <section id="overview" class="page-section active">
@@ -42,12 +39,12 @@
           <article class="card stat-card">
             <span class="stat-label">Módulos ativos</span>
             <strong>7</strong>
-            <p>Base estável v2.1 preservada.</p>
+            <p>Agora com navegação funcional e lógica melhorada.</p>
           </article>
           <article class="card stat-card">
-            <span class="stat-label">Melhor sugestão do dia</span>
-            <strong>Mercado automático</strong>
-            <p id="opportunitySummary">Carregando as melhores oportunidades do mercado...</p>
+            <span class="stat-label">Radar de oportunidades</span>
+            <strong>Ao vivo</strong>
+            <p id="opportunitySummary">Lendo oportunidades do mercado...</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
@@ -57,35 +54,47 @@
         </div>
 
         <div class="cards-grid">
-          <article class="card radar-card">
+          <article class="card">
             <div class="section-header">
               <div>
                 <h3>Radar rápido</h3>
-                <p class="muted">Pesquise 1 item específico. O sistema puxa preços automaticamente do Albion Data e mostra a melhor compra e a melhor venda confiáveis.</p>
+                <p class="muted">Pesquise um item só, com tier, encantamento e qualidade, e veja onde comprar barato e vender melhor.</p>
               </div>
             </div>
-
-            <div class="form-grid radar-grid">
-              <label>
-                <span>Categoria</span>
-                <select id="radarCategory"></select>
+            <div class="form-grid compact-grid">
+              <label><span>Categoria</span>
+                <select id="radarCategory">
+                  <option value="bolsas">Bolsas</option>
+                  <option value="capas">Capas</option>
+                  <option value="recursoBruto">Recursos brutos</option>
+                  <option value="recursoRefinado">Recursos refinados</option>
+                </select>
               </label>
-              <label>
-                <span>Item</span>
-                <select id="radarItem"></select>
+              <label><span>Item</span><select id="radarItem"></select></label>
+              <label><span>Tier</span>
+                <select id="radarTier">
+                  <option value="T4">T4</option><option value="T5">T5</option><option value="T6">T6</option><option value="T7">T7</option><option value="T8">T8</option>
+                </select>
               </label>
-              <label>
-                <span>Tier</span>
-                <select id="radarTier"></select>
+              <label><span>Encantamento</span>
+                <select id="radarEnchant">
+                  <option value="0">Sem encantamento</option>
+                  <option value="1">.1</option>
+                  <option value="2">.2</option>
+                  <option value="3">.3</option>
+                </select>
               </label>
-              <label>
-                <span>Encantamento</span>
-                <select id="radarEnchant"></select>
+              <label><span>Qualidade</span>
+                <select id="radarQuality">
+                  <option value="1">Normal</option>
+                  <option value="2">Bom</option>
+                  <option value="3">Excepcional</option>
+                  <option value="4">Excelente</option>
+                  <option value="5">Obra-prima</option>
+                </select>
               </label>
             </div>
-
-            <div class="radar-actions">
-              <div class="item-preview" id="radarPreview">Escolha um item para ver o radar.</div>
+            <div class="inline-form top-gap">
               <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
             </div>
             <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
@@ -95,7 +104,7 @@
             <div class="section-header">
               <div>
                 <h3>Módulos planejados</h3>
-                <p class="muted">Clique para abrir os módulos que já existem nesta base estável.</p>
+                <p class="muted">Agora você pode clicar para abrir os módulos que já existem.</p>
               </div>
             </div>
             <div class="tag-grid">
@@ -118,19 +127,16 @@
           <div class="section-header">
             <div>
               <h3>Radar de oportunidades</h3>
-              <p class="muted">Mostra as melhores oportunidades do dia. Por padrão, busca os 300 itens mais populares. Se quiser, você também pode escanear o mercado completo.</p>
+              <p class="muted">Aqui ficam as melhores oportunidades do mercado inteiro, classificadas por lucro líquido.</p>
             </div>
             <div class="button-row">
-              <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar 300 populares</button>
-              <button id="loadOpportunityFullBtn" class="btn btn-outline">Pesquisar mercado completo</button>
+              <button id="loadOpportunityBtn" class="btn btn-primary">Itens populares</button>
+              <button id="loadOpportunityAllBtn" class="btn btn-outline">Mercado completo</button>
             </div>
           </div>
-          <div class="progress-wrap">
-            <div class="progress-head">
-              <span id="opportunityProgressText">Aguardando leitura do mercado...</span>
-              <span id="opportunityProgressPercent">0%</span>
-            </div>
-            <div class="progress-bar"><div id="opportunityProgressBar" class="progress-bar-fill" style="width:0%"></div></div>
+          <div class="progress-shell">
+            <div class="progress-bar"><div id="marketProgressBar" class="progress-fill"></div></div>
+            <div id="marketProgressText" class="muted small-text">Aguardando consulta...</div>
           </div>
           <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
         </article>
@@ -180,50 +186,17 @@
       <section id="ilhas" class="page-section">
         <div class="card module-card">
           <h2>Simulador de Ilhas</h2>
-          <p class="muted">Agora você pode testar a quantidade de ilhas, o que quer plantar, o animal e se vai produzir ou comprar a comida.</p>
+          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
           <div class="form-grid">
-            <label><span>Quantidade de ilhas</span><input id="islandCount" type="number" min="1" max="20" value="2" /></label>
             <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
+            <label><span>Quantidade de ilhas</span><input id="islandCount" type="number" min="1" value="2" /></label>
             <label><span>Plantações por ilha</span><input id="islandPlots" type="number" value="5" /></label>
             <label><span>Pastos por ilha</span><input id="islandPastures" type="number" value="2" /></label>
             <label><span>Usa foco?</span>
               <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
             </label>
-            <label><span>Plantação escolhida</span>
-              <select id="islandCropChoice">
-                <option value="auto">Automático</option>
-                <option value="Cenoura">Cenoura</option>
-                <option value="Feijão">Feijão</option>
-                <option value="Trigo">Trigo</option>
-                <option value="Erva medicinal">Erva medicinal</option>
-                <option value="Abóbora">Abóbora</option>
-              </select>
-            </label>
-            <label><span>Animal escolhido</span>
-              <select id="islandAnimalChoice">
-                <option value="auto">Automático</option>
-                <option value="Galinha">Galinha</option>
-                <option value="Porco">Porco</option>
-                <option value="Cabra">Cabra</option>
-                <option value="Cavalo">Cavalo</option>
-                <option value="Boi">Boi</option>
-              </select>
-            </label>
-            <label><span>Tier do animal</span>
-              <select id="islandAnimalTier">
-                <option value="3">T3</option>
-                <option value="4">T4</option>
-                <option value="5" selected>T5</option>
-                <option value="6">T6</option>
-                <option value="7">T7</option>
-                <option value="8">T8</option>
-              </select>
-            </label>
-            <label><span>Comida dos animais</span>
-              <select id="islandFeedMode">
-                <option value="plantar">Produzir na própria ilha</option>
-                <option value="comprar">Comprar no mercado</option>
-              </select>
+            <label><span>Comida dos bichos</span>
+              <select id="islandFeedMode"><option value="produzir">Produzir a comida</option><option value="comprar">Comprar a comida</option></select>
             </label>
           </div>
           <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
@@ -249,25 +222,26 @@
       <section id="mercado" class="page-section">
         <div class="card module-card">
           <h2>Mercado e Guerra</h2>
-          <p class="muted">Acompanhe as oportunidades no dashboard. Nesta base estável, o foco aqui é validar o que o radar trouxe.</p>
-          <div id="opportunityResultCopy" class="result-box muted">Use o radar de oportunidades no dashboard para encontrar os itens com maior lucro agora.</div>
+          <p class="muted">Esse módulo agora exibe o radar legível e uma leitura rápida do que fazer.</p>
+          <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
           <div class="insight-list">
-            <div class="insight-item">Sempre valide no jogo antes de comprar volume alto.</div>
-            <div class="insight-item">Lucro bom sem giro é capital travado.</div>
-            <div class="insight-item">Caerleon costuma concentrar bons spreads, mas também mais risco de transporte.</div>
+            <div class="insight-item">Itens com melhor spread tendem a funcionar melhor em rotas curtas e com capital girando rápido.</div>
+            <div class="insight-item">Mercado bom não é só lucro unitário: é lucro unitário + velocidade de venda.</div>
+            <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
           </div>
         </div>
       </section>
 
       <section id="riqueza" class="page-section">
         <div class="card module-card">
-          <h2>Planejador de riqueza</h2>
+          <h2>Planejador de Riqueza</h2>
+          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
           <div class="form-grid">
             <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
-            <label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label>
-            <label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
+            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Montar plano</button>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
           <div id="wealthResult" class="result-box"></div>
         </div>
       </section>
