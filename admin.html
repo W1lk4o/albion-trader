@@ -14,65 +14,160 @@
         <h2 class="sidebar-title">Admin</h2>
       </div>
       <nav class="nav-list">
-        <button class="nav-item active">Usuários</button>
-        <button class="nav-item">Licenças</button>
-        <button class="nav-item">Configurações</button>
+        <button class="nav-item active" data-admin-target="adminOverview">Resumo</button>
+        <button class="nav-item" data-admin-target="adminUsers">Usuários</button>
+        <button class="nav-item" data-admin-target="adminLicenses">Licenças</button>
+        <button class="nav-item" data-admin-target="adminSettings">Configurações</button>
       </nav>
-      <a href="/dashboard" class="btn btn-outline btn-full">Ir para dashboard</a>
+      <a href="/dashboard.html" class="btn btn-outline btn-full">Ir para dashboard</a>
+      <a href="/" class="btn btn-outline btn-full">Voltar para home</a>
       <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
-    <main class="content">
+    <main class="content admin-content">
       <header class="topbar">
         <div>
           <p class="muted">Administrador</p>
           <h1 id="adminTitle">Painel de controle</h1>
         </div>
-        <div class="status-pill">Modo Vercel</div>
+        <div class="button-row wrap-right">
+          <a href="/dashboard.html" class="btn btn-outline">Dashboard</a>
+          <a href="/" class="btn btn-outline">Home</a>
+          <div class="status-pill">Modo Vercel</div>
+        </div>
       </header>
 
-      <div class="cards-grid admin-grid">
-        <article class="card">
-          <h3>Resumo</h3>
-          <p class="muted">Base pronta para Vercel. Nesta versão, o gerenciamento de usuários é de demonstração sem banco persistente.</p>
-          <div class="mini-stats">
-            <div><strong id="adminUserCount">0</strong><span>Usuários</span></div>
-            <div><strong>3</strong><span>Idiomas planejados</span></div>
-            <div><strong>10+</strong><span>Módulos futuros</span></div>
-          </div>
-        </article>
+      <section id="adminOverview" class="page-section active">
+        <div class="cards-grid admin-grid">
+          <article class="card">
+            <h3>Resumo</h3>
+            <p class="muted">Painel admin restaurado com navegação funcional e cadastro local de usuários desta base.</p>
+            <div class="mini-stats">
+              <div><strong id="adminUserCount">0</strong><span>Usuários</span></div>
+              <div><strong id="adminPendingCount">0</strong><span>Primeiro acesso</span></div>
+              <div><strong>Americas</strong><span>Servidor padrão</span></div>
+            </div>
+          </article>
 
-        <article class="card">
-          <h3>Próximo upgrade sério</h3>
-          <ul class="feature-list compact">
-            <li>Banco de dados persistente</li>
-            <li>Criação real de usuários</li>
-            <li>Licença com expiração automática real</li>
-            <li>Travamento forte por dispositivo</li>
-            <li>Logs e histórico</li>
-          </ul>
-        </article>
-      </div>
-
-      <section class="card">
-        <div class="section-header">
-          <div>
-            <h2>Usuários do sistema</h2>
-            <p id="adminNotice" class="muted">Carregando...</p>
-          </div>
+          <article class="card">
+            <h3>Observações desta base</h3>
+            <ul class="feature-list compact">
+              <li>Cadastro novo fica salvo nesta base atual do projeto.</li>
+              <li>Primeiro acesso fica marcado como pendente de senha.</li>
+              <li>O próximo passo forte é persistir isso de forma real no backend.</li>
+            </ul>
+          </article>
         </div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Perfil</th>
-                <th>Licença</th>
-              </tr>
-            </thead>
-            <tbody id="adminUsersTable"></tbody>
-          </table>
+      </section>
+
+      <section id="adminUsers" class="page-section">
+        <div class="cards-grid admin-grid">
+          <article class="card">
+            <div class="section-header">
+              <div>
+                <h2>Usuários do sistema</h2>
+                <p id="adminNotice" class="muted">Carregando...</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Perfil</th>
+                    <th>Licença</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTable"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>Adicionar novo usuário</h3>
+            <form id="adminCreateUserForm" class="form-grid">
+              <label><span>Nome</span><input id="newUserName" required /></label>
+              <label><span>Email</span><input id="newUserEmail" type="email" required /></label>
+              <label><span>Telefone</span><input id="newUserPhone" required /></label>
+              <label><span>Licença</span>
+                <select id="newUserLicense">
+                  <option value="7">7 dias</option>
+                  <option value="15">15 dias</option>
+                  <option value="30" selected>30 dias</option>
+                  <option value="365">1 ano</option>
+                </select>
+              </label>
+              <label><span>Perfil</span>
+                <select id="newUserRole">
+                  <option value="user" selected>Usuário</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+              <div class="form-actions-row">
+                <button type="submit" class="btn btn-primary">Cadastrar usuário</button>
+              </div>
+            </form>
+            <p id="adminCreateMessage" class="form-message"></p>
+          </article>
+        </div>
+      </section>
+
+      <section id="adminLicenses" class="page-section">
+        <article class="card">
+          <div class="section-header">
+            <div>
+              <h2>Licenças</h2>
+              <p class="muted">Visão rápida das licenças atuais e pendências de primeiro acesso.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Email</th>
+                  <th>Expira em</th>
+                  <th>Dias restantes</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminLicensesTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="adminSettings" class="page-section">
+        <div class="cards-grid admin-grid">
+          <article class="card">
+            <h3>Configurações do mercado</h3>
+            <form id="adminSettingsForm" class="form-grid">
+              <label><span>Servidor padrão</span>
+                <select id="settingServer">
+                  <option value="west">Americas</option>
+                  <option value="europe">Europe</option>
+                  <option value="asia">Asia</option>
+                </select>
+              </label>
+              <label><span>Taxa de mercado (%)</span><input id="settingMarketFee" type="number" min="0" step="0.1" value="6.5" /></label>
+              <div class="form-actions-row">
+                <button type="submit" class="btn btn-primary">Salvar configurações</button>
+              </div>
+            </form>
+            <p id="adminSettingsMessage" class="form-message"></p>
+          </article>
+
+          <article class="card">
+            <h3>Fluxo sugerido para novo usuário</h3>
+            <ul class="feature-list compact">
+              <li>Admin cadastra nome, email, telefone e licença.</li>
+              <li>Usuário entra no sistema e fica marcado como primeiro acesso pendente.</li>
+              <li>Na próxima etapa do projeto, esse primeiro acesso vai criar senha de forma persistente.</li>
+            </ul>
+          </article>
         </div>
       </section>
     </main>

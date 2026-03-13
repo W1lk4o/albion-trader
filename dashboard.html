@@ -22,6 +22,8 @@
         <button class="nav-item" data-target="mercado">Mercado</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
       </nav>
+      <a href="/" class="btn btn-outline btn-full">Voltar para home</a>
+      <button id="dashboardAdminBtn" class="btn btn-outline btn-full hidden">Ir para admin</button>
       <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
@@ -31,7 +33,11 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+        <div class="button-row wrap-right">
+          <a href="/" class="btn btn-outline">Home</a>
+          <button id="dashboardAdminTopBtn" class="btn btn-outline hidden">Admin</button>
+          <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+        </div>
       </header>
 
       <section id="overview" class="page-section active">
@@ -39,7 +45,7 @@
           <article class="card stat-card">
             <span class="stat-label">Módulos ativos</span>
             <strong>7</strong>
-            <p>Agora com navegação funcional e lógica melhorada.</p>
+            <p>Base estável com radar de item e oportunidades.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Radar de oportunidades</span>
@@ -58,49 +64,30 @@
             <div class="section-header">
               <div>
                 <h3>Radar de item</h3>
-                <p class="muted">Pesquise um item específico e veja onde comprar barato e onde vender melhor.</p>
+                <p class="muted">Pesquise um item específico e veja claramente onde comprar barato e onde vender melhor.</p>
               </div>
             </div>
             <div class="form-grid compact-grid radar-grid radar-grid-albion">
-              <label><span>Categoria</span>
-                <select id="radarCategory"></select>
-              </label>
-              <label><span>Grupo</span>
-                <select id="radarGroup"></select>
-              </label>
-              <label><span>Item</span>
-                <select id="radarItem"></select>
-              </label>
+              <label><span>Categoria</span><select id="radarCategory"></select></label>
+              <label><span>Grupo</span><select id="radarGroup"></select></label>
+              <label><span>Item</span><select id="radarItem"></select></label>
               <label><span>Tier</span>
                 <select id="radarTier">
-                  <option value="T3">T3</option>
-                  <option value="T4" selected>T4</option>
-                  <option value="T5">T5</option>
-                  <option value="T6">T6</option>
-                  <option value="T7">T7</option>
-                  <option value="T8">T8</option>
+                  <option value="T3">T3</option><option value="T4" selected>T4</option><option value="T5">T5</option><option value="T6">T6</option><option value="T7">T7</option><option value="T8">T8</option>
                 </select>
               </label>
               <label><span>Encantamento</span>
                 <select id="radarEnchant">
-                  <option value="0">Sem encantamento</option>
-                  <option value="1">.1</option>
-                  <option value="2">.2</option>
-                  <option value="3">.3</option>
-                  <option value="4">.4</option>
+                  <option value="0">Sem encantamento</option><option value="1">.1</option><option value="2">.2</option><option value="3">.3</option><option value="4">.4</option>
                 </select>
               </label>
               <label><span>Qualidade</span>
                 <select id="radarQuality">
-                  <option value="1">Normal</option>
-                  <option value="2">Bom</option>
-                  <option value="3">Excepcional</option>
-                  <option value="4">Excelente</option>
-                  <option value="5">Obra-prima</option>
+                  <option value="1">Normal</option><option value="2">Bom</option><option value="3">Excepcional</option><option value="4">Excelente</option><option value="5">Obra-prima</option>
                 </select>
               </label>
             </div>
-            <p class="muted small-text">Agora o radar segue a lógica do mercado do Albion: categoria → grupo → item. Se não houver lucro, ele ainda mostra onde o item está mais barato e onde está mais caro.</p>
+            <p class="muted small-text">Estrutura igual à lógica do mercado do Albion: categoria → grupo → item → tier → encantamento → qualidade.</p>
             <div class="inline-form top-gap">
               <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
             </div>
@@ -111,7 +98,7 @@
             <div class="section-header">
               <div>
                 <h3>Módulos planejados</h3>
-                <p class="muted">Agora você pode clicar para abrir os módulos que já existem.</p>
+                <p class="muted">Clique para abrir os módulos que já existem nesta base.</p>
               </div>
             </div>
             <div class="tag-grid">
@@ -149,104 +136,15 @@
         </article>
       </section>
 
-      <section id="craft" class="page-section">
-        <div class="card module-card">
-          <h2>Calculadora de Craft</h2>
-          <div class="form-grid">
-            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
-            <label><span>Cidade</span>
-              <select id="craftCity">
-                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
-                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
-              </select>
-            </label>
-            <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
-            <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
-          </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
-          <div id="craftResult" class="result-box"></div>
-        </div>
-      </section>
-
-      <section id="refino" class="page-section">
-        <div class="card module-card">
-          <h2>Calculadora de Refino</h2>
-          <div class="form-grid">
-            <label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label>
-            <label><span>Cidade</span>
-              <select id="refineCity">
-                <option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option>
-                <option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option>
-              </select>
-            </label>
-            <label><span>Usa foco?</span>
-              <select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
-            </label>
-            <label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label>
-            <label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label>
-          </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button>
-          <div id="refineResult" class="result-box"></div>
-        </div>
-      </section>
-
-      <section id="ilhas" class="page-section">
-        <div class="card module-card">
-          <h2>Simulador de Ilhas</h2>
-          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
-          <div class="form-grid">
-            <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
-            <label><span>Quantidade de ilhas</span><input id="islandCount" type="number" min="1" value="2" /></label>
-            <label><span>Plantações por ilha</span><input id="islandPlots" type="number" value="5" /></label>
-            <label><span>Pastos por ilha</span><input id="islandPastures" type="number" value="2" /></label>
-            <label><span>Usa foco?</span>
-              <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
-            </label>
-            <label><span>Comida dos bichos</span>
-              <select id="islandFeedMode"><option value="produzir">Produzir a comida</option><option value="comprar">Comprar a comida</option></select>
-            </label>
-          </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
-          <div id="islandResult" class="result-box"></div>
-        </div>
-      </section>
-
-      <section id="transporte" class="page-section">
-        <div class="card module-card">
-          <h2>Planejamento de Transporte</h2>
-          <div class="form-grid">
-            <label><span>Cidade de compra</span><select id="transportBuyCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label>
-            <label><span>Cidade de venda</span><select id="transportSellCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label>
-            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9000" /></label>
-            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="13000" /></label>
-            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="1200" /></label>
-          </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button>
-          <div id="transportResult" class="result-box"></div>
-        </div>
-      </section>
-
-      <section id="mercado" class="page-section">
-        <div class="card module-card">
-          <h2>Mercado</h2>
-          <p class="muted">Use o Radar de Oportunidades na dashboard para ver o que está pagando melhor agora.</p>
-        </div>
-      </section>
-
-      <section id="riqueza" class="page-section">
-        <div class="card module-card">
-          <h2>Planejador de Riqueza</h2>
-          <div class="form-grid">
-            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
-            <label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label>
-            <label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label>
-          </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano</button>
-          <div id="wealthResult" class="result-box"></div>
-        </div>
-      </section>
+      <section id="craft" class="page-section"><div class="card module-card"><h2>Calculadora de Craft</h2><div class="form-grid"><label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label><label><span>Cidade</span><select id="craftCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label><label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label><label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button><div id="craftResult" class="result-box"></div></div></section>
+      <section id="refino" class="page-section"><div class="card module-card"><h2>Calculadora de Refino</h2><div class="form-grid"><label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label><label><span>Cidade</span><select id="refineCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label><label><span>Usa foco?</span><select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select></label><label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label><label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button><div id="refineResult" class="result-box"></div></div></section>
+      <section id="ilhas" class="page-section"><div class="card module-card"><h2>Simulador de Ilhas</h2><p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p><div class="form-grid"><label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label><label><span>Quantidade de ilhas</span><input id="islandCount" type="number" min="1" value="2" /></label><label><span>Plantações por ilha</span><input id="islandPlots" type="number" value="5" /></label><label><span>Pastos por ilha</span><input id="islandPastures" type="number" value="2" /></label><label><span>Usa foco?</span><select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select></label><label><span>Comida dos bichos</span><select id="islandFeedMode"><option value="produzir">Produzir a comida</option><option value="comprar">Comprar a comida</option></select></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilha</button><div id="islandResult" class="result-box"></div></div></section>
+      <section id="transporte" class="page-section"><div class="card module-card"><h2>Calculadora de Transporte</h2><div class="form-grid"><label><span>Cidade de compra</span><select id="transportBuyCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label><label><span>Cidade de venda</span><select id="transportSellCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label><label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9000" /></label><label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="12400" /></label><label><span>Custo do transporte</span><input id="transportCost" type="number" value="700" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button><div id="transportResult" class="result-box"></div></div></section>
+      <section id="mercado" class="page-section"><div class="card module-card"><h2>Mercado</h2><p>Use o radar rápido e o radar de oportunidades na aba principal.</p></div></section>
+      <section id="riqueza" class="page-section"><div class="card module-card"><h2>Planejador de riqueza</h2><div class="form-grid"><label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label><label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label><label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano</button><div id="wealthResult" class="result-box"></div></div></section>
     </main>
   </div>
+
   <script src="js/main.js"></script>
 </body>
 </html>
