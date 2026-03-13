@@ -61,20 +61,15 @@
                 <p class="muted">Pesquise um item específico e veja onde comprar barato e onde vender melhor.</p>
               </div>
             </div>
-            <div class="form-grid compact-grid radar-grid">
+            <div class="form-grid compact-grid radar-grid radar-grid-albion">
               <label><span>Categoria</span>
-                <select id="radarCategory">
-                  <option value="all">Todas</option>
-                  <option value="utilitarios">Utilitários</option>
-                  <option value="recursoBruto">Recursos brutos</option>
-                  <option value="recursoRefinado">Recursos refinados</option>
-                  <option value="armaduras">Armaduras</option>
-                  <option value="montarias">Montarias</option>
-                </select>
+                <select id="radarCategory"></select>
               </label>
-              <label class="item-search-field"><span>Item</span>
-                <input id="radarItemSearch" list="radarItemList" placeholder="Digite o nome do item" />
-                <datalist id="radarItemList"></datalist>
+              <label><span>Grupo</span>
+                <select id="radarGroup"></select>
+              </label>
+              <label><span>Item</span>
+                <select id="radarItem"></select>
               </label>
               <label><span>Tier</span>
                 <select id="radarTier">
@@ -92,6 +87,7 @@
                   <option value="1">.1</option>
                   <option value="2">.2</option>
                   <option value="3">.3</option>
+                  <option value="4">.4</option>
                 </select>
               </label>
               <label><span>Qualidade</span>
@@ -104,7 +100,7 @@
                 </select>
               </label>
             </div>
-            <p class="muted small-text">Dica: você pode digitar o nome do item em português. Se preferir, também aceita o ID do item do Albion.</p>
+            <p class="muted small-text">Agora o radar segue a lógica do mercado do Albion: categoria → grupo → item. Se não houver lucro, ele ainda mostra onde o item está mais barato e onde está mais caro.</p>
             <div class="inline-form top-gap">
               <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
             </div>

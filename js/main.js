@@ -4,53 +4,120 @@
   const MARKET_FEE_DEFAULT = 6.5;
   const QUALITY_LABELS = {'1':'Normal','2':'Bom','3':'Excepcional','4':'Excelente','5':'Obra-prima'};
   const CATEGORY_LABELS = {
-    all: 'Todas', utilitarios: 'Utilitários', recursoBruto: 'Recursos brutos', recursoRefinado: 'Recursos refinados', armaduras: 'Armaduras', montarias: 'Montarias'
+    utilitarios: 'Utilitários',
+    recursoBruto: 'Recursos brutos',
+    recursoRefinado: 'Recursos refinados',
+    armaduraPano: 'Armadura de pano',
+    armaduraCouro: 'Armadura de couro',
+    armaduraPlaca: 'Armadura de placa',
+    montarias: 'Montarias'
   };
-  const ITEM_ENTRIES = [
-    {base:'BAG',label:'Bolsa',category:'utilitarios'},
-    {base:'CAPE',label:'Capa',category:'utilitarios'},
-    {base:'WOOD',label:'Madeira bruta',category:'recursoBruto'},
-    {base:'ORE',label:'Minério bruto',category:'recursoBruto'},
-    {base:'FIBER',label:'Fibra bruta',category:'recursoBruto'},
-    {base:'HIDE',label:'Couro bruto',category:'recursoBruto'},
-    {base:'ROCK',label:'Pedra bruta',category:'recursoBruto'},
-    {base:'PLANKS',label:'Tábuas',category:'recursoRefinado'},
-    {base:'METALBAR',label:'Barra de metal',category:'recursoRefinado'},
-    {base:'CLOTH',label:'Tecido',category:'recursoRefinado'},
-    {base:'LEATHER',label:'Couro refinado',category:'recursoRefinado'},
-    {base:'STONEBLOCK',label:'Bloco de pedra',category:'recursoRefinado'},
-    {base:'MOUNT_OX',label:'Boi de montaria',category:'montarias'},
-    {base:'MOUNT_HORSE',label:'Cavalo de montaria',category:'montarias'},
-    {base:'HEAD_CLOTH_SET1',label:'Capuz de estudioso',category:'armaduras'},
-    {base:'ARMOR_CLOTH_SET1',label:'Túnica de estudioso',category:'armaduras'},
-    {base:'SHOES_CLOTH_SET1',label:'Sandálias de estudioso',category:'armaduras'},
-    {base:'HEAD_CLOTH_SET2',label:'Capuz clerical',category:'armaduras'},
-    {base:'ARMOR_CLOTH_SET2',label:'Manto clerical',category:'armaduras'},
-    {base:'SHOES_CLOTH_SET2',label:'Sandálias clericais',category:'armaduras'},
-    {base:'HEAD_CLOTH_SET3',label:'Capuz de mago',category:'armaduras'},
-    {base:'ARMOR_CLOTH_SET3',label:'Manto de mago',category:'armaduras'},
-    {base:'SHOES_CLOTH_SET3',label:'Sandálias de mago',category:'armaduras'},
-    {base:'HEAD_LEATHER_SET1',label:'Capuz de mercenário',category:'armaduras'},
-    {base:'ARMOR_LEATHER_SET1',label:'Casaco de mercenário',category:'armaduras'},
-    {base:'SHOES_LEATHER_SET1',label:'Sapatos de mercenário',category:'armaduras'},
-    {base:'HEAD_LEATHER_SET2',label:'Capuz de caçador',category:'armaduras'},
-    {base:'ARMOR_LEATHER_SET2',label:'Casaco de caçador',category:'armaduras'},
-    {base:'SHOES_LEATHER_SET2',label:'Sapatos de caçador',category:'armaduras'},
-    {base:'HEAD_LEATHER_SET3',label:'Capuz de assassino',category:'armaduras'},
-    {base:'ARMOR_LEATHER_SET3',label:'Casaco de assassino',category:'armaduras'},
-    {base:'SHOES_LEATHER_SET3',label:'Sapatos de assassino',category:'armaduras'},
-    {base:'HEAD_PLATE_SET1',label:'Capacete de soldado',category:'armaduras'},
-    {base:'ARMOR_PLATE_SET1',label:'Armadura de soldado',category:'armaduras'},
-    {base:'SHOES_PLATE_SET1',label:'Botas de soldado',category:'armaduras'},
-    {base:'HEAD_PLATE_SET2',label:'Capacete de cavaleiro',category:'armaduras'},
-    {base:'ARMOR_PLATE_SET2',label:'Armadura de cavaleiro',category:'armaduras'},
-    {base:'SHOES_PLATE_SET2',label:'Botas de cavaleiro',category:'armaduras'},
-    {base:'HEAD_PLATE_SET3',label:'Capacete de guardião',category:'armaduras'},
-    {base:'ARMOR_PLATE_SET3',label:'Armadura de guardião',category:'armaduras'},
-    {base:'SHOES_PLATE_SET3',label:'Botas de guardião',category:'armaduras'}
-  ];
+  const MARKET_CATALOG = {
+    utilitarios: {
+      label: 'Utilitários',
+      groups: {
+        bolsas: { label: 'Bolsas', items: [
+          { base: 'BAG', label: 'Bolsa' }
+        ]},
+        capas: { label: 'Capas', items: [
+          { base: 'CAPE', label: 'Capa comum' }
+        ]}
+      }
+    },
+    recursoBruto: {
+      label: 'Recursos brutos',
+      groups: {
+        madeira: { label: 'Madeira', items: [{ base: 'WOOD', label: 'Madeira bruta' }] },
+        minerio: { label: 'Minério', items: [{ base: 'ORE', label: 'Minério bruto' }] },
+        fibra: { label: 'Fibra', items: [{ base: 'FIBER', label: 'Fibra bruta' }] },
+        couro: { label: 'Couro', items: [{ base: 'HIDE', label: 'Couro bruto' }] },
+        pedra: { label: 'Pedra', items: [{ base: 'ROCK', label: 'Pedra bruta' }] }
+      }
+    },
+    recursoRefinado: {
+      label: 'Recursos refinados',
+      groups: {
+        madeira: { label: 'Madeira refinada', items: [{ base: 'PLANKS', label: 'Tábuas' }] },
+        metal: { label: 'Metal refinado', items: [{ base: 'METALBAR', label: 'Barra de metal' }] },
+        tecido: { label: 'Tecido', items: [{ base: 'CLOTH', label: 'Tecido' }] },
+        couro: { label: 'Couro refinado', items: [{ base: 'LEATHER', label: 'Couro refinado' }] },
+        pedra: { label: 'Pedra refinada', items: [{ base: 'STONEBLOCK', label: 'Bloco de pedra' }] }
+      }
+    },
+    armaduraPano: {
+      label: 'Armadura de pano',
+      groups: {
+        capuzes: { label: 'Capuzes', items: [
+          { base: 'HEAD_CLOTH_SET1', label: 'Capuz de estudioso' },
+          { base: 'HEAD_CLOTH_SET2', label: 'Capuz clerical' },
+          { base: 'HEAD_CLOTH_SET3', label: 'Capuz de mago' }
+        ]},
+        peitorais: { label: 'Peitorais', items: [
+          { base: 'ARMOR_CLOTH_SET1', label: 'Túnica de estudioso' },
+          { base: 'ARMOR_CLOTH_SET2', label: 'Manto clerical' },
+          { base: 'ARMOR_CLOTH_SET3', label: 'Manto de mago' }
+        ]},
+        calcados: { label: 'Calçados', items: [
+          { base: 'SHOES_CLOTH_SET1', label: 'Sandálias de estudioso' },
+          { base: 'SHOES_CLOTH_SET2', label: 'Sandálias clericais' },
+          { base: 'SHOES_CLOTH_SET3', label: 'Sandálias de mago' }
+        ]}
+      }
+    },
+    armaduraCouro: {
+      label: 'Armadura de couro',
+      groups: {
+        capuzes: { label: 'Capuzes', items: [
+          { base: 'HEAD_LEATHER_SET1', label: 'Capuz de mercenário' },
+          { base: 'HEAD_LEATHER_SET2', label: 'Capuz de caçador' },
+          { base: 'HEAD_LEATHER_SET3', label: 'Capuz de assassino' }
+        ]},
+        peitorais: { label: 'Peitorais', items: [
+          { base: 'ARMOR_LEATHER_SET1', label: 'Casaco de mercenário' },
+          { base: 'ARMOR_LEATHER_SET2', label: 'Casaco de caçador' },
+          { base: 'ARMOR_LEATHER_SET3', label: 'Casaco de assassino' }
+        ]},
+        calcados: { label: 'Calçados', items: [
+          { base: 'SHOES_LEATHER_SET1', label: 'Sapatos de mercenário' },
+          { base: 'SHOES_LEATHER_SET2', label: 'Sapatos de caçador' },
+          { base: 'SHOES_LEATHER_SET3', label: 'Sapatos de assassino' }
+        ]}
+      }
+    },
+    armaduraPlaca: {
+      label: 'Armadura de placa',
+      groups: {
+        capacetes: { label: 'Capacetes', items: [
+          { base: 'HEAD_PLATE_SET1', label: 'Capacete de soldado' },
+          { base: 'HEAD_PLATE_SET2', label: 'Capacete de cavaleiro' },
+          { base: 'HEAD_PLATE_SET3', label: 'Capacete de guardião' }
+        ]},
+        peitorais: { label: 'Peitorais', items: [
+          { base: 'ARMOR_PLATE_SET1', label: 'Armadura de soldado' },
+          { base: 'ARMOR_PLATE_SET2', label: 'Armadura de cavaleiro' },
+          { base: 'ARMOR_PLATE_SET3', label: 'Armadura de guardião' }
+        ]},
+        botas: { label: 'Botas', items: [
+          { base: 'SHOES_PLATE_SET1', label: 'Botas de soldado' },
+          { base: 'SHOES_PLATE_SET2', label: 'Botas de cavaleiro' },
+          { base: 'SHOES_PLATE_SET3', label: 'Botas de guardião' }
+        ]}
+      }
+    },
+    montarias: {
+      label: 'Montarias',
+      groups: {
+        bois: { label: 'Bois', items: [{ base: 'MOUNT_OX', label: 'Boi de montaria' }] },
+        cavalos: { label: 'Cavalos', items: [{ base: 'MOUNT_HORSE', label: 'Cavalo de montaria' }] }
+      }
+    }
+  };
+  const ITEM_ENTRIES = Object.values(MARKET_CATALOG).flatMap(category =>
+    Object.values(category.groups).flatMap(group => group.items)
+  );
   const ITEM_BY_LABEL = new Map(ITEM_ENTRIES.map(entry => [entry.label.toLowerCase(), entry]));
   const ITEM_BY_BASE = new Map(ITEM_ENTRIES.map(entry => [entry.base.toUpperCase(), entry]));
+  const RADAR_CATEGORY_ORDER = Object.keys(MARKET_CATALOG);
   const POPULAR_ITEMS = [
     'T4_BAG','T4_BAG@1','T5_BAG','T5_BAG@1','T6_BAG','T6_BAG@1','T7_BAG','T8_BAG',
     'T4_CAPE','T5_CAPE','T6_CAPE','T7_CAPE','T8_CAPE',
@@ -102,7 +169,15 @@
   function bindNav(){document.querySelectorAll('[data-target]').forEach(item=>item.addEventListener('click',()=>activateSection(item.dataset.target)));}
   function formatSilver(v){return new Intl.NumberFormat('pt-BR').format(Math.round(v||0));}
   function setHtml(id,html){const el=document.getElementById(id); if(el) el.innerHTML=html;}
-  function getItemEntryFromRaw(raw){if(!raw) return null; const trimmed=String(raw).trim(); return ITEM_BY_LABEL.get(trimmed.toLowerCase()) || ITEM_BY_BASE.get(trimmed.toUpperCase()) || null;}
+  function getItemEntryFromRaw(raw){
+    if(!raw) return null;
+    const trimmed=String(raw).trim();
+    return ITEM_BY_LABEL.get(trimmed.toLowerCase()) || ITEM_BY_BASE.get(trimmed.toUpperCase()) || null;
+  }
+  function getSelectedRadarEntry(){
+    const base=document.getElementById('radarItem')?.value || '';
+    return ITEM_BY_BASE.get(base.toUpperCase()) || null;
+  }
   function prettyItemName(itemId){
     const tier=(itemId.match(/^T(\d+)/)||[])[1];
     const enchant=(itemId.match(/@(\d)$/)||[])[1];
@@ -112,27 +187,111 @@
     return `${base}${tier?` T${tier}`:''}${enchant && enchant!=='0'?'.'+enchant:''}`.trim();
   }
   function itemIdFromSelection(){
-    const rawValue=document.getElementById('radarItemSearch').value;
-    const entry=getItemEntryFromRaw(rawValue);
-    const base=(entry?.base || String(rawValue||'').trim().toUpperCase());
+    const entry=getSelectedRadarEntry();
+    const base=(entry?.base || '');
     const tier=document.getElementById('radarTier').value;
     const enchant=document.getElementById('radarEnchant').value;
     if(!base||!tier) return '';
     return `${tier}_${base}${enchant!=='0'?`@${enchant}`:''}`;
   }
-  function populateRadarItems(){
-    const category = document.getElementById('radarCategory')?.value || 'all';
-    const list = document.getElementById('radarItemList');
-    if(!list) return;
-    const entries = ITEM_ENTRIES.filter(entry => category === 'all' || entry.category === category);
-    list.innerHTML = entries.map(entry => `<option value="${entry.label}"></option>`).join('');
+  function populateRadarCategories(){
+    const categorySelect=document.getElementById('radarCategory');
+    if(!categorySelect) return;
+    categorySelect.innerHTML = RADAR_CATEGORY_ORDER.map(key => `<option value="${key}">${MARKET_CATALOG[key].label}</option>`).join('');
+    if(!categorySelect.value) categorySelect.value = RADAR_CATEGORY_ORDER[0];
+    populateRadarGroups();
   }
-  function isStale(dateStr){if(!dateStr) return true; const date=new Date(dateStr); if(Number.isNaN(date.getTime())) return true; return (Date.now()-date.getTime())/36e5 > 72;}
+  function populateRadarGroups(){
+    const categoryKey=document.getElementById('radarCategory')?.value;
+    const groupSelect=document.getElementById('radarGroup');
+    if(!categoryKey || !groupSelect) return;
+    const groups = MARKET_CATALOG[categoryKey]?.groups || {};
+    const keys = Object.keys(groups);
+    groupSelect.innerHTML = keys.map(key => `<option value="${key}">${groups[key].label}</option>`).join('');
+    if(keys.length && !keys.includes(groupSelect.value)) groupSelect.value = keys[0];
+    populateRadarItems();
+  }
+  function populateRadarItems(){
+    const categoryKey=document.getElementById('radarCategory')?.value;
+    const groupKey=document.getElementById('radarGroup')?.value;
+    const itemSelect=document.getElementById('radarItem');
+    if(!categoryKey || !groupKey || !itemSelect) return;
+    const items = MARKET_CATALOG[categoryKey]?.groups?.[groupKey]?.items || [];
+    itemSelect.innerHTML = items.map(item => `<option value="${item.base}">${item.label}</option>`).join('');
+  }
+  function isStale(dateStr,hours=168){
+    if(!dateStr) return true;
+    const date=new Date(dateStr);
+    if(Number.isNaN(date.getTime())) return true;
+    return (Date.now()-date.getTime())/36e5 > hours;
+  }
   function looksLikePlaceholder(price){return /^9{6,}$/.test(String(price||''));}
   function median(nums){if(!nums.length) return 0; const arr=[...nums].sort((a,b)=>a-b); const mid=Math.floor(arr.length/2); return arr.length%2?arr[mid]:(arr[mid-1]+arr[mid])/2;}
-  function sanitizeRows(rows){const valid=rows.filter(r=>{const price=Number(r.sell_price_min||0); return price>0 && !looksLikePlaceholder(price) && !isStale(r.sell_price_min_date);}); if(!valid.length) return []; const med=median(valid.map(r=>Number(r.sell_price_min))); return valid.filter(r=>{const price=Number(r.sell_price_min||0); return med<=0 || (price>=med*0.45 && price<=med*2.2);});}
-  function calculateArbitrage(rows){const cleaned=sanitizeRows(rows); if(cleaned.length<2) return null; const sorted=[...cleaned].sort((a,b)=>a.sell_price_min-b.sell_price_min); const bestBuy=sorted[0]; const bestSell=[...sorted].sort((a,b)=>b.sell_price_min-a.sell_price_min)[0]; if(!bestBuy||!bestSell||bestBuy.city===bestSell.city) return null; const buyPrice=Number(bestBuy.sell_price_min||0); const sellPrice=Number(bestSell.sell_price_min||0); const tax=Math.round(sellPrice*(MARKET_FEE_DEFAULT/100)); const transport=Math.round(buyPrice*0.04); const profit=sellPrice-buyPrice-tax-transport; const margin=buyPrice>0?(profit/buyPrice)*100:0; if(profit<=0) return null; return {buyCity:bestBuy.city,sellCity:bestSell.city,buyPrice,sellPrice,profit,margin,tax,transport,quality:QUALITY_LABELS[String(bestBuy.quality||1)]||'Normal',rows:cleaned};}
-  async function loadMarket(){const itemId=itemIdFromSelection(); const quality=document.getElementById('radarQuality').value; const box=document.getElementById('marketResult'); if(!itemId){box.textContent='Escolha ou digite um item, além de tier e qualidade.'; return;} box.innerHTML='<div class="muted">Buscando preços do item...</div>'; try{const params=new URLSearchParams({items:itemId,locations:DEFAULT_LOCATIONS.join(','),qualities:quality,server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); const rows=data.data||[]; const arb=calculateArbitrage(rows); if(!arb){box.innerHTML=`<div class="muted">Não encontrei arbitragem confiável agora para <strong>${prettyItemName(itemId)}</strong>. Os preços vieram muito velhos, inconsistentes ou sem spread útil.</div>`; return;} const tableRows=sanitizeRows(rows).sort((a,b)=>a.sell_price_min-b.sell_price_min).map(row=>`<tr><td>${row.city}</td><td>${formatSilver(row.sell_price_min)}</td><td>${QUALITY_LABELS[String(row.quality||quality)]||'Normal'}</td><td>${new Date(row.sell_price_min_date).toLocaleString('pt-BR')}</td></tr>`).join(''); box.innerHTML=`<div class="mini-grid"><div class="mini-card"><span>Item</span><strong>${prettyItemName(itemId)}</strong></div><div class="mini-card"><span>Melhor compra</span><strong>${arb.buyCity}</strong><small>${formatSilver(arb.buyPrice)} prata</small></div><div class="mini-card"><span>Melhor venda</span><strong>${arb.sellCity}</strong><small>${formatSilver(arb.sellPrice)} prata</small></div><div class="mini-card"><span>Lucro líquido</span><strong>${formatSilver(arb.profit)}</strong><small>${arb.margin.toFixed(1)}% de margem</small></div></div><div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>Cidade</th><th>Venda mínima</th><th>Qualidade</th><th>Atualizado em</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;}catch(error){box.textContent=error.message;}}
+  function sanitizeRows(rows,{strict=false}={}){
+    const valid=rows.filter(r=>{
+      const price=Number(r.sell_price_min||0);
+      return price>0 && !looksLikePlaceholder(price) && !isStale(r.sell_price_min_date, strict?120:240);
+    });
+    if(valid.length<=2) return valid;
+    const med=median(valid.map(r=>Number(r.sell_price_min)));
+    if(med<=0) return valid;
+    const low = strict ? med*0.45 : med*0.2;
+    const high = strict ? med*2.2 : med*5;
+    const filtered = valid.filter(r=>{
+      const price=Number(r.sell_price_min||0);
+      return price>=low && price<=high;
+    });
+    return filtered.length ? filtered : valid;
+  }
+  function calculateArbitrage(rows,{strict=false}={}){
+    const cleaned=sanitizeRows(rows,{strict});
+    if(!cleaned.length) return null;
+    const sorted=[...cleaned].sort((a,b)=>Number(a.sell_price_min||0)-Number(b.sell_price_min||0));
+    const bestBuy=sorted[0];
+    const bestSell=sorted[sorted.length-1];
+    if(!bestBuy || !bestSell) return null;
+    const buyPrice=Number(bestBuy.sell_price_min||0);
+    const sellPrice=Number(bestSell.sell_price_min||0);
+    const tax=Math.round(sellPrice*(MARKET_FEE_DEFAULT/100));
+    const transport=Math.round(buyPrice*0.04);
+    const profit=sellPrice-buyPrice-tax-transport;
+    const margin=buyPrice>0?(profit/buyPrice)*100:0;
+    return {
+      buyCity:bestBuy.city,
+      sellCity:bestSell.city,
+      buyPrice,
+      sellPrice,
+      profit,
+      margin,
+      tax,
+      transport,
+      quality:QUALITY_LABELS[String(bestBuy.quality||1)]||'Normal',
+      rows:cleaned,
+      hasSpread: cleaned.length>1 && bestBuy.city!==bestSell.city,
+      profitable: cleaned.length>1 && bestBuy.city!==bestSell.city && profit>0
+    };
+  }
+  async function loadMarket(){
+    const itemId=itemIdFromSelection();
+    const quality=document.getElementById('radarQuality').value;
+    const box=document.getElementById('marketResult');
+    if(!itemId){box.textContent='Escolha categoria, grupo, item, tier e qualidade.'; return;}
+    box.innerHTML='<div class="muted">Buscando preços do item...</div>';
+    try{
+      const params=new URLSearchParams({items:itemId,locations:DEFAULT_LOCATIONS.join(','),qualities:quality,server:'west'});
+      const data=await api(`/api/albion-prices?${params.toString()}`);
+      const rows=data.data||[];
+      const cleaned=sanitizeRows(rows,{strict:false}).sort((a,b)=>Number(a.sell_price_min||0)-Number(b.sell_price_min||0));
+      if(!cleaned.length){
+        box.innerHTML=`<div class="muted">Ainda não apareceu preço confiável para <strong>${prettyItemName(itemId)}</strong> nessa qualidade. Tente outra qualidade ou outro encantamento.</div>`;
+        return;
+      }
+      const arb=calculateArbitrage(rows,{strict:false});
+      const tableRows=cleaned.map(row=>`<tr><td>${row.city}</td><td>${formatSilver(row.sell_price_min)}</td><td>${QUALITY_LABELS[String(row.quality||quality)]||'Normal'}</td><td>${new Date(row.sell_price_min_date).toLocaleString('pt-BR')}</td></tr>`).join('');
+      const statusText = !arb?.hasSpread ? 'Só encontrei preço válido em uma cidade por enquanto.' : (arb.profitable ? 'Spread positivo encontrado.' : 'Há spread, mas ele ainda não cobre taxa + transporte.');
+      box.innerHTML=`<div class="mini-grid"><div class="mini-card"><span>Item</span><strong>${prettyItemName(itemId)}</strong></div><div class="mini-card"><span>Melhor compra</span><strong>${arb?.buyCity||cleaned[0].city}</strong><small>${formatSilver(arb?.buyPrice||cleaned[0].sell_price_min)} prata</small></div><div class="mini-card"><span>Melhor venda</span><strong>${arb?.sellCity||cleaned[cleaned.length-1].city}</strong><small>${formatSilver(arb?.sellPrice||cleaned[cleaned.length-1].sell_price_min)} prata</small></div><div class="mini-card"><span>Resultado</span><strong>${arb?formatSilver(arb.profit):'—'}</strong><small>${arb?arb.margin.toFixed(1)+'% de margem':'Sem cálculo'}</small></div></div><div class="muted top-gap">${statusText}</div><div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>Cidade</th><th>Venda mínima</th><th>Qualidade</th><th>Atualizado em</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
+    }catch(error){box.textContent=error.message;}
+  }
   function setProgress(percent,text){const bar=document.getElementById('marketProgressBar'); const label=document.getElementById('marketProgressText'); if(bar) bar.style.width=`${percent}%`; if(label) label.textContent=text;}
   function buildOpportunityRows(rows){const byItem=new Map(); rows.forEach(row=>{if(!row.item_id) return; if(!byItem.has(row.item_id)) byItem.set(row.item_id,[]); byItem.get(row.item_id).push(row);}); const opportunities=[]; byItem.forEach((itemRows,itemId)=>{const arb=calculateArbitrage(itemRows); if(!arb) return; opportunities.push({itemId,itemName:prettyItemName(itemId),...arb,confidence:arb.rows.length>=4?'Boa':'Média',confidenceRank:arb.rows.length>=4?2:1});}); return opportunities.sort((a,b)=>b.profit-a.profit).slice(0,20);}
   function sortOpportunities(list){
@@ -170,7 +329,7 @@
   }
   function chunk(list,size){const out=[]; for(let i=0;i<list.length;i+=size) out.push(list.slice(i,i+size)); return out;}
   async function loadOpportunityRadar(fullMarket=false){const box=document.getElementById('opportunityResult'); if(!box) return; const list=fullMarket?POPULAR_ITEMS:POPULAR_ITEMS.slice(0,80); const chunks=chunk(list,12); box.innerHTML='<div class="muted">Consultando mercado...</div>'; const status=document.getElementById('apiStatusBadge'); if(status) status.textContent=`AlbionData consultando ${fullMarket?'mercado completo':'itens populares'}...`; try{let allRows=[]; for(let i=0;i<chunks.length;i++){const params=new URLSearchParams({items:chunks[i].join(','),locations:DEFAULT_LOCATIONS.join(','),qualities:'1',server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); allRows=allRows.concat(data.data||[]); const percent=Math.round(((i+1)/chunks.length)*100); setProgress(percent,`Consultando Albion Data: ${percent}%`);} lastOpportunities=buildOpportunityRows(allRows); const summary=document.getElementById('opportunitySummary'); if(status) status.textContent='AlbionData online'; setProgress(100,`${lastOpportunities.length} oportunidades confiáveis encontradas.`); if(!lastOpportunities.length){renderOpportunityTable(); if(summary) summary.textContent='Sem spreads úteis no momento.'; return;} if(summary){const best=sortOpportunities(lastOpportunities)[0]; summary.textContent=`Melhor oportunidade agora: ${best.itemName} comprando em ${best.buyCity} e vendendo em ${best.sellCity}.`;} renderOpportunityTable();}catch(error){if(status) status.textContent='AlbionData com falha'; setProgress(0,'Falha ao consultar a API do Albion.'); box.textContent=error.message;}}
-  async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); bindLogout(); bindNav(); populateRadarItems(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); loadOpportunityRadar(false);}
+  async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); bindLogout(); bindNav(); populateRadarCategories(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarGroups); document.getElementById('radarGroup')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); loadOpportunityRadar(false);}
   async function initAdmin(){const user=await requireAuth(); if(!user) return; const title=document.getElementById('adminTitle'); if(title) title.textContent=`Painel admin — ${user.nome||user.email}`; bindLogout(); try{const data=await api('/api/users'); const tbody=document.getElementById('adminUsersTable'); const count=document.getElementById('adminUserCount'); const notice=document.getElementById('adminNotice'); if(notice) notice.textContent=data.notice||''; if(count) count.textContent=data.users.length; if(tbody) tbody.innerHTML=data.users.map(u=>`<tr><td>${u.nome||'-'}</td><td>${u.email}</td><td>${u.admin?'Admin':'Usuário'}</td><td>${new Date(u.licencaExpiraEm).toLocaleDateString('pt-BR')}</td></tr>`).join('');}catch(error){const notice=document.getElementById('adminNotice'); if(notice) notice.textContent=error.message;}}
   function calcCraft(){const level=Number(document.getElementById('craftLevel').value||0); const city=document.getElementById('craftCity').value; const cost=Number(document.getElementById('craftCost').value||0); const sell=Number(document.getElementById('craftSell').value||0); const bonus=level>=80?1.07:level>=50?1.04:1.01; const fee=Math.round(sell*0.065); const adjustedCost=cost/bonus; const lucro=sell-adjustedCost-fee; const margem=cost>0?(lucro/cost)*100:0; setHtml('craftResult',`<strong>Resultado do craft em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong><br>Margem: <strong>${margem.toFixed(1)}%</strong>`);}
   function calcRefine(){const level=Number(document.getElementById('refineLevel').value||0); const city=document.getElementById('refineCity').value; const focus=document.getElementById('refineFocus').value==='sim'; const cost=Number(document.getElementById('refineCost').value||0); const sell=Number(document.getElementById('refineSell').value||0); const efficiency=focus?0.86:1; const xpBonus=level>=75?0.95:1; const fee=Math.round(sell*0.065); const lucro=sell-cost*efficiency*xpBonus-fee; setHtml('refineResult',`<strong>Resultado do refino em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong> ${focus?'com foco':'sem foco'}`);}
