@@ -234,16 +234,20 @@
   function median(nums){if(!nums.length) return 0; const arr=[...nums].sort((a,b)=>a-b); const mid=Math.floor(arr.length/2); return arr.length%2?arr[mid]:(arr[mid-1]+arr[mid])/2;}
   function sanitizeRows(rows,{strict=false}={}){
     const valid=rows.filter(r=>{
-      const price=Number(r.sell_price_min||0);
-      return price>0 && !looksLikePlaceholder(price) && !isStale(r.sell_price_min_date, strict?120:240);
+      const sell=Number(r.sell_price_min||0);
+      const buy=Number(r.buy_price_max||0);
+      const hasSell=sell>0 && !looksLikePlaceholder(sell) && !isStale(r.sell_price_min_date, strict?120:240);
+      const hasBuy=buy>0 && !looksLikePlaceholder(buy) && !isStale(r.buy_price_max_date, strict?120:240);
+      return hasSell || hasBuy;
     });
     if(valid.length<=2) return valid;
-    const med=median(valid.map(r=>Number(r.sell_price_min)));
+    const baseNumbers=valid.map(r=>Number(r.sell_price_min||r.buy_price_max||0)).filter(Boolean);
+    const med=median(baseNumbers);
     if(med<=0) return valid;
     const low = strict ? med*0.45 : med*0.2;
     const high = strict ? med*2.2 : med*5;
     const filtered = valid.filter(r=>{
-      const price=Number(r.sell_price_min||0);
+      const price=Number(r.sell_price_min||r.buy_price_max||0);
       return price>=low && price<=high;
     });
     return filtered.length ? filtered : valid;
@@ -251,12 +255,14 @@
   function calculateArbitrage(rows,{strict=false}={}){
     const cleaned=sanitizeRows(rows,{strict});
     if(!cleaned.length) return null;
-    const sorted=[...cleaned].sort((a,b)=>Number(a.sell_price_min||0)-Number(b.sell_price_min||0));
-    const bestBuy=sorted[0];
-    const bestSell=sorted[sorted.length-1];
+    const buyCandidates=cleaned.filter(r=>Number(r.sell_price_min||0)>0 && !isStale(r.sell_price_min_date, strict?120:240));
+    const sellCandidates=cleaned.filter(r=>Number(r.buy_price_max||0)>0 && !isStale(r.buy_price_max_date, strict?120:240));
+    const fallbackSellCandidates=cleaned.filter(r=>Number(r.sell_price_min||0)>0 && !isStale(r.sell_price_min_date, strict?120:240));
+    const bestBuy=[...buyCandidates].sort((a,b)=>Number(a.sell_price_min||0)-Number(b.sell_price_min||0))[0] || null;
+    const bestSell=[...sellCandidates].sort((a,b)=>Number(b.buy_price_max||0)-Number(a.buy_price_max||0))[0] || [...fallbackSellCandidates].sort((a,b)=>Number(b.sell_price_min||0)-Number(a.sell_price_min||0))[0] || null;
     if(!bestBuy || !bestSell) return null;
     const buyPrice=Number(bestBuy.sell_price_min||0);
-    const sellPrice=Number(bestSell.sell_price_min||0);
+    const sellPrice=Number(bestSell.buy_price_max||bestSell.sell_price_min||0);
     const tax=Math.round(sellPrice*(MARKET_FEE_DEFAULT/100));
     const transport=Math.round(buyPrice*0.04);
     const profit=sellPrice-buyPrice-tax-transport;
@@ -270,10 +276,11 @@
       margin,
       tax,
       transport,
-      quality:QUALITY_LABELS[String(bestBuy.quality||1)]||'Normal',
+      quality:QUALITY_LABELS[String(bestBuy.quality||bestSell.quality||1)]||'Normal',
       rows:cleaned,
-      hasSpread: cleaned.length>1 && bestBuy.city!==bestSell.city,
-      profitable: cleaned.length>1 && bestBuy.city!==bestSell.city && profit>0
+      hasSpread: cleaned.length>1 && (bestBuy.city!==bestSell.city || sellPrice!==buyPrice),
+      profitable: sellPrice>buyPrice && profit>0,
+      sellMode: Number(bestSell.buy_price_max||0)>0 ? 'ordem de compra' : 'referência de venda'
     };
   }
   async function loadMarket(){
@@ -286,23 +293,25 @@
       const params=new URLSearchParams({items:itemId,locations:DEFAULT_LOCATIONS.join(','),qualities:quality,server:'west'});
       const data=await api(`/api/albion-prices?${params.toString()}`);
       const rows=data.data||[];
-      const cleaned=sanitizeRows(rows,{strict:false}).sort((a,b)=>Number(a.sell_price_min||0)-Number(b.sell_price_min||0));
+      const cleaned=sanitizeRows(rows,{strict:false});
       if(!cleaned.length){
         box.innerHTML=`<div class="muted">Ainda não apareceu preço confiável para <strong>${prettyItemName(itemId)}</strong> nessa qualidade. Tente outra qualidade ou outro encantamento.</div>`;
         return;
       }
+      const sellRows=[...cleaned].filter(r=>Number(r.sell_price_min||0)>0).sort((a,b)=>Number(a.sell_price_min||0)-Number(b.sell_price_min||0));
+      const buyRows=[...cleaned].filter(r=>Number(r.buy_price_max||0)>0).sort((a,b)=>Number(b.buy_price_max||0)-Number(a.buy_price_max||0));
       const arb=calculateArbitrage(rows,{strict:false});
-      const first=cleaned[0];
-      const last=cleaned[cleaned.length-1];
-      const buyCity=arb?.buyCity||first.city;
-      const sellCity=arb?.sellCity||last.city;
-      const buyPrice=arb?.buyPrice||Number(first.sell_price_min||0);
-      const sellPrice=arb?.sellPrice||Number(last.sell_price_min||0);
+      const bestBuy=sellRows[0] || cleaned[0];
+      const bestSell=buyRows[0] || [...sellRows].sort((a,b)=>Number(b.sell_price_min||0)-Number(a.sell_price_min||0))[0] || cleaned[0];
+      const buyCity=arb?.buyCity||bestBuy.city;
+      const sellCity=arb?.sellCity||bestSell.city;
+      const buyPrice=arb?.buyPrice||Number(bestBuy.sell_price_min||0);
+      const sellPrice=arb?.sellPrice||Number(bestSell.buy_price_max||bestSell.sell_price_min||0);
       const profit=arb?.profit ?? (sellPrice-buyPrice-Math.round(sellPrice*(MARKET_FEE_DEFAULT/100))-Math.round(buyPrice*0.04));
       const margin=buyPrice>0?(profit/buyPrice)*100:0;
-      const qualityLabel=QUALITY_LABELS[String(arb?.rows?.[0]?.quality||quality)]||'Normal';
-      const statusText = !arb?.hasSpread ? 'Só encontrei preço válido em uma cidade por enquanto.' : (profit>0 ? 'Arbitragem possível agora.' : 'Há spread, mas ele ainda não cobre taxa + transporte.');
-      const tableRows=cleaned.map(row=>`<tr><td>${row.city}</td><td>${formatSilver(row.sell_price_min)}</td><td>${QUALITY_LABELS[String(row.quality||quality)]||'Normal'}</td><td>${new Date(row.sell_price_min_date).toLocaleString('pt-BR')}</td></tr>`).join('');
+      const qualityLabel=QUALITY_LABELS[String(bestBuy.quality||bestSell.quality||quality)]||'Normal';
+      const statusText = !arb?.hasSpread ? 'Encontrei preços válidos, mas sem spread útil entre cidades agora.' : (profit>0 ? 'Arbitragem possível agora.' : 'Há spread, mas ele ainda não cobre taxa + transporte.');
+      const tableRows=[...cleaned].sort((a,b)=>Number(a.sell_price_min||999999999)-Number(b.sell_price_min||999999999)).map(row=>`<tr><td>${row.city}</td><td>${Number(row.sell_price_min||0)>0?formatSilver(row.sell_price_min):'—'}</td><td>${Number(row.buy_price_max||0)>0?formatSilver(row.buy_price_max):'—'}</td><td>${QUALITY_LABELS[String(row.quality||quality)]||'Normal'}</td><td>${row.sell_price_min_date?new Date(row.sell_price_min_date).toLocaleString('pt-BR'):'—'}</td></tr>`).join('');
       box.innerHTML=`
         <div class="callout-grid">
           <div class="callout-card success"><span>Cidade mais barata para comprar</span><strong>${buyCity}</strong><small>${formatSilver(buyPrice)} prata</small></div>
@@ -310,8 +319,8 @@
           <div class="callout-card"><span>Qualidade usada</span><strong>${qualityLabel}</strong><small>${prettyItemName(itemId)}</small></div>
           <div class="callout-card"><span>Lucro líquido estimado</span><strong>${formatSilver(profit)} prata</strong><small>${margin.toFixed(1)}% de margem</small></div>
         </div>
-        <div class="muted top-gap"><strong>Resumo:</strong> compre em <strong>${buyCity}</strong> e venda em <strong>${sellCity}</strong>. ${statusText}</div>
-        <div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>Cidade</th><th>Preço de venda</th><th>Qualidade</th><th>Atualizado em</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
+        <div class="muted top-gap"><strong>Resumo:</strong> cidade mais barata para comprar: <strong>${buyCity}</strong>. Melhor cidade para vender: <strong>${sellCity}</strong>. Base de venda: <strong>${arb?.sellMode||'ordem de compra'}</strong>. ${statusText}</div>
+        <div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>Cidade</th><th>Menor venda</th><th>Maior compra</th><th>Qualidade</th><th>Atualizado em</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
     }catch(error){box.textContent=error.message;}
   }
   function setProgress(percent,text){const bar=document.getElementById('marketProgressBar'); const label=document.getElementById('marketProgressText'); if(bar) bar.style.width=`${percent}%`; if(label) label.textContent=text;}
@@ -351,7 +360,7 @@
   }
   function chunk(list,size){const out=[]; for(let i=0;i<list.length;i+=size) out.push(list.slice(i,i+size)); return out;}
   async function loadOpportunityRadar(fullMarket=false){const box=document.getElementById('opportunityResult'); if(!box) return; const list=fullMarket?POPULAR_ITEMS:POPULAR_ITEMS.slice(0,80); const chunks=chunk(list,12); box.innerHTML='<div class="muted">Consultando mercado...</div>'; const status=document.getElementById('apiStatusBadge'); if(status) status.textContent=`AlbionData consultando ${fullMarket?'mercado completo':'itens populares'}...`; try{let allRows=[]; for(let i=0;i<chunks.length;i++){const params=new URLSearchParams({items:chunks[i].join(','),locations:DEFAULT_LOCATIONS.join(','),qualities:'1',server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); allRows=allRows.concat(data.data||[]); const percent=Math.round(((i+1)/chunks.length)*100); setProgress(percent,`Consultando Albion Data: ${percent}%`);} lastOpportunities=buildOpportunityRows(allRows); const summary=document.getElementById('opportunitySummary'); if(status) status.textContent='AlbionData online'; setProgress(100,`${lastOpportunities.length} oportunidades confiáveis encontradas.`); if(!lastOpportunities.length){renderOpportunityTable(); if(summary) summary.textContent='Sem spreads úteis no momento.'; return;} if(summary){const best=sortOpportunities(lastOpportunities)[0]; summary.textContent=`Melhor oportunidade agora: ${best.itemName} comprando em ${best.buyCity} e vendendo em ${best.sellCity}.`;} renderOpportunityTable();}catch(error){if(status) status.textContent='AlbionData com falha'; setProgress(0,'Falha ao consultar a API do Albion.'); box.textContent=error.message;}}
-  async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); const adminBtn=document.getElementById('dashboardAdminBtn'); const adminTopBtn=document.getElementById('dashboardAdminTopBtn'); if(user.admin){adminBtn?.classList.remove('hidden'); adminTopBtn?.classList.remove('hidden'); adminBtn?.addEventListener('click',()=>window.location.href='/admin.html'); adminTopBtn?.addEventListener('click',()=>window.location.href='/admin.html');} bindLogout(); bindNav(); populateRadarCategories(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarGroups); document.getElementById('radarGroup')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); loadOpportunityRadar(false);}
+  async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); const adminBtn=document.getElementById('dashboardAdminBtn'); const adminTopBtn=document.getElementById('dashboardAdminTopBtn'); if(user.admin){adminBtn?.classList.remove('hidden'); adminTopBtn?.classList.remove('hidden'); adminBtn?.addEventListener('click',()=>window.location.href='/admin.html'); adminTopBtn?.addEventListener('click',()=>window.location.href='/admin.html');} bindLogout(); bindNav(); document.getElementById('goOverviewBtn')?.addEventListener('click',()=>activateSection('overview')); document.getElementById('goOverviewTopBtn')?.addEventListener('click',()=>activateSection('overview')); populateRadarCategories(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarGroups); document.getElementById('radarGroup')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); loadOpportunityRadar(false);}
   function activateAdminSection(targetId){document.querySelectorAll('.nav-item[data-admin-target]').forEach(i=>i.classList.toggle('active',i.dataset.adminTarget===targetId)); document.querySelectorAll('#adminOverview, #adminUsers, #adminLicenses, #adminSettings').forEach(s=>s.classList.toggle('active',s.id===targetId));}
   function bindAdminNav(){document.querySelectorAll('[data-admin-target]').forEach(item=>item.addEventListener('click',()=>activateAdminSection(item.dataset.adminTarget)));}
   function renderAdminUsers(users){const tbody=document.getElementById('adminUsersTable'); const count=document.getElementById('adminUserCount'); const pending=document.getElementById('adminPendingCount'); if(count) count.textContent=String(users.length); if(pending) pending.textContent=String(users.filter(u=>u.status==='Primeiro acesso').length); if(tbody) tbody.innerHTML=users.map(u=>`<tr><td>${u.nome||'-'}</td><td>${u.email}</td><td>${u.telefone||'-'}</td><td>${u.admin?'Admin':'Usuário'}</td><td>${new Date(u.licencaExpiraEm).toLocaleDateString('pt-BR')}</td><td>${u.status||'Ativo'}</td></tr>`).join('');}
