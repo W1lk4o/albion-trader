@@ -1,397 +1,401 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Albion Trader | Dashboard</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Albion Trader - Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="app-body" data-page="dashboard">
-  <div class="app-shell dashboard-shell">
+<body class="app-body">
+  <div class="app-layout">
     <aside class="sidebar">
-      <div>
-        <p class="eyebrow">Albion Trader</p>
-        <h2 class="sidebar-title">Dashboard</h2>
+      <div class="sidebar-top">
+        <div class="brand-logo">AT</div>
+        <div>
+          <h2>Albion Trader</h2>
+          <p id="sidebarUser">Operador</p>
+        </div>
       </div>
 
-      <nav class="nav-list">
-        <button class="nav-item active" data-target="overview">Dashboard</button>
-        <button class="nav-item" data-target="craft">Craft</button>
-        <button class="nav-item" data-target="refino">Refino</button>
-        <button class="nav-item" data-target="ilhas">Ilhas</button>
-        <button class="nav-item" data-target="transporte">Transporte</button>
-        <button class="nav-item" data-target="mercado">Mercado</button>
-        <button class="nav-item" data-target="guerra">Radar de Guerra</button>
-        <button class="nav-item" data-target="riqueza">Planejador</button>
-        <button class="nav-item" data-target="assistente">IA do Sistema</button>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-section="home">Dashboard</button>
+        <button class="nav-btn" data-section="market">Mercado Automático</button>
+        <button class="nav-btn" data-section="quick">Radar Rápido</button>
+        <button class="nav-btn" data-section="loot">Análise de Loot</button>
+        <button class="nav-btn" data-section="war">Mercado de Guerra</button>
+        <button class="nav-btn" data-section="planner">Planejador de Prata</button>
+        <button class="nav-btn" data-section="routes">Rotas</button>
+        <button class="nav-btn" data-section="avalon">Avalon</button>
+        <button class="nav-btn" data-section="craft">Craft</button>
+        <button class="nav-btn" data-section="refine">Refino</button>
+        <button class="nav-btn" data-section="fame">Fama</button>
+        <button class="nav-btn" data-section="settings">Configurações</button>
       </nav>
 
       <div class="sidebar-footer">
-        <a href="/admin" class="btn btn-outline btn-full">Ir para admin</a>
-        <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+        <button id="toggleAiBtn" class="btn btn-primary btn-block">Abrir IA</button>
+        <button id="logoutBtn" class="btn btn-outline btn-block">Sair</button>
       </div>
     </aside>
 
     <main class="content">
-      <header class="topbar">
+      <header class="page-header">
         <div>
-          <p class="muted">Bem-vindo</p>
-          <h1 id="welcomeTitle">Carregando...</h1>
+          <h1 id="welcomeTitle">Bem-vindo ao Albion Trader</h1>
+          <p id="welcomeSubtitle">As maiores oportunidades para ganhar prata aparecem aqui primeiro.</p>
         </div>
-        <div class="topbar-actions">
-          <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
-          <div class="status-pill status-accent" id="aiStatusBadge">IA offline</div>
+        <div class="header-actions">
+          <select id="serverSelect">
+            <option value="west">Americas</option>
+            <option value="europe">Europe</option>
+            <option value="east">Asia</option>
+          </select>
+          <select id="capitalPreset">
+            <option value="0">Sem filtro de capital</option>
+            <option value="500000">Até 500k</option>
+            <option value="2000000">Até 2M</option>
+            <option value="10000000">Até 10M</option>
+            <option value="50000000">Até 50M</option>
+          </select>
+          <button id="refreshHomeBtn" class="btn btn-secondary">Atualizar agora</button>
         </div>
       </header>
 
-      <section id="overview" class="page-section active">
-        <div class="stats-grid">
-          <article class="card stat-card">
-            <span class="stat-label">Módulos úteis</span>
-            <strong>9</strong>
-            <p>Agora com radar de guerra e planejador mais guiado.</p>
-          </article>
-          <article class="card stat-card">
-            <span class="stat-label">Radar de oportunidades</span>
-            <strong>Ao vivo</strong>
-            <p id="opportunitySummary">Lendo oportunidades do mercado...</p>
-          </article>
-          <article class="card stat-card">
-            <span class="stat-label">Licença</span>
-            <strong id="licenseDate">—</strong>
-            <p>Controle simples por sessão.</p>
-          </article>
+      <section class="panel-section" data-panel="home">
+        <div class="grid-4">
+          <div class="card metric"><h3>Top lucro</h3><p id="metricTopProfit">-</p></div>
+          <div class="card metric"><h3>Melhor rota</h3><p id="metricTopRoute">-</p></div>
+          <div class="card metric"><h3>Melhor categoria</h3><p id="metricTopCategory">-</p></div>
+          <div class="card metric"><h3>Atualizado</h3><p id="metricUpdatedAt">-</p></div>
         </div>
-
-        <div class="cards-grid">
-          <article class="card">
-            <div class="section-header">
-              <div>
-                <h3>Radar rápido de item</h3>
-                <p class="muted">Agora em estilo de mercado do Albion: item, tier e encantamento.</p>
-              </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-head">
+              <h3>🔥 Melhores oportunidades agora</h3>
+              <button class="btn btn-secondary" data-jump="market">Ver scanner completo</button>
             </div>
-            <div class="form-grid compact-grid">
-              <label><span>Categoria</span>
-                <select id="marketCategory"></select>
-              </label>
-              <label><span>Item</span>
-                <select id="marketItemSelect"></select>
-              </label>
-              <label><span>Tier</span>
-                <select id="marketTier"></select>
-              </label>
-              <label><span>Encantamento</span>
-                <select id="marketEnchant"></select>
-              </label>
-            </div>
-            <div class="inline-actions market-quick-actions">
-              <div class="module-pill" id="marketCodePreview">Código: —</div>
-              <button id="loadMarketBtn" class="btn btn-primary">Buscar</button>
-            </div>
-            <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
-          </article>
-
-          <article class="card">
-            <div class="section-header">
-              <div>
-                <h3>Módulos planejados</h3>
-                <p class="muted">Clique nos módulos para abrir a seção correspondente.</p>
-              </div>
-            </div>
-            <div class="tag-grid">
-              <button class="tag tag-button" data-target="craft">Craft</button>
-              <button class="tag tag-button" data-target="refino">Refino</button>
-              <button class="tag tag-button" data-target="ilhas">Ilhas</button>
-              <button class="tag tag-button" data-target="transporte">Transporte</button>
-              <button class="tag tag-button" data-target="mercado">Mercado</button>
-              <button class="tag tag-button" data-target="guerra">Radar de guerra</button>
-              <button class="tag tag-button" data-target="riqueza">Planejador</button>
-              <button class="tag tag-button" data-target="assistente">IA do sistema</button>
-              <span class="tag">Agricultura</span>
-              <span class="tag">Animais</span>
-              <span class="tag">Trabalhadores</span>
-              <span class="tag">Rotas Avalon</span>
-            </div>
-          </article>
-        </div>
-
-        <article class="card">
-          <div class="section-header">
-            <div>
-              <h3>Radar de oportunidades</h3>
-              <p class="muted">Busca spreads entre cidades usando a API de preços.</p>
-            </div>
-            <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar radar</button>
+            <div id="homeOpportunities"></div>
           </div>
-          <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
-        </article>
+          <div class="card">
+            <div class="section-head">
+              <h3>⚔ Mercado de guerra</h3>
+              <button class="btn btn-secondary" data-jump="war">Abrir módulo</button>
+            </div>
+            <div id="homeWar"></div>
+          </div>
+        </div>
       </section>
 
-      <section id="craft" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
-            <div>
-              <h2>Craft guiado</h2>
-              <p class="muted">Agora mais simples: escolha a linha, informe os custos e o sistema te diz o quão saudável está o craft.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="craft">Perguntar à IA</button>
+      <section class="panel-section hidden" data-panel="market">
+        <div class="card">
+          <div class="section-head">
+            <h3>Mercado automático</h3>
+            <p>Compra na cidade X, vende na cidade Y, com melhor margem e lucro.</p>
           </div>
           <div class="form-grid">
-            <label><span>Linha de craft</span>
-              <select id="craftLine">
-                <option value="bag">Bolsa</option>
-                <option value="cape">Capa</option>
-                <option value="cloth-armor">Armadura de pano</option>
-                <option value="leather-armor">Armadura de couro</option>
-                <option value="plate-armor">Armadura de placa</option>
-                <option value="food">Comida</option>
-                <option value="potion">Poção</option>
+            <div>
+              <label>Cidade de compra</label>
+              <select id="marketFrom"></select>
+            </div>
+            <div>
+              <label>Cidade de venda</label>
+              <select id="marketTo"></select>
+            </div>
+            <div>
+              <label>Capital disponível</label>
+              <input id="marketCapital" type="number" value="2000000">
+            </div>
+            <div>
+              <label>Quantidade de resultados</label>
+              <select id="marketLimit">
+                <option value="20">20</option>
+                <option value="40">40</option>
+                <option value="60">60</option>
               </select>
-            </label>
-            <label><span>Tier</span>
-              <select id="craftTier"></select>
-            </label>
-            <label><span>Encantamento</span>
-              <select id="craftEnchant"></select>
-            </label>
-            <label><span>Especialização</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
-            <label><span>Cidade</span>
-              <select id="craftCity">
-                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
-                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
-              </select>
-            </label>
-            <label><span>Usa foco?</span>
-              <select id="craftFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
-            </label>
-            <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
-            <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
-          <div id="craftResult" class="result-box"></div>
+          <div class="action-row">
+            <button id="scanMarketBtn" class="btn btn-primary">Escanear mercado</button>
+            <span class="muted">Analisa centenas de combinações e prioriza margem, lucro e capital disponível.</span>
+          </div>
+          <div id="marketScanStatus" class="status-text"></div>
+          <div id="marketResults"></div>
         </div>
       </section>
 
-      <section id="refino" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
-            <div>
-              <h2>Refino guiado</h2>
-              <p class="muted">Mesmo raciocínio do craft, mas focado em recurso bruto → refinado, com leitura clara de foco e margem.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="refino">Perguntar à IA</button>
+      <section class="panel-section hidden" data-panel="quick">
+        <div class="card">
+          <div class="section-head">
+            <h3>Radar rápido</h3>
+            <p>Escolha como no mercado do Albion: categoria → subcategoria → item → tier → encantamento.</p>
           </div>
           <div class="form-grid">
-            <label><span>Linha de refino</span>
-              <select id="refineLine">
-                <option value="ore">Minério → Barra</option>
-                <option value="fiber">Fibra → Tecido</option>
-                <option value="wood">Madeira → Tábua</option>
-                <option value="hide">Pele → Couro</option>
-                <option value="stone">Pedra → Bloco</option>
-              </select>
-            </label>
-            <label><span>Tier</span>
-              <select id="refineTier"></select>
-            </label>
-            <label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label>
-            <label><span>Cidade</span>
-              <select id="refineCity">
-                <option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option>
-                <option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option>
-              </select>
-            </label>
-            <label><span>Usa foco?</span>
-              <select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
-            </label>
-            <label><span>Quantidade</span><input id="refineQuantity" type="number" value="100" /></label>
-            <label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label>
-            <label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label>
+            <div><label>Categoria</label><select id="quickCategory"></select></div>
+            <div><label>Subcategoria</label><select id="quickSubcategory"></select></div>
+            <div><label>Item</label><select id="quickItem"></select></div>
+            <div><label>Tier</label><select id="quickTier"></select></div>
+            <div><label>Encantamento</label><select id="quickEnchant"></select></div>
+            <div><label>Cidade</label><select id="quickCity"></select></div>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button>
-          <div id="refineResult" class="result-box"></div>
+          <div class="action-row">
+            <button id="quickSearchBtn" class="btn btn-primary">Consultar item</button>
+          </div>
+          <div id="quickResults"></div>
         </div>
       </section>
 
-      <section id="ilhas" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
-            <div>
-              <h2>Simulador de Ilhas</h2>
-              <p class="muted">Agora recomenda o que plantar, o que criar e separa plano principal e plano reserva.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="ilhas">Perguntar à IA</button>
+      <section class="panel-section hidden" data-panel="loot">
+        <div class="card">
+          <div class="section-head">
+            <h3>Análise de loot</h3>
+            <p>Informe o que lootou e descubra se vale vender bruto, refinar ou levar para outra cidade.</p>
           </div>
           <div class="form-grid">
-            <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
-            <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
-            <label><span>Pastos</span><input id="islandPastures" type="number" value="2" /></label>
-            <label><span>Usa foco?</span>
-              <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
-            </label>
+            <div><label>Cidade atual</label><select id="lootCity"></select></div>
+            <div><label>Tipo de atividade</label>
+              <select id="lootType">
+                <option>Mundo aberto</option>
+                <option>Solo DG</option>
+                <option>Grupo DG</option>
+                <option>Corrompida</option>
+                <option>Caçada / Coleta</option>
+              </select>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
-          <div id="islandResult" class="result-box"></div>
+          <label>Loot (uma linha por item, ex: T6_HIDE@1 120)</label>
+          <textarea id="lootInput" rows="8" placeholder="T6_HIDE@1 120
+T5_RUNE 50
+T6_PLANKS 40"></textarea>
+          <div class="action-row">
+            <button id="analyzeLootBtn" class="btn btn-primary">Analisar loot</button>
+          </div>
+          <div id="lootResults"></div>
         </div>
       </section>
 
-      <section id="transporte" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
-            <div>
-              <h2>Calculadora de Transporte</h2>
-              <p class="muted">Conta simples para você ver rápido se a rota tem espaço ou se está apertada.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="transporte">Perguntar à IA</button>
+      <section class="panel-section hidden" data-panel="war">
+        <div class="card">
+          <div class="section-head">
+            <h3>Mercado de guerra</h3>
+            <p>Itens e builds PvP quentes, com foco em rotação de mercado.</p>
           </div>
           <div class="form-grid">
-            <label><span>Cidade de compra</span><input id="transportBuyCity" type="text" value="Bridgewatch" /></label>
-            <label><span>Cidade de venda</span><input id="transportSellCity" type="text" value="Caerleon" /></label>
-            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9800" /></label>
-            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="14200" /></label>
-            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="600" /></label>
-          </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button>
-          <div id="transportResult" class="result-box"></div>
-        </div>
-      </section>
-
-      <section id="mercado" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
             <div>
-              <h2>Mercado e oportunidades</h2>
-              <p class="muted">Leitura rápida do mercado vivo e interpretação do spread encontrado.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="mercado">Perguntar à IA</button>
-          </div>
-          <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
-          <div class="insight-list">
-            <div class="insight-item">Mercado bom não é só lucro unitário. É lucro unitário + velocidade de venda.</div>
-            <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
-            <div class="insight-item">Use a IA para comparar rotas, spreads e decidir se compensa girar capital hoje.</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="guerra" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
-            <div>
-              <h2>Radar de Guerra</h2>
-              <p class="muted">Base curada de builds PvP para você vigiar demanda de mercado por modo de jogo.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="guerra">Perguntar à IA</button>
-          </div>
-          <div class="form-grid compact-grid">
-            <label><span>Modo PvP</span>
-              <select id="warMode"></select>
-            </label>
-            <label><span>Perfil de venda</span>
-              <select id="warFocus">
-                <option value="fast">Giro rápido</option>
-                <option value="margin">Maior margem</option>
-                <option value="stable">Mais estável</option>
+              <label>Modo PvP</label>
+              <select id="warMode">
+                <option value="zvz">ZvZ</option>
+                <option value="smallscale">Small Scale</option>
+                <option value="mists">Mists</option>
+                <option value="corrupted">Corrompida</option>
+                <option value="hellgate">Hellgate</option>
+                <option value="arena">Crystal / Arena</option>
               </select>
-            </label>
+            </div>
+            <div>
+              <label>Cidade foco</label>
+              <select id="warCity"></select>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.renderWarMarket()">Atualizar radar de guerra</button>
-          <div id="warResult" class="result-box"></div>
+          <div class="action-row">
+            <button id="loadWarBtn" class="btn btn-primary">Analisar mercado de guerra</button>
+          </div>
+          <div id="warResults"></div>
         </div>
       </section>
 
-      <section id="riqueza" class="page-section">
-        <div class="card module-card">
-          <div class="section-header">
-            <div>
-              <h2>Planejador de Prata</h2>
-              <p class="muted">Agora ele monta rota, mostra melhor caminho e aceita preferências do jogador.</p>
-            </div>
-            <button class="btn btn-outline ask-ai-btn" data-module="riqueza">Perguntar à IA</button>
+      <section class="panel-section hidden" data-panel="planner">
+        <div class="card">
+          <div class="section-head">
+            <h3>Planejador de prata</h3>
+            <p>Não só média por dia. Aqui sai a rota mais rentável e as alternativas baseadas no que o jogador gosta de fazer.</p>
           </div>
           <div class="form-grid">
-            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
-            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
-            <label><span>Dias para atingir</span><input id="wealthDays" type="number" value="30" /></label>
-            <label><span>Modo do planejador</span>
-              <select id="wealthMode">
-                <option value="best">Me mostra o melhor caminho</option>
-                <option value="custom">Quero escolher o que gosto de fazer</option>
-              </select>
-            </label>
+            <div><label>Prata atual</label><input id="plannerCurrent" type="number" value="1000000"></div>
+            <div><label>Meta de prata</label><input id="plannerGoal" type="number" value="1000000000"></div>
+            <div><label>Horas por dia</label><input id="plannerHours" type="number" value="3"></div>
+            <div><label>Cidade base</label><select id="plannerCity"></select></div>
           </div>
-
-          <div class="card inner-card">
-            <h3>Atividades que eu gosto</h3>
-            <div class="checkbox-grid" id="wealthActivities">
-              <label class="check-chip"><input type="checkbox" value="hide" /> <span>Coletar pele</span></label>
-              <label class="check-chip"><input type="checkbox" value="ore" /> <span>Garimpar minério</span></label>
-              <label class="check-chip"><input type="checkbox" value="fiber" /> <span>Coletar fibra</span></label>
-              <label class="check-chip"><input type="checkbox" value="wood" /> <span>Coletar madeira</span></label>
-              <label class="check-chip"><input type="checkbox" value="stone" /> <span>Coletar pedra</span></label>
-              <label class="check-chip"><input type="checkbox" value="dg" /> <span>DG</span></label>
-              <label class="check-chip"><input type="checkbox" value="mists" /> <span>Mists</span></label>
-              <label class="check-chip"><input type="checkbox" value="transport" /> <span>Transporte</span></label>
-              <label class="check-chip"><input type="checkbox" value="craft" /> <span>Craft</span></label>
-              <label class="check-chip"><input type="checkbox" value="refine" /> <span>Refino</span></label>
-              <label class="check-chip"><input type="checkbox" value="market" /> <span>Mercado</span></label>
-            </div>
+          <label>O que você gosta de fazer?</label>
+          <div class="chips" id="plannerActivities">
+            <button class="chip active" data-activity="mercado">Mercado</button>
+            <button class="chip" data-activity="transporte">Transporte</button>
+            <button class="chip" data-activity="pele">Coletar pele</button>
+            <button class="chip" data-activity="minerio">Garimpar minério</button>
+            <button class="chip" data-activity="fibra">Coletar fibra</button>
+            <button class="chip" data-activity="madeira">Coletar madeira</button>
+            <button class="chip" data-activity="pedra">Coletar pedra</button>
+            <button class="chip" data-activity="dg">DG</button>
+            <button class="chip" data-activity="mists">Mists</button>
+            <button class="chip" data-activity="craft">Craft</button>
+            <button class="chip" data-activity="refino">Refino</button>
           </div>
-
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Montar plano</button>
-          <div id="wealthResult" class="result-box"></div>
+          <div class="action-row">
+            <button id="runPlannerBtn" class="btn btn-primary">Traçar rota de riqueza</button>
+          </div>
+          <div id="plannerResults"></div>
         </div>
       </section>
 
-      <section id="assistente" class="page-section">
-        <article class="card module-card">
-          <div class="section-header">
+      <section class="panel-section hidden" data-panel="routes">
+        <div class="card">
+          <div class="section-head">
+            <h3>Planejador de rotas</h3>
+            <p>Rota mais safe, mais rápida e sugestão de montaria para transporte.</p>
+          </div>
+          <div class="form-grid">
+            <div><label>Mapa de origem</label><input id="routeFrom" type="text" placeholder="ex: Dryvein Cross"></div>
+            <div><label>Mapa de destino</label><input id="routeTo" type="text" placeholder="ex: Sandrift Steppe"></div>
+            <div><label>Tipo de rota</label>
+              <select id="routeMode">
+                <option value="safe">Mais safe</option>
+                <option value="fast">Mais rápida</option>
+                <option value="black">Só black</option>
+                <option value="yellow">Só amarela</option>
+                <option value="avalon">Usando Avalon/Roads</option>
+              </select>
+            </div>
+            <div><label>Carga estimada (kg)</label><input id="routeWeight" type="number" value="800"></div>
+          </div>
+          <div class="action-row">
+            <button id="planRouteBtn" class="btn btn-primary">Traçar rota</button>
+          </div>
+          <div id="routeResults"></div>
+        </div>
+      </section>
+
+      <section class="panel-section hidden" data-panel="avalon">
+        <div class="card">
+          <div class="section-head">
+            <h3>Análise de Avalon</h3>
+            <p>Diga onde está e qual tier quer buscar. O sistema sugere uma estratégia de caça e transição por Roads.</p>
+          </div>
+          <div class="form-grid">
+            <div><label>Mapa atual</label><input id="avalonMap" type="text" placeholder="ex: Highstone Mound"></div>
+            <div><label>Objetivo</label>
+              <select id="avalonGoal">
+                <option value="farmt8">Achar Avalon T8 para farm</option>
+                <option value="safeexit">Saída mais segura</option>
+                <option value="royal">Voltar para Royal</option>
+              </select>
+            </div>
+          </div>
+          <div class="action-row">
+            <button id="scanAvalonBtn" class="btn btn-primary">Gerar estratégia Avalon</button>
+          </div>
+          <div id="avalonResults"></div>
+        </div>
+      </section>
+
+      <section class="panel-section hidden" data-panel="craft">
+        <div class="card">
+          <div class="section-head">
+            <h3>Craft guiado</h3>
+            <p>Fluxo simples: escolha cidade, categoria e nível. O sistema mostra o que tende a girar melhor.</p>
+          </div>
+          <div class="form-grid">
+            <div><label>Cidade</label><select id="craftCity"></select></div>
+            <div><label>Nível de craft</label><select id="craftLevel"><option>T4</option><option>T5</option><option>T6</option><option>T7</option><option>T8</option></select></div>
+            <div><label>Categoria</label><select id="craftCategory"><option>Bolsas</option><option>Armaduras</option><option>Armas</option><option>Consumíveis</option></select></div>
+            <div><label>Usa foco?</label><select id="craftFocus"><option>Não</option><option>Sim</option></select></div>
+          </div>
+          <div class="action-row">
+            <button id="craftSuggestBtn" class="btn btn-primary">Mostrar craft mais simples</button>
+          </div>
+          <div id="craftResults"></div>
+        </div>
+      </section>
+
+      <section class="panel-section hidden" data-panel="refine">
+        <div class="card">
+          <div class="section-head">
+            <h3>Refino guiado</h3>
+            <p>Escolha cidade, recurso e foco. O sistema sugere a rota de refino mais fácil de executar.</p>
+          </div>
+          <div class="form-grid">
+            <div><label>Cidade</label><select id="refineCity"></select></div>
+            <div><label>Recurso</label><select id="refineResource"><option>Minério</option><option>Madeira</option><option>Fibra</option><option>Pele</option><option>Pedra</option></select></div>
+            <div><label>Nível</label><select id="refineLevel"><option>T4</option><option>T5</option><option>T6</option><option>T7</option><option>T8</option></select></div>
+            <div><label>Usa foco?</label><select id="refineFocus"><option>Não</option><option>Sim</option></select></div>
+          </div>
+          <div class="action-row">
+            <button id="refineSuggestBtn" class="btn btn-primary">Mostrar refino mais simples</button>
+          </div>
+          <div id="refineResults"></div>
+        </div>
+      </section>
+
+      <section class="panel-section hidden" data-panel="fame">
+        <div class="card">
+          <div class="section-head">
+            <h3>Calculadora de fama e prata/hora</h3>
+            <p>Coloque a fama e o horário de entrada e saída para medir eficiência.</p>
+          </div>
+          <div class="form-grid">
+            <div><label>Fama inicial</label><input id="fameStart" type="number" value="0"></div>
+            <div><label>Fama final</label><input id="fameEnd" type="number" value="1000000"></div>
+            <div><label>Hora inicial</label><input id="timeStart" type="time" value="19:00"></div>
+            <div><label>Hora final</label><input id="timeEnd" type="time" value="21:00"></div>
+            <div><label>Loot em prata</label><input id="lootSilver" type="number" value="800000"></div>
+            <div><label>Atividade</label>
+              <select id="fameActivity">
+                <option>Open World</option>
+                <option>DG Solo</option>
+                <option>DG Grupo</option>
+                <option>Mists</option>
+                <option>Corrompida</option>
+              </select>
+            </div>
+          </div>
+          <div class="action-row">
+            <button id="calcFameBtn" class="btn btn-primary">Calcular</button>
+          </div>
+          <div id="fameResults"></div>
+        </div>
+      </section>
+
+      <section class="panel-section hidden" data-panel="settings">
+        <div class="card">
+          <h3>Configurações</h3>
+          <div class="form-grid">
             <div>
-              <h2>Assistente IA do Albion Trader</h2>
-              <p class="muted">Converse com a IA sobre o módulo atual. Ela lê o contexto da tela antes de responder.</p>
+              <label>Servidor padrão</label>
+              <select id="settingsServer">
+                <option value="west">Americas</option>
+                <option value="europe">Europe</option>
+                <option value="east">Asia</option>
+              </select>
             </div>
-            <div class="module-pill" id="currentAiModule">Módulo atual: Dashboard</div>
-          </div>
-
-          <div class="ai-layout">
-            <div class="ai-chat-box" id="aiChatMessages">
-              <div class="chat-message ai">
-                <strong>IA</strong>
-                <p>Estou pronta. Você pode perguntar, por exemplo: “Na minha ilha vale mais plantar cenoura ou erva?”</p>
-              </div>
-            </div>
-
-            <div class="ai-chat-controls">
-              <label>
-                <span>Módulo</span>
-                <select id="aiModuleSelect">
-                  <option value="overview">Dashboard</option>
-                  <option value="craft">Craft</option>
-                  <option value="refino">Refino</option>
-                  <option value="ilhas">Ilhas</option>
-                  <option value="transporte">Transporte</option>
-                  <option value="mercado">Mercado</option>
-                  <option value="guerra">Radar de guerra</option>
-                  <option value="riqueza">Planejador de riqueza</option>
-                </select>
-              </label>
-              <label>
-                <span>Sua pergunta</span>
-                <textarea id="aiQuestion" rows="5" placeholder="Ex: Tenho 5 plantações, uso foco e estou em dúvida entre cenoura e erva. O que faz mais sentido?"></textarea>
-              </label>
-              <div class="inline-actions">
-                <button id="sendAiBtn" class="btn btn-primary">Perguntar à IA</button>
-                <button id="clearAiBtn" class="btn btn-outline">Limpar conversa</button>
-              </div>
-              <p class="muted small">Para a IA responder de verdade, você precisa configurar a variável <code>OPENAI_API_KEY</code> no Vercel.</p>
+            <div>
+              <label>Perfil de risco</label>
+              <select id="riskProfile">
+                <option value="safe">Conservador</option>
+                <option value="balanced">Equilibrado</option>
+                <option value="aggressive">Agressivo</option>
+              </select>
             </div>
           </div>
-        </article>
+          <button id="saveSettingsBtn" class="btn btn-primary">Salvar configurações</button>
+        </div>
       </section>
     </main>
   </div>
 
+  <div id="aiDrawer" class="ai-drawer">
+    <div class="ai-header">
+      <div>
+        <h3>IA do Albion Trader</h3>
+        <p>Converse sem sair da página</p>
+      </div>
+      <button id="closeAiBtn" class="btn btn-outline">Fechar</button>
+    </div>
+    <div id="aiMessages" class="ai-messages"></div>
+    <div class="ai-input-row">
+      <textarea id="aiInput" rows="3" placeholder="Pergunte algo como: Vale vender minha pele em Caerleon ou refinar antes?"></textarea>
+      <button id="sendAiBtn" class="btn btn-primary">Enviar</button>
+    </div>
+  </div>
+
+  <script src="js/users.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

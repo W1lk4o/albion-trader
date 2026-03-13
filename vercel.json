@@ -1,8 +1,8 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" }
-  ]
+  "version": 2,
+  "functions": {
+    "api/*.js": {
+      "runtime": "@vercel/node@5.3.24"
+    }
+  }
 }

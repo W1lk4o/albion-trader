@@ -1,30 +1,14 @@
-# Albion Trader — Vercel
+# Albion Trader v5
 
-Projeto pronto para Vercel com frontend estático + API Functions.
+Projeto pronto para Vercel com frontend estático + funções em `api/`.
 
-## Login padrão
+## Variáveis de ambiente
+- `OPENAI_API_KEY` — opcional. Se não existir, a IA usa um modo local heurístico.
+- `OPENAI_MODEL` — opcional. Ex.: `gpt-4.1-mini`
 
-Admin:
-- email: wilkeringracio@gmail.com
-- senha: Wilker12@
-
-Teste:
-- email: convidado@albiontrader.com
-- senha: Albion123
-
-## Variáveis de ambiente no Vercel
-
-Obrigatórias para produção séria:
-- `JWT_SECRET`
-
-Para ativar a IA:
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL` (opcional, padrão: `gpt-4.1-mini`)
-
-## Rotas da API
-
-- `/api/login`
-- `/api/me`
-- `/api/users`
-- `/api/albion-prices`
-- `/api/ai-chat`
+## Deploy
+1. Apague o conteúdo antigo do projeto local.
+2. Copie tudo desta pasta.
+3. Commit no GitHub Desktop.
+4. Push.
+5. Aguarde o Vercel redeployar.

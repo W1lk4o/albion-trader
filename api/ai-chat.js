@@ -1,91 +1,72 @@
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido.' });
+
+const { json, parseBody } = require('./_lib');
+
+function heuristicReply(message, context = {}){
+  const msg = String(message || '').toLowerCase();
+  const sec = context.currentSection || context.module || 'dashboard';
+
+  if(msg.includes('pele')){
+    return `Se o foco é pele, eu começaria comparando Bridgewatch, Martlock e Caerleon. Normalmente a decisão certa vem em 3 passos: ver preço bruto da pele, comparar couro refinado e medir spread entre cidades. Se você quiser, me diga seu tier, cidade atual e capital que eu te monto a rota.`;
+  }
+  if(msg.includes('cenoura') || msg.includes('erva') || msg.includes('ilha')){
+    return `Para ilha, cenoura costuma ser rota simples e líquida. Ervas podem dar mais margem em momentos específicos, mas exigem comparar preço de semente, colheita e velocidade de venda. Me diga quantos plots você tem, se usa foco e sua cidade.`;
+  }
+  if(msg.includes('rota') || msg.includes('transport')){
+    return `Para rota, eu preciso de origem, destino, peso da carga e se você quer o caminho mais seguro ou mais rápido. Para ticket alto, normalmente recomendo montaria mais resistente; para giros leves, montaria veloz.`;
+  }
+  if(msg.includes('loot') || msg.includes('drop')){
+    return `Me mande o loot em linhas do tipo ITEM_ID quantidade e a cidade atual. Eu vou comparar venda direta, melhor cidade e se faz sentido refinar antes.`;
+  }
+  if(msg.includes('prata') || msg.includes('1 bilh') || msg.includes('milhão')){
+    return `Para rota de prata, o importante não é só a meta. É sua preferência, horas por dia, capital atual e tolerância a risco. Se você não quiser a rota mais rentável, me diga o que gosta de fazer que eu traço um plano alternativo.`;
   }
 
-  try {
+  return `Entendi sua pergunta sobre ${sec}. Eu consigo ajudar com mercado, loot, rotas, craft, refino, ilhas e planejamento de prata. Me mande mais contexto: cidade, capital, item ou atividade preferida.`;
+}
+
+module.exports = async (req, res) => {
+  if(req.method !== 'POST') return json(res, 405, { ok:false, error:'Método não permitido' });
+  try{
+    const { message, memory = [], context = {} } = await parseBody(req);
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return res.status(503).json({
-        error: 'A IA ainda não foi ativada. Configure OPENAI_API_KEY no projeto da Vercel.'
-      });
+    if(!apiKey){
+      const reply = heuristicReply(message, context);
+      return json(res, 200, { ok:true, mode:'fallback', reply });
     }
 
-    const {
-      module: moduleName = 'overview',
-      message = '',
-      context = {},
-      history = []
-    } = req.body || {};
-
-    if (!String(message || '').trim()) {
-      return res.status(400).json({ error: 'Envie uma pergunta para a IA.' });
-    }
-
-    const systemPrompt = [
-      'Você é o assistente do Albion Trader.',
-      'Responda em português do Brasil.',
-      'Seja objetivo, útil e prático.',
-      'Sempre entregue recomendação acionável, não só teoria.',
-      'Quando houver números no contexto, use-os.',
-      'Quando o módulo for ilhas, explique claramente o que plantar, o que criar e por quê.',
-      'Quando o módulo for riqueza, responda em etapas claras e respeite as atividades favoritas do jogador quando elas existirem.',
-      'Quando o módulo for mercado, priorize margem, giro e risco.',
-      'Quando o módulo for guerra, transforme a leitura em itens que valem vigiar no mercado.',
-      'Nunca invente que viu dados que não estão no contexto. Se faltar dado, diga o que falta.'
-    ].join(' ');
-
-    const limitedHistory = Array.isArray(history) ? history.slice(-6) : [];
+    const model = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
     const input = [
       {
         role: 'system',
-        content: [{ type: 'input_text', text: systemPrompt }]
+        content: [
+          { type: 'input_text', text:
+`Você é a IA do Albion Trader. Responda em português do Brasil, direto ao ponto, com foco em lucro, mercado, loot, rotas, craft, refino, ilhas e estratégia de prata no Albion Online.
+Use o contexto do usuário para responder. Se o contexto estiver incompleto, peça só o mínimo necessário. Sempre entregue uma recomendação prática primeiro.`
+          }
+        ]
       },
-      ...limitedHistory.map((item) => ({
-        role: item.role === 'assistant' ? 'assistant' : 'user',
-        content: [{ type: 'input_text', text: String(item.text || '').slice(0, 2000) }]
+      ...memory.slice(-8).map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: [{ type:'input_text', text:String(m.content || '') }]
       })),
       {
         role: 'user',
-        content: [{
-          type: 'input_text',
-          text: JSON.stringify({ module: moduleName, context, question: message })
-        }]
+        content: [{ type:'input_text', text: `Contexto atual: ${JSON.stringify(context)}\n\nPergunta: ${message}` }]
       }
     ];
 
     const response = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
-        input,
-        max_output_tokens: 500
-      })
+      body: JSON.stringify({ model, input, temperature: 0.4, max_output_tokens: 600 })
     });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      const message = data?.error?.message || 'Falha ao consultar a IA.';
-      return res.status(response.status).json({ error: message });
-    }
-
-    const text = typeof data.output_text === 'string'
-      ? data.output_text
-      : Array.isArray(data.output)
-        ? data.output
-            .flatMap((item) => item.content || [])
-            .filter((item) => item.type === 'output_text' || item.type === 'text')
-            .map((item) => item.text || '')
-            .join('\n')
-        : '';
-
-    return res.status(200).json({ ok: true, answer: text || 'A IA respondeu, mas sem texto retornado.' });
-  } catch (error) {
-    return res.status(500).json({ error: 'Erro interno ao consultar a IA.' });
+    const data = await response.json();
+    const reply = data.output_text || (data.output && JSON.stringify(data.output)) || 'Sem resposta.';
+    return json(res, 200, { ok:true, mode:'openai', reply });
+  }catch(err){
+    return json(res, 500, { ok:false, error:'Falha no chat de IA.', details:String(err.message || err) });
   }
 };

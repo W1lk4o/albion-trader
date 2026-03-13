@@ -1,0 +1,3261 @@
+[
+  {
+    "category": "Recursos",
+    "subcategory": "Brutos",
+    "labelPt": "Minério",
+    "itemIdBase": "ORE",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Brutos",
+    "labelPt": "Madeira",
+    "itemIdBase": "WOOD",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Brutos",
+    "labelPt": "Fibra",
+    "itemIdBase": "FIBER",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Brutos",
+    "labelPt": "Pele",
+    "itemIdBase": "HIDE",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Brutos",
+    "labelPt": "Pedra",
+    "itemIdBase": "ROCK",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Refinados",
+    "labelPt": "Barra de Metal",
+    "itemIdBase": "METALBAR",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Refinados",
+    "labelPt": "Tábua",
+    "itemIdBase": "PLANKS",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Refinados",
+    "labelPt": "Tecido",
+    "itemIdBase": "CLOTH",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Refinados",
+    "labelPt": "Couro",
+    "itemIdBase": "LEATHER",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Recursos",
+    "subcategory": "Refinados",
+    "labelPt": "Bloco de Pedra",
+    "itemIdBase": "STONEBLOCK",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Bolsa",
+    "itemIdBase": "BAG",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa Comum",
+    "itemIdBase": "CAPE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa de Thetford",
+    "itemIdBase": "CAPEITEM_FW_THETFORD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa de Martlock",
+    "itemIdBase": "CAPEITEM_FW_MARTLOCK",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa de Bridgewatch",
+    "itemIdBase": "CAPEITEM_FW_BRIDGEWATCH",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa de Fort Sterling",
+    "itemIdBase": "CAPEITEM_FW_FORTSTERLING",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa de Lymhurst",
+    "itemIdBase": "CAPEITEM_FW_LYMHURST",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Acessórios",
+    "subcategory": "Capas e Bolsas",
+    "labelPt": "Capa de Caerleon",
+    "itemIdBase": "CAPEITEM_FW_CAERLEON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Cura",
+    "itemIdBase": "POTION_HEAL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Energia",
+    "itemIdBase": "POTION_ENERGY",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Resistência",
+    "itemIdBase": "POTION_REVIVE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção Invisível",
+    "itemIdBase": "POTION_INVISIBILITY",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Veneno",
+    "itemIdBase": "POTION_COOLDOWN",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Gigante",
+    "itemIdBase": "POTION_ACID",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Velocidade",
+    "itemIdBase": "POTION_SWIFTCLAW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Poções",
+    "labelPt": "Poção de Resistência ao Fogo",
+    "itemIdBase": "POTION_CLEANSE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Omelete",
+    "itemIdBase": "OMELETTE",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Ensopado",
+    "itemIdBase": "STEW",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Sanduíche",
+    "itemIdBase": "SANDWICH",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Salada",
+    "itemIdBase": "SALAD",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Torta",
+    "itemIdBase": "PIE",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Sopa",
+    "itemIdBase": "SOUP",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Peixe Assado",
+    "itemIdBase": "FISH",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Carne Assada",
+    "itemIdBase": "ROAST",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Consumíveis",
+    "subcategory": "Comidas",
+    "labelPt": "Guisado",
+    "itemIdBase": "MEAL",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Ferramentas",
+    "subcategory": "Coleta",
+    "labelPt": "Picareta",
+    "itemIdBase": "PICK",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Ferramentas",
+    "subcategory": "Coleta",
+    "labelPt": "Machado",
+    "itemIdBase": "AXE",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Ferramentas",
+    "subcategory": "Coleta",
+    "labelPt": "Faca de Esfolar",
+    "itemIdBase": "SKINNINGKNIFE",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Ferramentas",
+    "subcategory": "Coleta",
+    "labelPt": "Martelo de Pedreiro",
+    "itemIdBase": "STONEHAMMER",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Ferramentas",
+    "subcategory": "Coleta",
+    "labelPt": "Foice",
+    "itemIdBase": "SICKLE",
+    "tiers": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Pano",
+    "labelPt": "Capuz de Erudito",
+    "itemIdBase": "HEAD_CLOTH_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Pano",
+    "labelPt": "Capuz de Clérigo",
+    "itemIdBase": "HEAD_CLOTH_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Pano",
+    "labelPt": "Capuz de Mago",
+    "itemIdBase": "HEAD_CLOTH_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Pano",
+    "labelPt": "Capuz de Cultista",
+    "itemIdBase": "HEAD_CLOTH_ROYAL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Pano",
+    "labelPt": "Capuz de Druid",
+    "itemIdBase": "HEAD_CLOTH_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Pano",
+    "labelPt": "Manto de Erudito",
+    "itemIdBase": "ARMOR_CLOTH_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Pano",
+    "labelPt": "Manto de Clérigo",
+    "itemIdBase": "ARMOR_CLOTH_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Pano",
+    "labelPt": "Túnica de Mago",
+    "itemIdBase": "ARMOR_CLOTH_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Pano",
+    "labelPt": "Manto de Cultista",
+    "itemIdBase": "ARMOR_CLOTH_ROYAL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Pano",
+    "labelPt": "Túnica Druídica",
+    "itemIdBase": "ARMOR_CLOTH_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Pano",
+    "labelPt": "Sandálias de Erudito",
+    "itemIdBase": "SHOES_CLOTH_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Pano",
+    "labelPt": "Sandálias de Clérigo",
+    "itemIdBase": "SHOES_CLOTH_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Pano",
+    "labelPt": "Sandálias de Mago",
+    "itemIdBase": "SHOES_CLOTH_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Pano",
+    "labelPt": "Sandálias de Cultista",
+    "itemIdBase": "SHOES_CLOTH_ROYAL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Pano",
+    "labelPt": "Sandálias Druídicas",
+    "itemIdBase": "SHOES_CLOTH_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Couro",
+    "labelPt": "Capuz de Mercenário",
+    "itemIdBase": "HEAD_LEATHER_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Couro",
+    "labelPt": "Capuz de Caçador",
+    "itemIdBase": "HEAD_LEATHER_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Couro",
+    "labelPt": "Capuz de Assassino",
+    "itemIdBase": "HEAD_LEATHER_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Couro",
+    "labelPt": "Capuz de Demônio",
+    "itemIdBase": "HEAD_LEATHER_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Couro",
+    "labelPt": "Capuz de Espectro",
+    "itemIdBase": "HEAD_LEATHER_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Couro",
+    "labelPt": "Jaqueta de Mercenário",
+    "itemIdBase": "ARMOR_LEATHER_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Couro",
+    "labelPt": "Jaqueta de Caçador",
+    "itemIdBase": "ARMOR_LEATHER_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Couro",
+    "labelPt": "Jaqueta de Assassino",
+    "itemIdBase": "ARMOR_LEATHER_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Couro",
+    "labelPt": "Jaqueta de Demônio",
+    "itemIdBase": "ARMOR_LEATHER_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Couro",
+    "labelPt": "Jaqueta Espectral",
+    "itemIdBase": "ARMOR_LEATHER_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Couro",
+    "labelPt": "Sapatos de Mercenário",
+    "itemIdBase": "SHOES_LEATHER_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Couro",
+    "labelPt": "Sapatos de Caçador",
+    "itemIdBase": "SHOES_LEATHER_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Couro",
+    "labelPt": "Sapatos de Assassino",
+    "itemIdBase": "SHOES_LEATHER_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Couro",
+    "labelPt": "Sapatos de Demônio",
+    "itemIdBase": "SHOES_LEATHER_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Sapatos de Couro",
+    "labelPt": "Sapatos Espectrais",
+    "itemIdBase": "SHOES_LEATHER_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Placa",
+    "labelPt": "Capacete de Soldado",
+    "itemIdBase": "HEAD_PLATE_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Placa",
+    "labelPt": "Capacete de Guardião",
+    "itemIdBase": "HEAD_PLATE_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Placa",
+    "labelPt": "Capacete de Cavaleiro",
+    "itemIdBase": "HEAD_PLATE_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Placa",
+    "labelPt": "Capuz de Juiz",
+    "itemIdBase": "HEAD_PLATE_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Capacetes de Placa",
+    "labelPt": "Capacete de Cavaleiro da Tumba",
+    "itemIdBase": "HEAD_PLATE_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Placa",
+    "labelPt": "Armadura de Soldado",
+    "itemIdBase": "ARMOR_PLATE_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Placa",
+    "labelPt": "Armadura de Guardião",
+    "itemIdBase": "ARMOR_PLATE_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Placa",
+    "labelPt": "Armadura de Cavaleiro",
+    "itemIdBase": "ARMOR_PLATE_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Placa",
+    "labelPt": "Armadura do Juiz",
+    "itemIdBase": "ARMOR_PLATE_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Peitorais de Placa",
+    "labelPt": "Armadura da Tumba",
+    "itemIdBase": "ARMOR_PLATE_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Botas de Placa",
+    "labelPt": "Botas de Soldado",
+    "itemIdBase": "SHOES_PLATE_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Botas de Placa",
+    "labelPt": "Botas de Guardião",
+    "itemIdBase": "SHOES_PLATE_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Botas de Placa",
+    "labelPt": "Botas de Cavaleiro",
+    "itemIdBase": "SHOES_PLATE_SET3",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Botas de Placa",
+    "labelPt": "Botas do Juiz",
+    "itemIdBase": "SHOES_PLATE_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armaduras",
+    "subcategory": "Botas de Placa",
+    "labelPt": "Botas da Tumba",
+    "itemIdBase": "SHOES_PLATE_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Espadas",
+    "labelPt": "Espada Larga",
+    "itemIdBase": "MAIN_SWORD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Espadas",
+    "labelPt": "Espadas Largas Duplas",
+    "itemIdBase": "2H_DUALSWORD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Espadas",
+    "labelPt": "Claymore",
+    "itemIdBase": "2H_CLAYMORE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Espadas",
+    "labelPt": "Galatinas",
+    "itemIdBase": "2H_CLARIENT",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Espadas",
+    "labelPt": "Carving Sword",
+    "itemIdBase": "2H_CLEAVER_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Machados",
+    "labelPt": "Machado de Batalha",
+    "itemIdBase": "MAIN_AXE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Machados",
+    "labelPt": "Machado Grande",
+    "itemIdBase": "2H_AXE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Machados",
+    "labelPt": "Halberd",
+    "itemIdBase": "2H_HALBERD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Machados",
+    "labelPt": "Lâmina de Urso",
+    "itemIdBase": "2H_SCYTHE_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Machados",
+    "labelPt": "Machado Carrasco",
+    "itemIdBase": "2H_EXECUTIONER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Maças",
+    "labelPt": "Maça",
+    "itemIdBase": "MAIN_MACE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Maças",
+    "labelPt": "Maça Pesada",
+    "itemIdBase": "2H_MACE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Maças",
+    "labelPt": "Mangual",
+    "itemIdBase": "MAIN_ROCKMACE_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Maças",
+    "labelPt": "Cajado da Forja",
+    "itemIdBase": "2H_DUALHAMMER_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Maças",
+    "labelPt": "Morning Star",
+    "itemIdBase": "MAIN_1H_MACE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Martelos",
+    "labelPt": "Martelo",
+    "itemIdBase": "MAIN_HAMMER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Martelos",
+    "labelPt": "Martelo de Guerra",
+    "itemIdBase": "2H_POLEHAMMER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Martelos",
+    "labelPt": "Tumba",
+    "itemIdBase": "2H_HAMMER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Martelos",
+    "labelPt": "Grande Martelo",
+    "itemIdBase": "2H_GREAT_HAMMER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Arcos",
+    "labelPt": "Arco",
+    "itemIdBase": "MAIN_BOW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Arcos",
+    "labelPt": "Arco de Guerra",
+    "itemIdBase": "2H_WARBOW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Arcos",
+    "labelPt": "Arco Sussurrante",
+    "itemIdBase": "2H_LONGBOW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Arcos",
+    "labelPt": "Arco do Mau Espírito",
+    "itemIdBase": "2H_BOW_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Arcos",
+    "labelPt": "Arco de Badon",
+    "itemIdBase": "2H_BOW_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bestas",
+    "labelPt": "Besta Leve",
+    "itemIdBase": "MAIN_1HCROSSBOW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bestas",
+    "labelPt": "Besta Pesada",
+    "itemIdBase": "2H_CROSSBOW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bestas",
+    "labelPt": "Besta de Repetição",
+    "itemIdBase": "2H_REPEATINGCROSSBOW_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bestas",
+    "labelPt": "Siegebow",
+    "itemIdBase": "2H_SIEGEBOW",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bestas",
+    "labelPt": "Weeping Repeater",
+    "itemIdBase": "2H_CROSSBOWLANCE_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Lanças",
+    "labelPt": "Lança",
+    "itemIdBase": "MAIN_SPEAR",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Lanças",
+    "labelPt": "Glaive",
+    "itemIdBase": "2H_GLAIVE",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Lanças",
+    "labelPt": "Pike",
+    "itemIdBase": "2H_HARPOON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Lanças",
+    "labelPt": "Spirithunter",
+    "itemIdBase": "2H_TRIDENT_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Lanças",
+    "labelPt": "Heron Spear",
+    "itemIdBase": "MAIN_SPEAR_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Adagas",
+    "labelPt": "Adaga",
+    "itemIdBase": "MAIN_DAGGER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Adagas",
+    "labelPt": "Garras",
+    "itemIdBase": "2H_CLAWPAIR",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Adagas",
+    "labelPt": "Dagger Pair",
+    "itemIdBase": "2H_DAGGERPAIR",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Adagas",
+    "labelPt": "Bloodletter",
+    "itemIdBase": "MAIN_RAPIER_MORGANA",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Adagas",
+    "labelPt": "Bridled Fury",
+    "itemIdBase": "2H_DUALSCIMITAR_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Fogo",
+    "labelPt": "Cajado de Fogo",
+    "itemIdBase": "MAIN_FIRESTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Fogo",
+    "labelPt": "Grande Cajado de Fogo",
+    "itemIdBase": "2H_FIRESTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Fogo",
+    "labelPt": "Incêndio",
+    "itemIdBase": "2H_INFERNOSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Fogo",
+    "labelPt": "Wildfire",
+    "itemIdBase": "MAIN_FIRESTAFF_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Fogo",
+    "labelPt": "Brimstone",
+    "itemIdBase": "2H_FIRE_RINGPAIR_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Gelo",
+    "labelPt": "Cajado de Gelo",
+    "itemIdBase": "MAIN_FROSTSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Gelo",
+    "labelPt": "Grande Cajado de Gelo",
+    "itemIdBase": "2H_FROSTSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Gelo",
+    "labelPt": "Permafrost",
+    "itemIdBase": "2H_ICEGAUNTLETS_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Gelo",
+    "labelPt": "Frost Prism",
+    "itemIdBase": "2H_ICECRYSTAL_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões de Gelo",
+    "labelPt": "Icicle",
+    "itemIdBase": "MAIN_FROSTSTAFF_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Arcanos",
+    "labelPt": "Cajado Arcano",
+    "itemIdBase": "MAIN_ARCANESTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Arcanos",
+    "labelPt": "Grande Cajado Arcano",
+    "itemIdBase": "2H_ARCANESTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Arcanos",
+    "labelPt": "Occult",
+    "itemIdBase": "2H_ENIGMATICSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Arcanos",
+    "labelPt": "Witchwork",
+    "itemIdBase": "MAIN_ARCANESTAFF_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Arcanos",
+    "labelPt": "Evensong",
+    "itemIdBase": "2H_ARCANE_RINGPAIR_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados Sagrados",
+    "labelPt": "Cajado Sagrado",
+    "itemIdBase": "MAIN_HOLYSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados Sagrados",
+    "labelPt": "Grande Cajado Sagrado",
+    "itemIdBase": "2H_HOLYSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados Sagrados",
+    "labelPt": "Divine",
+    "itemIdBase": "MAIN_HOLYSTAFF_MORGANA",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados Sagrados",
+    "labelPt": "Fallen",
+    "itemIdBase": "2H_HOLYSTAFF_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados Sagrados",
+    "labelPt": "Hallowfall",
+    "itemIdBase": "MAIN_HOLYSTAFF_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados da Natureza",
+    "labelPt": "Cajado da Natureza",
+    "itemIdBase": "MAIN_NATURESTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados da Natureza",
+    "labelPt": "Grande Cajado da Natureza",
+    "itemIdBase": "2H_NATURESTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados da Natureza",
+    "labelPt": "Wild Staff",
+    "itemIdBase": "2H_WILDSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados da Natureza",
+    "labelPt": "Druidic",
+    "itemIdBase": "MAIN_NATURESTAFF_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados da Natureza",
+    "labelPt": "Blight",
+    "itemIdBase": "2H_NATURESTAFF_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Amaldiçoados",
+    "labelPt": "Cajado Amaldiçoado",
+    "itemIdBase": "MAIN_CURSEDSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Amaldiçoados",
+    "labelPt": "Grande Cajado Amaldiçoado",
+    "itemIdBase": "2H_CURSEDSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Amaldiçoados",
+    "labelPt": "Maldição Sombria",
+    "itemIdBase": "2H_DEMONICSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Amaldiçoados",
+    "labelPt": "Damnation",
+    "itemIdBase": "2H_CURSedSTAFF_MORGANA",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Bastões Amaldiçoados",
+    "labelPt": "Lifecurse",
+    "itemIdBase": "MAIN_CURSEDSTAFF_UNDEAD",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Luva de Guerra",
+    "labelPt": "Manoplas de Batalha",
+    "itemIdBase": "MAIN_GLOVES",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Luva de Guerra",
+    "labelPt": "Punhos de Espinho",
+    "itemIdBase": "2H_KNUCKLES_SET1",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Luva de Guerra",
+    "labelPt": "Punhos de Brawler",
+    "itemIdBase": "2H_KNUCKLES_SET2",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Luva de Guerra",
+    "labelPt": "Punhos Avalônicos",
+    "itemIdBase": "2H_KNUCKLES_AVALON",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Luva de Guerra",
+    "labelPt": "Punhos Demoníacos",
+    "itemIdBase": "2H_KNUCKLES_HELL",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados de Quarto",
+    "labelPt": "Bastão",
+    "itemIdBase": "MAIN_QUARTERSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados de Quarto",
+    "labelPt": "Ironclad",
+    "itemIdBase": "2H_IRONCLADEDSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados de Quarto",
+    "labelPt": "Double Bladed",
+    "itemIdBase": "2H_DOUBLEBLADEDSTAFF",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados de Quarto",
+    "labelPt": "Black Monk",
+    "itemIdBase": "MAIN_QUARTERSTAFF_KEEPER",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Armas",
+    "subcategory": "Cajados de Quarto",
+    "labelPt": "Soulscythe",
+    "itemIdBase": "2H_COMBATSTAFF_MORGANA",
+    "tiers": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Cavalo",
+    "itemIdBase": "MOUNT_HORSE",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Cavalo Blindado",
+    "itemIdBase": "MOUNT_ARMORED_HORSE",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Boi",
+    "itemIdBase": "MOUNT_OX",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Javali",
+    "itemIdBase": "MOUNT_BOAR",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Alce",
+    "itemIdBase": "MOUNT_MOOSE",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Swiftclaw",
+    "itemIdBase": "MOUNT_SWIFTCLAW",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Lobo Terrível",
+    "itemIdBase": "MOUNT_DIREWOLF",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Lagarto de Carga",
+    "itemIdBase": "MOUNT_GREYWOLF",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Mamute",
+    "itemIdBase": "MOUNT_MAMMOTH",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  },
+  {
+    "category": "Montarias",
+    "subcategory": "Transporte e Mobilidade",
+    "labelPt": "Urso",
+    "itemIdBase": "MOUNT_BEAR",
+    "tiers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "enchants": [
+      0
+    ]
+  }
+]

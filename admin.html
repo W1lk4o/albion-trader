@@ -1,134 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Albion Trader | Admin</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Albion Trader - Admin</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="app-body" data-page="admin">
-  <div class="app-shell">
+<body class="app-body">
+  <div class="app-layout">
     <aside class="sidebar">
-      <div>
-        <p class="eyebrow">Albion Trader</p>
-        <h2 class="sidebar-title">Admin</h2>
+      <div class="sidebar-top">
+        <div class="brand-logo">AT</div>
+        <div>
+          <h2>Albion Trader</h2>
+          <p>Painel Admin</p>
+        </div>
       </div>
-
-      <nav class="nav-list">
-        <button class="nav-item active" data-target="admin-overview">Admin</button>
-        <button class="nav-item" data-target="admin-users">Usuários</button>
-        <button class="nav-item" data-target="admin-licenses">Licenças</button>
-        <button class="nav-item" data-target="admin-settings">Configurações</button>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-admin-section="overview">Admin</button>
+        <button class="nav-btn" data-admin-section="users">Usuários</button>
+        <button class="nav-btn" data-admin-section="licenses">Licenças</button>
+        <button class="nav-btn" data-admin-section="settings">Configurações</button>
       </nav>
-
-      <div class="sidebar-footer">
-        <a href="/dashboard" class="btn btn-outline btn-full">Ir para dashboard</a>
-        <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
-      </div>
+      <button id="logoutBtn" class="btn btn-outline btn-block">Sair</button>
     </aside>
 
-    <main class="content">
-      <header class="topbar">
+    <main class="content admin-content">
+      <header class="page-header">
         <div>
-          <p class="muted">Administrador</p>
-          <h1 id="adminTitle">Painel de controle</h1>
+          <h1>Painel Administrativo</h1>
+          <p id="adminWelcome">Gerencie usuários, licenças e servidor padrão.</p>
         </div>
-        <div class="status-pill">Modo Vercel</div>
       </header>
 
-      <section id="admin-overview" class="page-section active">
-        <div class="cards-grid admin-grid">
-          <article class="card">
-            <h3>Resumo</h3>
-            <p class="muted">Agora as abas da esquerda funcionam de verdade e cada uma abre sua própria área.</p>
-            <div class="mini-stats">
-              <div><strong id="adminUserCount">0</strong><span>Usuários</span></div>
-              <div><strong>4</strong><span>Abas úteis</span></div>
-              <div><strong>IA</strong><span>Pronta para integrar</span></div>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Próximo upgrade sério</h3>
-            <ul class="feature-list compact">
-              <li>Banco persistente</li>
-              <li>Criação real de usuários</li>
-              <li>Expiração automática de licença</li>
-              <li>Logs e histórico de acesso</li>
-              <li>Travamento forte por dispositivo</li>
-            </ul>
-          </article>
+      <section class="admin-section" data-admin-panel="overview">
+        <div class="grid-3">
+          <div class="card"><h3>Usuários ativos</h3><p id="statUsers">0</p></div>
+          <div class="card"><h3>Licenças válidas</h3><p id="statLicenses">0</p></div>
+          <div class="card"><h3>Servidor padrão</h3><p id="statServer">Americas</p></div>
         </div>
       </section>
 
-      <section id="admin-users" class="page-section">
-        <article class="card">
-          <div class="section-header">
-            <div>
-              <h2>Usuários do sistema</h2>
-              <p id="adminNotice" class="muted">Carregando...</p>
-            </div>
+      <section class="admin-section hidden" data-admin-panel="users">
+        <div class="card">
+          <div class="section-head">
+            <h3>Usuários</h3>
+            <button id="seedUsersBtn" class="btn btn-secondary">Criar usuários de exemplo</button>
           </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Email</th>
-                  <th>Perfil</th>
-                  <th>Licença</th>
-                </tr>
-              </thead>
-              <tbody id="adminUsersTable"></tbody>
-            </table>
-          </div>
-        </article>
+          <div id="usersTableWrap"></div>
+        </div>
       </section>
 
-      <section id="admin-licenses" class="page-section">
-        <article class="card">
-          <div class="section-header">
-            <div>
-              <h2>Licenças</h2>
-              <p class="muted">Leitura rápida das licenças ativas desta versão.</p>
-            </div>
-          </div>
-          <div id="adminLicenseCards" class="cards-grid"></div>
-        </article>
+      <section class="admin-section hidden" data-admin-panel="licenses">
+        <div class="card">
+          <h3>Licenças</h3>
+          <div id="licensesTableWrap"></div>
+        </div>
       </section>
 
-      <section id="admin-settings" class="page-section">
-        <article class="card">
-          <div class="section-header">
-            <div>
-              <h2>Configurações</h2>
-              <p class="muted">Sem banco, esta tela funciona como centro de leitura e próximos passos.</p>
-            </div>
-          </div>
-
-          <div class="settings-grid">
-            <div class="setting-card">
-              <h3>Autenticação</h3>
-              <p>Login real com token JWT.</p>
-            </div>
-            <div class="setting-card">
-              <h3>Hospedagem</h3>
-              <p>Frontend + API Functions no Vercel.</p>
-            </div>
-            <div class="setting-card">
-              <h3>IA</h3>
-              <p>Ative com <code>OPENAI_API_KEY</code> nas variáveis do projeto.</p>
-            </div>
-            <div class="setting-card">
-              <h3>Albion Data</h3>
-              <p>Consulta de preços via função server-side.</p>
-            </div>
-          </div>
-        </article>
+      <section class="admin-section hidden" data-admin-panel="settings">
+        <div class="card">
+          <h3>Configurações</h3>
+          <label>Servidor padrão</label>
+          <select id="defaultServerSelect">
+            <option value="west">Americas</option>
+            <option value="europe">Europe</option>
+            <option value="east">Asia</option>
+          </select>
+          <p class="muted">O usuário pode trocar depois no próprio painel.</p>
+        </div>
       </section>
     </main>
   </div>
-
+  <script src="js/users.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

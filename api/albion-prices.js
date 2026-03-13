@@ -1,42 +1,16 @@
+
+const { json, fetchPrices } = require('./_lib');
+
 module.exports = async (req, res) => {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método não permitido.' });
-  }
-
-  try {
-    const {
-      items = 'T4_BAG',
-      item,
-      locations = 'Caerleon,Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford',
-      qualities = '1'
-    } = req.query || {};
-
-    const itemIds = (item || items)
-      .split(',')
-      .map((value) => value.trim())
-      .filter(Boolean)
-      .join(',');
-
-    if (!itemIds) {
-      return res.status(400).json({ error: 'Informe ao menos um item.' });
-    }
-
-    const endpoint = `https://west.albion-online-data.com/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
-
-    const response = await fetch(endpoint, {
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Encoding': 'gzip, deflate, br'
-      }
-    });
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: 'Falha ao consultar a API do Albion.' });
-    }
-
-    const data = await response.json();
-    return res.status(200).json({ ok: true, data, meta: { source: 'albion-data', itemCount: itemIds.split(',').length } });
-  } catch (error) {
-    return res.status(500).json({ error: 'Erro ao buscar preços do Albion.' });
+  try{
+    const { searchParams } = new URL(req.url, 'http://localhost');
+    const server = searchParams.get('server') || 'west';
+    const itemId = searchParams.get('itemId') || '';
+    const locations = (searchParams.get('locations') || '').split(',').filter(Boolean);
+    if(!itemId || !locations.length) return json(res, 400, { ok:false, error:'Informe itemId e locations.' });
+    const prices = await fetchPrices({ server, itemIds:[itemId], locations });
+    return json(res, 200, { ok:true, prices });
+  }catch(err){
+    return json(res, 500, { ok:false, error:'Falha ao consultar Albion Data.', details:String(err.message || err) });
   }
 };
