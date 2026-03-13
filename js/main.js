@@ -580,12 +580,10 @@
   window.AlbionTrader = AlbionTrader;
 
   document.addEventListener('DOMContentLoaded', () => {
-    const page = document.body.dataset.page;
-    if (page === 'index') {
-      document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
-      return;
-    }
-    if (page === 'dashboard') initDashboard();
-    if (page === 'admin') initAdmin();
+    const form = document.getElementById('loginForm');
+    if (form) form.addEventListener('submit', handleLogin);
+
+    if (document.body.dataset.page === 'dashboard') initDashboard();
+    if (document.body.dataset.page === 'admin') initAdmin();
   });
 })();
