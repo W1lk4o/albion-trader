@@ -33,7 +33,7 @@
         </div>
         <div class="status-stack">
           <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
-          <div class="status-small" id="catalogBadge">Catálogo completo do radar</div>
+          <div class="status-small" id="catalogBadge">Patch 2 do radar ativo</div>
         </div>
       </header>
 
@@ -46,8 +46,8 @@
           </article>
           <article class="card stat-card">
             <span class="stat-label">Radar rápido</span>
-            <strong>Completo</strong>
-            <p id="opportunitySummary">Selecione categoria, item, tier e encantamento.</p>
+            <strong>Pesquisa de 1 item</strong>
+            <p id="opportunitySummary">Carregando melhor oportunidade do mercado...</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
@@ -60,8 +60,8 @@
           <article class="card radar-card">
             <div class="section-header">
               <div>
-                <h3>Radar rápido estilo mercado do Albion</h3>
-                <p class="muted">Fluxo guiado: categoria → item → tier → encantamento. Sem digitar código manual.</p>
+                <h3>Radar rápido</h3>
+                <p class="muted">Pesquise um item específico e veja onde comprar barato e onde vender melhor.</p>
               </div>
             </div>
 
@@ -85,7 +85,7 @@
             </div>
 
             <div class="radar-actions">
-              <div class="item-preview" id="radarPreview">Escolha um item para ver o código Albion.</div>
+              <div class="item-preview" id="radarPreview">Escolha um item para ver o radar.</div>
               <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
             </div>
             <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
@@ -118,9 +118,9 @@
           <div class="section-header">
             <div>
               <h3>Radar de oportunidades</h3>
-              <p class="muted">Busca spreads entre cidades usando a API de preços.</p>
+              <p class="muted">Escaneia o mercado inteiro da base desta versão e lista primeiro o maior lucro líquido.</p>
             </div>
-            <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar radar</button>
+            <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar oportunidades</button>
           </div>
           <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
         </article>
@@ -170,13 +170,50 @@
       <section id="ilhas" class="page-section">
         <div class="card module-card">
           <h2>Simulador de Ilhas</h2>
-          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
+          <p class="muted">Agora você pode testar a quantidade de ilhas, o que quer plantar, o animal e se vai produzir ou comprar a comida.</p>
           <div class="form-grid">
+            <label><span>Quantidade de ilhas</span><input id="islandCount" type="number" min="1" max="20" value="2" /></label>
             <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
-            <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
-            <label><span>Pastos</span><input id="islandPastures" type="number" value="2" /></label>
+            <label><span>Plantações por ilha</span><input id="islandPlots" type="number" value="5" /></label>
+            <label><span>Pastos por ilha</span><input id="islandPastures" type="number" value="2" /></label>
             <label><span>Usa foco?</span>
               <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+            <label><span>Plantação escolhida</span>
+              <select id="islandCropChoice">
+                <option value="auto">Automático</option>
+                <option value="Cenoura">Cenoura</option>
+                <option value="Feijão">Feijão</option>
+                <option value="Trigo">Trigo</option>
+                <option value="Erva medicinal">Erva medicinal</option>
+                <option value="Abóbora">Abóbora</option>
+              </select>
+            </label>
+            <label><span>Animal escolhido</span>
+              <select id="islandAnimalChoice">
+                <option value="auto">Automático</option>
+                <option value="Galinha">Galinha</option>
+                <option value="Porco">Porco</option>
+                <option value="Cabra">Cabra</option>
+                <option value="Cavalo">Cavalo</option>
+                <option value="Boi">Boi</option>
+              </select>
+            </label>
+            <label><span>Tier do animal</span>
+              <select id="islandAnimalTier">
+                <option value="3">T3</option>
+                <option value="4">T4</option>
+                <option value="5" selected>T5</option>
+                <option value="6">T6</option>
+                <option value="7">T7</option>
+                <option value="8">T8</option>
+              </select>
+            </label>
+            <label><span>Comida dos animais</span>
+              <select id="islandFeedMode">
+                <option value="plantar">Produzir na própria ilha</option>
+                <option value="comprar">Comprar no mercado</option>
+              </select>
             </label>
           </div>
           <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
@@ -202,12 +239,12 @@
       <section id="mercado" class="page-section">
         <div class="card module-card">
           <h2>Mercado e Guerra</h2>
-          <p class="muted">Esse módulo agora exibe o radar legível e uma leitura rápida do que fazer.</p>
-          <div id="opportunityResultCopy" class="result-box muted">Use o radar no dashboard para ver as oportunidades ao vivo. Depois valide manualmente no jogo antes de comprar muito volume.</div>
+          <p class="muted">Acompanhe as oportunidades no dashboard. Nesta base estável, o foco aqui é validar o que o radar trouxe.</p>
+          <div id="opportunityResultCopy" class="result-box muted">Use o radar de oportunidades no dashboard para encontrar os itens com maior lucro agora.</div>
           <div class="insight-list">
-            <div class="insight-item">Itens com melhor spread tendem a funcionar melhor em rotas curtas e com capital girando rápido.</div>
-            <div class="insight-item">Mercado bom não é só lucro unitário: é lucro unitário + velocidade de venda.</div>
-            <div class="insight-item">Quando a margem apertar, reduza risco e foque em giro ao invés de insistir na melhor % teórica.</div>
+            <div class="insight-item">Sempre valide no jogo antes de comprar volume alto.</div>
+            <div class="insight-item">Lucro bom sem giro é capital travado.</div>
+            <div class="insight-item">Caerleon costuma concentrar bons spreads, mas também mais risco de transporte.</div>
           </div>
         </div>
       </section>
