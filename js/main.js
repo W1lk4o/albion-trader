@@ -92,6 +92,7 @@
   }, {});
 
   const SCAN_ITEM_IDS = buildScanList();
+  const POPULAR_SCAN_ITEM_IDS = SCAN_ITEM_IDS.slice(0, 300);
 
   function buildScanList() {
     const ids = [];
@@ -197,6 +198,10 @@
   function formatSilver(value) { return new Intl.NumberFormat('pt-BR').format(Math.round(value || 0)); }
   function setHtml(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
   function sortByProfitDesc(list) { return [...list].sort((a, b) => b.profit - a.profit); }
+  function chunkArray(list, size) { const out=[]; for (let i=0;i<list.length;i+=size) out.push(list.slice(i,i+size)); return out; }
+  function median(values) { if (!values.length) return 0; const arr=[...values].sort((a,b)=>a-b); const mid=Math.floor(arr.length/2); return arr.length%2?arr[mid]:(arr[mid-1]+arr[mid])/2; }
+  function setProgress(percent, text) { const fill = document.getElementById('opportunityProgressBar'); const label = document.getElementById('opportunityProgressPercent'); const txt = document.getElementById('opportunityProgressText'); if (fill) fill.style.width = `${percent}%`; if (label) label.textContent = `${percent}%`; if (txt && text) txt.textContent = text; }
+  function setApiBadge(text, state='loading') { const badge = document.getElementById('apiStatusBadge'); if (!badge) return; badge.textContent = text; badge.classList.remove('loading','error','success'); badge.classList.add(state); }
   function buildAlbionItemId(itemDef, tier, enchant) { return Number(enchant) > 0 ? `T${tier}_${itemDef.code}@${enchant}` : `T${tier}_${itemDef.code}`; }
 
   function parseItemId(itemId) {
@@ -209,8 +214,9 @@
     const parsed = parseItemId(itemId);
     if (!parsed) return itemId;
     const base = ITEM_NAME_MAP[parsed.code] || parsed.code.replace(/_/g, ' ').toLowerCase();
+    const cleanBase = base.charAt(0).toUpperCase() + base.slice(1);
     const tierLabel = parsed.enchant > 0 ? `T${parsed.tier}.${parsed.enchant}` : `T${parsed.tier}`;
-    return `${base} ${tierLabel}`;
+    return `${cleanBase} ${tierLabel}`;
   }
 
   function populateRadarSelectors() {
@@ -258,6 +264,30 @@
     return { itemDef, tier, enchant, itemId: buildAlbionItemId(itemDef, tier, enchant) };
   }
 
+  function sanitizePriceRows(rows) {
+    const allowedCities = new Set(DEFAULT_LOCATIONS);
+    const clean = rows.filter((row) => allowedCities.has(row.city) && Number(row.sell_price_min) > 0 && Number(row.sell_price_min) < 50000000);
+    if (!clean.length) return [];
+    const prices = clean.map((r) => Number(r.sell_price_min)).filter((n) => n > 0);
+    const med = median(prices);
+    if (!med) return clean;
+    const filtered = clean.filter((row) => row.sell_price_min >= med * 0.35 && row.sell_price_min <= med * 3.5);
+    return filtered.length >= 2 ? filtered : clean;
+  }
+
+  async function fetchPricesChunked(itemIds, onProgress) {
+    const groups = chunkArray(itemIds, 35);
+    const all = [];
+    for (let i = 0; i < groups.length; i += 1) {
+      const group = groups[i];
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(group.join(','))}&locations=${encodeURIComponent(DEFAULT_LOCATIONS.join(','))}`);
+      all.push(...(data.data || []));
+      const percent = Math.max(1, Math.round(((i + 1) / groups.length) * 100));
+      if (onProgress) onProgress(percent, i + 1, groups.length);
+    }
+    return all;
+  }
+
   function refreshRadarPreview() {
     const preview = document.getElementById('radarPreview');
     const current = getCurrentRadarItem();
@@ -266,17 +296,16 @@
   }
 
   function buildItemTradeView(rows, itemName) {
-    const offers = rows.filter((x) => (x.sell_price_min || 0) > 0);
-    if (!offers.length) return '<div class="muted">Nenhum preço retornado para esse item.</div>';
+    const offers = sanitizePriceRows(rows);
+    if (!offers.length) return '<div class="muted">Não foi possível encontrar preços confiáveis para esse item agora.</div>';
 
     const buyOrder = offers.reduce((best, row) => row.sell_price_min < best.sell_price_min ? row : best, offers[0]);
     const sellCandidates = offers.filter((row) => row.city !== buyOrder.city);
-    const sellOrder = sellCandidates.length
-      ? sellCandidates.reduce((best, row) => row.sell_price_min > best.sell_price_min ? row : best, sellCandidates[0])
-      : offers.reduce((best, row) => row.sell_price_min > best.sell_price_min ? row : best, offers[0]);
+    if (!sellCandidates.length) return '<div class="muted">Só encontramos preço confiável em uma cidade. Tente novamente em alguns minutos.</div>';
+    const sellOrder = sellCandidates.reduce((best, row) => row.sell_price_min > best.sell_price_min ? row : best, sellCandidates[0]);
 
-    const buyPrice = buyOrder.sell_price_min;
-    const sellPrice = sellOrder.sell_price_min;
+    const buyPrice = Number(buyOrder.sell_price_min || 0);
+    const sellPrice = Number(sellOrder.sell_price_min || 0);
     const tax = Math.round(sellPrice * MARKET_FEE);
     const transport = Math.round(buyPrice * TRANSPORT_FEE);
     const profit = sellPrice - buyPrice - tax - transport;
@@ -295,20 +324,20 @@
           <small>${formatSilver(sellPrice)} prata</small>
         </div>
         <div>
-          <span class="muted">Lucro líquido</span>
+          <span class="muted">Lucro líquido estimado</span>
           <strong>${formatSilver(profit)}</strong>
           <small>${margin.toFixed(1)}% de margem</small>
         </div>
       </div>
-      <div class="result-intro"><strong>${itemName}</strong><span>Taxa de mercado padrão: 6,5% + transporte estimado de 4%</span></div>
+      <div class="result-intro"><strong>${itemName}</strong><span>Taxa padrão: 6,5% | Transporte estimado: 4%</span></div>
       <div class="table-wrap">
         <table class="data-table">
           <thead>
             <tr>
               <th>Cidade</th>
-              <th>Comprar lá</th>
-              <th>Oferta máxima</th>
-              <th>Última atualização</th>
+              <th>Preço de compra local</th>
+              <th>Ordem de compra</th>
+              <th>Atualizado em</th>
             </tr>
           </thead>
           <tbody>
@@ -322,6 +351,7 @@
           </tbody>
         </table>
       </div>
+      <div class="result-note">O radar rápido serve para 1 item só. O sistema já filtrou preços absurdos antes de sugerir a rota.</div>
     `;
   }
 
@@ -333,12 +363,15 @@
       box.textContent = 'Escolha um item primeiro.';
       return;
     }
-    box.textContent = 'Buscando preços do item...';
+    setApiBadge('AlbionData consultando item...', 'loading');
+    box.textContent = 'Buscando preços confiáveis do item...';
     try {
       const data = await api(`/api/albion-prices?items=${encodeURIComponent(current.itemId)}`);
       const rows = (data.data || []).filter((x) => x.sell_price_min || x.buy_price_max);
       box.innerHTML = buildItemTradeView(rows, prettyItemName(current.itemId));
+      setApiBadge('AlbionData pronto', 'success');
     } catch (error) {
+      setApiBadge('AlbionData com erro', 'error');
       box.textContent = error.message;
     }
   }
@@ -353,13 +386,15 @@
 
     const out = [];
     grouped.forEach((itemRows, itemId) => {
-      if (itemRows.length < 2) return;
-      const cheapest = itemRows.reduce((best, row) => row.sell_price_min < best.sell_price_min ? row : best, itemRows[0]);
-      const sellCandidates = itemRows.filter((row) => row.city !== cheapest.city);
+      const cleanRows = sanitizePriceRows(itemRows);
+      if (cleanRows.length < 2) return;
+      const cheapest = cleanRows.reduce((best, row) => row.sell_price_min < best.sell_price_min ? row : best, cleanRows[0]);
+      const sellCandidates = cleanRows.filter((row) => row.city !== cheapest.city);
       if (!sellCandidates.length) return;
       const expensive = sellCandidates.reduce((best, row) => row.sell_price_min > best.sell_price_min ? row : best, sellCandidates[0]);
-      const buyPrice = cheapest.sell_price_min;
-      const sellPrice = expensive.sell_price_min;
+      const buyPrice = Number(cheapest.sell_price_min || 0);
+      const sellPrice = Number(expensive.sell_price_min || 0);
+      if (!buyPrice || !sellPrice || sellPrice <= buyPrice) return;
       const marketTax = Math.round(sellPrice * MARKET_FEE);
       const transport = Math.round(buyPrice * TRANSPORT_FEE);
       const profit = sellPrice - buyPrice - marketTax - transport;
@@ -374,31 +409,38 @@
           sellPrice,
           profit,
           margin,
-          confidence: itemRows.length >= 4 ? 'Boa' : 'Média'
+          spread: sellPrice - buyPrice,
+          confidence: cleanRows.length >= 4 ? 'Boa' : 'Média'
         });
       }
     });
-    return sortByProfitDesc(out).slice(0, 20);
+    return sortByProfitDesc(out).slice(0, 30);
   }
 
-  async function loadOpportunityRadar() {
+  async function loadOpportunityRadar(mode = 'popular') {
     const box = document.getElementById('opportunityResult');
     if (!box) return;
-    box.textContent = 'Escaneando as melhores oportunidades...';
+    const scanList = mode === 'full' ? SCAN_ITEM_IDS : POPULAR_SCAN_ITEM_IDS;
+    const modeLabel = mode === 'full' ? 'mercado completo' : '300 itens populares';
+    setApiBadge(`AlbionData carregando ${modeLabel}...`, 'loading');
+    setProgress(0, `Preparando leitura de ${modeLabel}...`);
+    box.textContent = `Escaneando ${modeLabel}...`;
     try {
-      const data = await api(`/api/albion-prices?items=${encodeURIComponent(SCAN_ITEM_IDS.join(','))}&locations=${encodeURIComponent(DEFAULT_LOCATIONS.join(','))}`);
-      const opportunities = buildOpportunities(data.data || []);
+      const rows = await fetchPricesChunked(scanList, (percent, current, total) => {
+        setProgress(percent, `Consultando Albion Data: lote ${current} de ${total}`);
+      });
+      const opportunities = buildOpportunities(rows || []);
       const summary = document.getElementById('opportunitySummary');
-      const status = document.getElementById('apiStatusBadge');
-      if (status) status.textContent = data.meta?.source === 'albion-data' ? 'AlbionData online' : 'AlbionData indisponível';
+      setProgress(100, `Leitura concluída: ${modeLabel}.`);
+      setApiBadge('AlbionData pronto', 'success');
       if (!opportunities.length) {
-        box.innerHTML = '<div class="muted">Nenhuma oportunidade clara agora. Tente de novo em alguns minutos.</div>';
-        if (summary) summary.textContent = 'Sem oportunidades claras no momento.';
+        box.innerHTML = '<div class="muted">Nenhuma oportunidade confiável encontrada agora. Tente novamente em alguns minutos.</div>';
+        if (summary) summary.textContent = 'Sem oportunidade confiável no momento.';
         return;
       }
       if (summary) {
         const best = opportunities[0];
-        summary.textContent = `Melhor oportunidade do momento: ${best.itemName}, comprar em ${best.buyCity} e vender em ${best.sellCity}.`;
+        summary.textContent = `Melhor sugestão do dia: ${best.itemName}, comprar em ${best.buyCity} e vender em ${best.sellCity}, lucro líquido estimado de ${formatSilver(best.profit)} prata.`;
       }
       const html = `
         <div class="table-wrap">
@@ -408,8 +450,9 @@
                 <th>Item</th>
                 <th>Comprar em</th>
                 <th>Vender em</th>
-                <th>Compra</th>
-                <th>Venda</th>
+                <th>Preço compra</th>
+                <th>Preço venda</th>
+                <th>Spread bruto</th>
                 <th>Lucro líquido</th>
                 <th>Margem</th>
                 <th>Confiança</th>
@@ -423,6 +466,7 @@
                   <td>${op.sellCity}</td>
                   <td>${formatSilver(op.buyPrice)}</td>
                   <td>${formatSilver(op.sellPrice)}</td>
+                  <td>${formatSilver(op.spread)}</td>
                   <td>${formatSilver(op.profit)}</td>
                   <td>${op.margin.toFixed(1)}%</td>
                   <td>${op.confidence}</td>
@@ -434,6 +478,8 @@
       const mirror = document.getElementById('opportunityResultCopy');
       if (mirror) mirror.innerHTML = html;
     } catch (error) {
+      setApiBadge('AlbionData com erro', 'error');
+      setProgress(0, 'Falha ao consultar o mercado.');
       box.textContent = error.message;
     }
   }
@@ -449,8 +495,9 @@
     bindNav();
     populateRadarSelectors();
     document.getElementById('loadMarketBtn')?.addEventListener('click', loadMarket);
-    document.getElementById('loadOpportunityBtn')?.addEventListener('click', loadOpportunityRadar);
-    loadOpportunityRadar();
+    document.getElementById('loadOpportunityBtn')?.addEventListener('click', () => loadOpportunityRadar('popular'));
+    document.getElementById('loadOpportunityFullBtn')?.addEventListener('click', () => loadOpportunityRadar('full'));
+    loadOpportunityRadar('popular');
   }
 
   async function initAdmin() {
@@ -580,10 +627,9 @@
   window.AlbionTrader = AlbionTrader;
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('loginForm');
-    if (form) form.addEventListener('submit', handleLogin);
-
-    if (document.body.dataset.page === 'dashboard') initDashboard();
-    if (document.body.dataset.page === 'admin') initAdmin();
+    document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+    const page = document.body.dataset.page;
+    if (page === 'dashboard') initDashboard();
+    if (page === 'admin') initAdmin();
   });
 })();

@@ -45,9 +45,9 @@
             <p>Base estável v2.1 preservada.</p>
           </article>
           <article class="card stat-card">
-            <span class="stat-label">Radar rápido</span>
-            <strong>Pesquisa de 1 item</strong>
-            <p id="opportunitySummary">Carregando melhor oportunidade do mercado...</p>
+            <span class="stat-label">Melhor sugestão do dia</span>
+            <strong>Mercado automático</strong>
+            <p id="opportunitySummary">Carregando as melhores oportunidades do mercado...</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
@@ -61,7 +61,7 @@
             <div class="section-header">
               <div>
                 <h3>Radar rápido</h3>
-                <p class="muted">Pesquise um item específico e veja onde comprar barato e onde vender melhor.</p>
+                <p class="muted">Pesquise 1 item específico. O sistema puxa preços automaticamente do Albion Data e mostra a melhor compra e a melhor venda confiáveis.</p>
               </div>
             </div>
 
@@ -118,9 +118,19 @@
           <div class="section-header">
             <div>
               <h3>Radar de oportunidades</h3>
-              <p class="muted">Escaneia o mercado inteiro da base desta versão e lista primeiro o maior lucro líquido.</p>
+              <p class="muted">Mostra as melhores oportunidades do dia. Por padrão, busca os 300 itens mais populares. Se quiser, você também pode escanear o mercado completo.</p>
             </div>
-            <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar oportunidades</button>
+            <div class="button-row">
+              <button id="loadOpportunityBtn" class="btn btn-primary">Atualizar 300 populares</button>
+              <button id="loadOpportunityFullBtn" class="btn btn-outline">Pesquisar mercado completo</button>
+            </div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-head">
+              <span id="opportunityProgressText">Aguardando leitura do mercado...</span>
+              <span id="opportunityProgressPercent">0%</span>
+            </div>
+            <div class="progress-bar"><div id="opportunityProgressBar" class="progress-bar-fill" style="width:0%"></div></div>
           </div>
           <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
         </article>

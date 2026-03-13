@@ -142,3 +142,14 @@ button, input, select { font: inherit; }
   .auth-card, .content, .sidebar { padding: 18px; }
   .topbar { align-items: flex-start; flex-direction: column; }
 }
+
+
+.button-row { display:flex; gap:10px; flex-wrap:wrap; }
+.progress-wrap { display:grid; gap:8px; margin: 8px 0 14px; }
+.progress-head { display:flex; justify-content:space-between; gap:12px; color: var(--muted); font-size:14px; }
+.progress-bar { height: 12px; border-radius: 999px; background: rgba(255,255,255,0.07); overflow: hidden; border:1px solid var(--stroke); }
+.progress-bar-fill { height:100%; width:0%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width .25s ease; }
+.status-pill.loading { background: rgba(79,124,255,0.14); border-color: rgba(79,124,255,0.22); color: #cfe0ff; }
+.status-pill.error { background: rgba(255,93,115,0.12); border-color: rgba(255,93,115,0.22); color: #ffc3cb; }
+.status-pill.success { background: rgba(30,201,143,0.12); border-color: rgba(30,201,143,0.22); color: #9ff0d0; }
+.result-note { color: var(--muted); font-size: 13px; margin-top: 8px; }
