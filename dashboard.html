@@ -21,6 +21,7 @@
         <button class="nav-item" data-target="transporte">Transporte</button>
         <button class="nav-item" data-target="mercado">Mercado</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
+        <button class="nav-item" data-target="pesca">Pesca</button>
       </nav>
       <button id="goOverviewBtn" class="btn btn-outline btn-full">Voltar ao painel</button>
       <button id="dashboardAdminBtn" class="btn btn-outline btn-full hidden">Ir para admin</button>
@@ -108,6 +109,7 @@
               <button class="tag tag-button" data-target="transporte">Transporte</button>
               <button class="tag tag-button" data-target="mercado">Mercado</button>
               <button class="tag tag-button" data-target="riqueza">Planejador</button>
+              <button class="tag tag-button" data-target="pesca">Pesca</button>
               <span class="tag">Agricultura</span>
               <span class="tag">Animais</span>
               <span class="tag">Trabalhadores</span>
@@ -142,6 +144,25 @@
       <section id="transporte" class="page-section"><div class="card module-card"><h2>Calculadora de Transporte</h2><div class="form-grid"><label><span>Cidade de compra</span><select id="transportBuyCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label><label><span>Cidade de venda</span><select id="transportSellCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label><label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9000" /></label><label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="12400" /></label><label><span>Custo do transporte</span><input id="transportCost" type="number" value="700" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button><div id="transportResult" class="result-box"></div></div></section>
       <section id="mercado" class="page-section"><div class="card module-card"><h2>Mercado</h2><p>Use o radar rápido e o radar de oportunidades na aba principal.</p></div></section>
       <section id="riqueza" class="page-section"><div class="card module-card"><h2>Planejador de riqueza</h2><div class="form-grid"><label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label><label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label><label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano</button><div id="wealthResult" class="result-box"></div></div></section>
+
+      <section id="pesca" class="page-section">
+        <div class="card module-card">
+          <h2>Calculadora de up de pesca</h2>
+          <p class="muted">Compara peixes pelo melhor custo-benefício usando preços ao vivo do Albion Data no servidor americano. A fama por peixe segue a tabela pública de power leveling com premium; você pode ajustar a fama necessária manualmente.</p>
+          <div class="form-grid">
+            <label><span>Nível atual</span><input id="fishingCurrentLevel" type="number" min="0" max="100" value="10" /></label>
+            <label><span>Nível alvo</span><input id="fishingTargetLevel" type="number" min="0" max="100" value="60" /></label>
+            <label><span>Fama necessária</span><input id="fishingFameNeeded" type="number" min="1" value="826000" /></label>
+            <label><span>Cidades analisadas</span><input id="fishingCities" type="text" value="Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford,Caerleon,Brecilien" /></label>
+          </div>
+          <div class="button-row top-gap">
+            <button id="calcFishingBtn" class="btn btn-primary">Analisar melhor peixe</button>
+            <button id="presetFishingBtn" class="btn btn-outline">Usar preset 10 → 60</button>
+          </div>
+          <div id="fishingResult" class="result-box muted top-gap">Clique em <strong>Analisar melhor peixe</strong> para comparar os peixes automaticamente.</div>
+        </div>
+      </section>
+
     </main>
   </div>
 

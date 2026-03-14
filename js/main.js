@@ -118,6 +118,42 @@
   );
   const ITEM_BY_LABEL = new Map(ITEM_ENTRIES.map(entry => [entry.label.toLowerCase(), entry]));
   const ITEM_BY_BASE = new Map(ITEM_ENTRIES.map(entry => [entry.base.toUpperCase(), entry]));
+  const FISH_CATALOG = [
+    { id: 'T1_FISH_FRESHWATER_ALL_COMMON', name: 'Rudd comum', fame: 7, tier: 1 },
+    { id: 'T1_FISH_SALTWATER_ALL_COMMON', name: 'Arenque comum', fame: 7, tier: 1 },
+    { id: 'T2_FISH_FRESHWATER_ALL_COMMON', name: 'Carpa listrada', fame: 15, tier: 2 },
+    { id: 'T2_FISH_SALTWATER_ALL_COMMON', name: 'Cavala listrada', fame: 15, tier: 2 },
+    { id: 'T3_FISH_FRESHWATER_ALL_COMMON', name: 'Perca de Albion', fame: 22, tier: 3 },
+    { id: 'T3_FISH_SALTWATER_ALL_COMMON', name: 'Linguado de costa rasa', fame: 22, tier: 3 },
+    { id: 'T3_FISH_FRESHWATER_FOREST_RARE', name: 'Enguia Greenriver', fame: 75, tier: 3 },
+    { id: 'T3_FISH_FRESHWATER_HIGHLANDS_RARE', name: 'Lurcher Stonestream', fame: 75, tier: 3 },
+    { id: 'T3_FISH_FRESHWATER_MOUNTAIN_RARE', name: 'Coldeye de altitude', fame: 75, tier: 3 },
+    { id: 'T3_FISH_FRESHWATER_STEPPE_RARE', name: 'Caranguejo Lowriver', fame: 75, tier: 3 },
+    { id: 'T3_FISH_FRESHWATER_AVALON_RARE', name: 'Whitefog Snapper', fame: 100, tier: 3 },
+    { id: 'T4_FISH_FRESHWATER_ALL_COMMON', name: 'Lúcio Bluescale', fame: 30, tier: 4 },
+    { id: 'T4_FISH_SALTWATER_ALL_COMMON', name: 'Bacalhau Bluescale', fame: 30, tier: 4 },
+    { id: 'T4_FISH_FRESHWATER_FOREST_RARE', name: 'Enguia Redspring', fame: 150, tier: 4 },
+    { id: 'T4_FISH_FRESHWATER_HIGHLANDS_RARE', name: 'Lurcher Rushwater', fame: 150, tier: 4 },
+    { id: 'T4_FISH_FRESHWATER_MOUNTAIN_RARE', name: 'Blindeye da montanha', fame: 150, tier: 4 },
+    { id: 'T4_FISH_FRESHWATER_STEPPE_RARE', name: 'Caranguejo Drybrook', fame: 150, tier: 4 },
+    { id: 'T4_FISH_FRESHWATER_SWAMP_RARE', name: 'Molusco Murkwater', fame: 150, tier: 4 },
+    { id: 'T4_FISH_SALTWATER_ALL_RARE', name: 'Polvo Midwater', fame: 150, tier: 4 },
+    { id: 'T5_FISH_FRESHWATER_AVALON_RARE', name: 'Clearhaze Snapper', fame: 200, tier: 5 },
+    { id: 'T6_FISH_FRESHWATER_ALL_COMMON', name: 'Zander Brightscale', fame: 60, tier: 6 },
+    { id: 'T6_FISH_SALTWATER_ALL_COMMON', name: 'Salmão Strongfin', fame: 60, tier: 6 },
+    { id: 'T6_FISH_FRESHWATER_HIGHLANDS_COMMON', name: 'Bagre Danglemouth', fame: 75, tier: 6 },
+    { id: 'T6_FISH_SALTWATER_OCEAN_COMMON', name: 'Atum Bluefin', fame: 75, tier: 6 },
+    { id: 'T7_FISH_FRESHWATER_FOREST_RARE', name: 'Deadwater Eel', fame: 225, tier: 7 },
+    { id: 'T7_FISH_FRESHWATER_MOUNTAIN_RARE', name: 'Frostpeak Deadeye', fame: 225, tier: 7 },
+    { id: 'T7_FISH_FRESHWATER_HIGHLANDS_RARE', name: 'Thunderfall Lurcher', fame: 225, tier: 7 },
+    { id: 'T7_FISH_FRESHWATER_STEPPE_RARE', name: 'Dusthole Crab', fame: 225, tier: 7 },
+    { id: 'T7_FISH_FRESHWATER_SWAMP_RARE', name: 'Blackbog Clam', fame: 225, tier: 7 },
+    { id: 'T7_FISH_SALTWATER_ALL_RARE', name: 'Deepwater Kraken', fame: 225, tier: 7 },
+    { id: 'T7_FISH_FRESHWATER_AVALON_RARE', name: 'Puremist Snapper', fame: 300, tier: 7 },
+    { id: 'T8_FISH_FRESHWATER_ALL_COMMON', name: 'River Sturgeon', fame: 210, tier: 8 },
+    { id: 'T8_FISH_SALTWATER_ALL_COMMON', name: 'Steelscale Swordfish', fame: 210, tier: 8 }
+  ];
+  const FISH_BY_ID = new Map(FISH_CATALOG.map(entry => [entry.id, entry]));
   const RADAR_CATEGORY_ORDER = Object.keys(MARKET_CATALOG);
   const POPULAR_ITEMS = [
     'T4_BAG','T4_BAG@1','T5_BAG','T5_BAG@1','T6_BAG','T6_BAG@1','T7_BAG','T8_BAG',
@@ -360,7 +396,7 @@
   }
   function chunk(list,size){const out=[]; for(let i=0;i<list.length;i+=size) out.push(list.slice(i,i+size)); return out;}
   async function loadOpportunityRadar(fullMarket=false){const box=document.getElementById('opportunityResult'); if(!box) return; const list=fullMarket?POPULAR_ITEMS:POPULAR_ITEMS.slice(0,80); const chunks=chunk(list,12); box.innerHTML='<div class="muted">Consultando mercado...</div>'; const status=document.getElementById('apiStatusBadge'); if(status) status.textContent=`AlbionData consultando ${fullMarket?'mercado completo':'itens populares'}...`; try{let allRows=[]; for(let i=0;i<chunks.length;i++){const params=new URLSearchParams({items:chunks[i].join(','),locations:DEFAULT_LOCATIONS.join(','),qualities:'1',server:'west'}); const data=await api(`/api/albion-prices?${params.toString()}`); allRows=allRows.concat(data.data||[]); const percent=Math.round(((i+1)/chunks.length)*100); setProgress(percent,`Consultando Albion Data: ${percent}%`);} lastOpportunities=buildOpportunityRows(allRows); const summary=document.getElementById('opportunitySummary'); if(status) status.textContent='AlbionData online'; setProgress(100,`${lastOpportunities.length} oportunidades confiáveis encontradas.`); if(!lastOpportunities.length){renderOpportunityTable(); if(summary) summary.textContent='Sem spreads úteis no momento.'; return;} if(summary){const best=sortOpportunities(lastOpportunities)[0]; summary.textContent=`Melhor oportunidade agora: ${best.itemName} comprando em ${best.buyCity} e vendendo em ${best.sellCity}.`;} renderOpportunityTable();}catch(error){if(status) status.textContent='AlbionData com falha'; setProgress(0,'Falha ao consultar a API do Albion.'); box.textContent=error.message;}}
-  async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); const adminBtn=document.getElementById('dashboardAdminBtn'); const adminTopBtn=document.getElementById('dashboardAdminTopBtn'); if(user.admin){adminBtn?.classList.remove('hidden'); adminTopBtn?.classList.remove('hidden'); adminBtn?.addEventListener('click',()=>window.location.href='/admin.html'); adminTopBtn?.addEventListener('click',()=>window.location.href='/admin.html');} bindLogout(); bindNav(); document.getElementById('goOverviewBtn')?.addEventListener('click',()=>activateSection('overview')); document.getElementById('goOverviewTopBtn')?.addEventListener('click',()=>activateSection('overview')); populateRadarCategories(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarGroups); document.getElementById('radarGroup')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); loadOpportunityRadar(false);}
+  async function initDashboard(){const user=await requireAuth(); if(!user) return; const welcomeTitle=document.getElementById('welcomeTitle'); const licenseDate=document.getElementById('licenseDate'); if(welcomeTitle) welcomeTitle.textContent=`Olá, ${user.nome||user.email}`; if(licenseDate) licenseDate.textContent=new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'); const adminBtn=document.getElementById('dashboardAdminBtn'); const adminTopBtn=document.getElementById('dashboardAdminTopBtn'); if(user.admin){adminBtn?.classList.remove('hidden'); adminTopBtn?.classList.remove('hidden'); adminBtn?.addEventListener('click',()=>window.location.href='/admin.html'); adminTopBtn?.addEventListener('click',()=>window.location.href='/admin.html');} bindLogout(); bindNav(); document.getElementById('goOverviewBtn')?.addEventListener('click',()=>activateSection('overview')); document.getElementById('goOverviewTopBtn')?.addEventListener('click',()=>activateSection('overview')); populateRadarCategories(); document.getElementById('radarCategory')?.addEventListener('change',populateRadarGroups); document.getElementById('radarGroup')?.addEventListener('change',populateRadarItems); document.getElementById('loadMarketBtn')?.addEventListener('click',loadMarket); document.getElementById('loadOpportunityBtn')?.addEventListener('click',()=>loadOpportunityRadar(false)); document.getElementById('loadOpportunityAllBtn')?.addEventListener('click',()=>loadOpportunityRadar(true)); document.getElementById('calcFishingBtn')?.addEventListener('click',calcFishing); document.getElementById('presetFishingBtn')?.addEventListener('click',()=>{ const cur=document.getElementById('fishingCurrentLevel'); const tgt=document.getElementById('fishingTargetLevel'); const fame=document.getElementById('fishingFameNeeded'); if(cur) cur.value='10'; if(tgt) tgt.value='60'; if(fame) fame.value='826000';}); loadOpportunityRadar(false);}
   function activateAdminSection(targetId){document.querySelectorAll('.nav-item[data-admin-target]').forEach(i=>i.classList.toggle('active',i.dataset.adminTarget===targetId)); document.querySelectorAll('#adminOverview, #adminUsers, #adminLicenses, #adminSettings').forEach(s=>s.classList.toggle('active',s.id===targetId));}
   function bindAdminNav(){document.querySelectorAll('[data-admin-target]').forEach(item=>item.addEventListener('click',()=>activateAdminSection(item.dataset.adminTarget)));}
   function renderAdminUsers(users){const tbody=document.getElementById('adminUsersTable'); const count=document.getElementById('adminUserCount'); const pending=document.getElementById('adminPendingCount'); if(count) count.textContent=String(users.length); if(pending) pending.textContent=String(users.filter(u=>u.status==='Primeiro acesso').length); if(tbody) tbody.innerHTML=users.map(u=>`<tr><td>${u.nome||'-'}</td><td>${u.email}</td><td>${u.telefone||'-'}</td><td>${u.admin?'Admin':'Usuário'}</td><td>${new Date(u.licencaExpiraEm).toLocaleDateString('pt-BR')}</td><td>${u.status||'Ativo'}</td></tr>`).join('');}
@@ -372,7 +408,78 @@
   function calcRefine(){const level=Number(document.getElementById('refineLevel').value||0); const city=document.getElementById('refineCity').value; const focus=document.getElementById('refineFocus').value==='sim'; const cost=Number(document.getElementById('refineCost').value||0); const sell=Number(document.getElementById('refineSell').value||0); const efficiency=focus?0.86:1; const xpBonus=level>=75?0.95:1; const fee=Math.round(sell*0.065); const lucro=sell-cost*efficiency*xpBonus-fee; setHtml('refineResult',`<strong>Resultado do refino em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong> ${focus?'com foco':'sem foco'}`);}
   function calcIsland(){const level=Number(document.getElementById('islandLevel').value||0); const islands=Number(document.getElementById('islandCount').value||1); const plots=Number(document.getElementById('islandPlots').value||0)*islands; const pastures=Number(document.getElementById('islandPastures').value||0)*islands; const focus=document.getElementById('islandFocus').value==='sim'; const feedMode=document.getElementById('islandFeedMode').value; const cropOptions=ISLAND_CROPS.map(c=>({...c,totalProfit:Math.round(c.profit*plots*(1+level*0.03)*(focus?1.12:1))})); const animalOptions=ISLAND_ANIMALS.map(a=>{const feedDiscount=feedMode==='produzir'?0.8:1; return {...a,totalProfit:Math.round((a.profit-a.feed*feedDiscount)*pastures*(1+level*0.025)*(focus?1.08:1))};}); const bestCrop=cropOptions.sort((a,b)=>b.totalProfit-a.totalProfit)[0]; const bestAnimal=animalOptions.sort((a,b)=>b.totalProfit-a.totalProfit)[0]; const total=(bestCrop?.totalProfit||0)+(bestAnimal?.totalProfit||0); setHtml('islandResult',`<strong>Melhor plano para suas ilhas</strong><br><br>Ilhas consideradas: <strong>${islands}</strong><br>Plantações totais: <strong>${plots}</strong><br>Pastos totais: <strong>${pastures}</strong><br><br>Melhor plantação: <strong>${bestCrop.name} ${bestCrop.tier}</strong> — lucro por ciclo: <strong>${formatSilver(bestCrop.totalProfit)}</strong><br>Melhor criação: <strong>${bestAnimal.name} ${bestAnimal.tier}</strong> — lucro por ciclo: <strong>${formatSilver(bestAnimal.totalProfit)}</strong><br>Alimentação: <strong>${feedMode==='produzir'?'produzir a comida':'comprar a comida'}</strong><br>Lucro total estimado: <strong>${formatSilver(total)} prata</strong><br><br>• ${bestCrop.note}.<br>• ${bestAnimal.note}.`);}
   function calcTransport(){const buyCity=document.getElementById('transportBuyCity').value; const sellCity=document.getElementById('transportSellCity').value; const buy=Number(document.getElementById('transportBuyPrice').value||0); const sell=Number(document.getElementById('transportSellPrice').value||0); const cost=Number(document.getElementById('transportCost').value||0); const tax=Math.round(sell*0.065); const lucro=sell-buy-cost-tax; setHtml('transportResult',`<strong>Resultado do transporte</strong><br>Rota: <strong>${buyCity} → ${sellCity}</strong><br>Lucro líquido estimado: <strong>${formatSilver(lucro)} prata</strong>`);}
+  function validSellRows(rows){
+    return sanitizeRows(rows,{strict:false}).filter(r=>Number(r.sell_price_min||0)>0 && !isStale(r.sell_price_min_date,240));
+  }
+  async function calcFishing(){
+    const fameNeeded = Math.max(1, Number(document.getElementById('fishingFameNeeded')?.value || 826000));
+    const current = Number(document.getElementById('fishingCurrentLevel')?.value || 10);
+    const target = Number(document.getElementById('fishingTargetLevel')?.value || 60);
+    const citiesRaw = (document.getElementById('fishingCities')?.value || '').trim();
+    const cities = citiesRaw ? citiesRaw.split(',').map(v => v.trim()).filter(Boolean) : [...DEFAULT_LOCATIONS, 'Brecilien'];
+    const box = document.getElementById('fishingResult');
+    if (box) box.innerHTML = '<div class="muted">Consultando peixes no Albion Data...</div>';
+    try {
+      const params = new URLSearchParams({ items: FISH_CATALOG.map(f => f.id).join(','), locations: cities.join(','), qualities: '1', server: 'west' });
+      const data = await api(`/api/albion-prices?${params.toString()}`);
+      const grouped = new Map();
+      (data.data || []).forEach(row => {
+        if (!row.item_id) return;
+        if (!grouped.has(row.item_id)) grouped.set(row.item_id, []);
+        grouped.get(row.item_id).push(row);
+      });
+      const ranked = FISH_CATALOG.map(fish => {
+        const rows = validSellRows(grouped.get(fish.id) || []);
+        if (!rows.length) return null;
+        const best = [...rows].sort((a,b) => Number(a.sell_price_min||0) - Number(b.sell_price_min||0))[0];
+        const silverPerFame = Number(best.sell_price_min) / fish.fame;
+        const needed = Math.ceil(fameNeeded / fish.fame);
+        return {
+          ...fish,
+          city: best.city,
+          price: Number(best.sell_price_min),
+          updated: best.sell_price_min_date,
+          silverPerFame,
+          needed,
+          totalCost: needed * Number(best.sell_price_min)
+        };
+      }).filter(Boolean).sort((a,b) => a.silverPerFame - b.silverPerFame);
+
+      if (!ranked.length) {
+        box.innerHTML = '<div class="muted">Não encontrei preços de peixe suficientes agora. Tente de novo em alguns minutos.</div>';
+        return;
+      }
+
+      const best = ranked[0];
+      const practical = ranked.filter(f => f.fame >= 150)[0] || best;
+      const rowsHtml = ranked.slice(0, 12).map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${row.name}</td>
+          <td>T${row.tier}</td>
+          <td>${row.city}</td>
+          <td>${formatSilver(row.price)}</td>
+          <td>${row.fame}</td>
+          <td>${row.silverPerFame.toFixed(2)}</td>
+          <td>${formatSilver(row.needed)}</td>
+          <td>${formatSilver(row.totalCost)}</td>
+        </tr>`).join('');
+
+      box.innerHTML = `
+        <div class="callout-grid">
+          <div class="callout-card success"><span>Melhor custo-benefício</span><strong>${best.name}</strong><small>${best.city} — ${formatSilver(best.price)} prata</small></div>
+          <div class="callout-card success"><span>Melhor opção prática</span><strong>${practical.name}</strong><small>${practical.city} — ${formatSilver(practical.price)} prata</small></div>
+          <div class="callout-card"><span>Peixes necessários</span><strong>${formatSilver(best.needed)}</strong><small>usando ${best.name}</small></div>
+          <div class="callout-card"><span>Custo estimado</span><strong>${formatSilver(best.totalCost)} prata</strong><small>${best.silverPerFame.toFixed(2)} prata por fama</small></div>
+        </div>
+        <div class="muted top-gap"><strong>Leitura rápida:</strong> para sair do nível ${current} e buscar o ${target}, estou usando <strong>${formatSilver(fameNeeded)}</strong> de fama necessária. O melhor peixe pelo preço ao vivo encontrado agora foi <strong>${best.name}</strong>. Se você quiser menos cliques e ainda um custo razoável, a melhor opção prática foi <strong>${practical.name}</strong>.</div>
+        <div class="table-wrap compact-gap"><table class="data-table"><thead><tr><th>#</th><th>Peixe</th><th>Tier</th><th>Cidade mais barata</th><th>Preço</th><th>Fama</th><th>Prata/fama</th><th>Qtd. necessária</th><th>Custo total</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+    } catch (error) {
+      if (box) box.textContent = error.message;
+    }
+  }
+
   function calcWealth(){const current=Number(document.getElementById('wealthCurrent').value||0); const goal=Number(document.getElementById('wealthGoal').value||0); const days=Math.max(1,Number(document.getElementById('wealthDays').value||1)); const faltante=Math.max(0,goal-current); const porDia=faltante/days; setHtml('wealthResult',`<strong>Plano para sair de ${formatSilver(current)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(porDia)} prata por dia</strong><br>Dia 1: faça um giro curto em mercado e transporte para levantar caixa sem exagerar no risco.<br>Dia 2: repita o item com melhor saída e reinvista uma parte fixa.<br>Dia 3 em diante: mantenha uma linha estável e uma linha agressiva de lucro.<br>Fechamento diário: anote com quanto terminou o dia para ajustar o próximo passo.`);}
-  window.AlbionTrader={calcCraft,calcRefine,calcIsland,calcTransport,calcWealth};
+  window.AlbionTrader={calcCraft,calcRefine,calcIsland,calcTransport,calcWealth,calcFishing};
   document.addEventListener('DOMContentLoaded',()=>{const loginForm=document.getElementById('loginForm'); if(loginForm) loginForm.addEventListener('submit',handleLogin); if(document.body.dataset.page==='dashboard') initDashboard(); if(document.body.dataset.page==='admin') initAdmin();});
 })();

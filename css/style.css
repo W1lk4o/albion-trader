@@ -192,3 +192,10 @@ button, input, select { font: inherit; }
 @media (max-width: 640px) { .callout-grid { grid-template-columns: 1fr; } }
 
 .callout-card small{display:block;margin-top:6px;color:#aab8e8;}
+
+
+.radar-grid-albion label,.form-grid label{display:flex;flex-direction:column;gap:8px;}
+.button-row{display:flex;gap:12px;align-items:center;}
+.button-row.wrap-right{justify-content:flex-end;flex-wrap:wrap;}
+.top-gap{margin-top:16px;}
+.compact-gap{margin-top:12px;}
