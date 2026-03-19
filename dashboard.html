@@ -15,16 +15,15 @@
       </div>
       <nav class="nav-list">
         <button class="nav-item active" data-target="overview">Dashboard</button>
+        <button class="nav-item" data-target="mercado">Mercado</button>
+        <button class="nav-item" data-target="radar-item">Radar de item</button>
         <button class="nav-item" data-target="craft">Craft</button>
         <button class="nav-item" data-target="refino">Refino</button>
         <button class="nav-item" data-target="ilhas">Ilhas</button>
         <button class="nav-item" data-target="transporte">Transporte</button>
-        <button class="nav-item" data-target="mercado">Mercado</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
-        <button class="nav-item" data-target="pesca">Pesca</button>
       </nav>
-      <button id="goOverviewBtn" class="btn btn-outline btn-full">Voltar ao painel</button>
-      <button id="dashboardAdminBtn" class="btn btn-outline btn-full hidden">Ir para admin</button>
+      <a href="/admin" id="goAdminBtn" class="btn btn-outline btn-full hidden">Ir para admin</a>
       <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
@@ -34,29 +33,28 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="button-row wrap-right">
-          <button id="goOverviewTopBtn" class="btn btn-outline">Painel</button>
-          <button id="dashboardAdminTopBtn" class="btn btn-outline hidden">Admin</button>
-          <div class="status-pill" id="apiStatusBadge">AlbionData carregando...</div>
+        <div class="status-stack">
+          <div class="status-pill" id="apiStatusBadge">AlbionData aguardando consulta</div>
+          <div class="status-pill status-subtle" id="scanStatusBadge">Sem varredura em andamento</div>
         </div>
       </header>
 
       <section id="overview" class="page-section active">
         <div class="stats-grid">
           <article class="card stat-card">
-            <span class="stat-label">Módulos ativos</span>
-            <strong>7</strong>
-            <p>Base estável com radar de item e oportunidades.</p>
+            <span class="stat-label">Melhor oportunidade agora</span>
+            <strong id="heroOpportunityTitle">Aguardando varredura</strong>
+            <p id="heroOpportunityText">O sistema vai buscar spreads reais e ordenar pelo maior lucro.</p>
           </article>
           <article class="card stat-card">
-            <span class="stat-label">Radar de oportunidades</span>
-            <strong>Ao vivo</strong>
-            <p id="opportunitySummary">Lendo oportunidades do mercado...</p>
+            <span class="stat-label">Modo de operação</span>
+            <strong id="heroProfile">Equilibrado</strong>
+            <p>Você escolhe o perfil na hora: máximo lucro, consistente ou equilibrado.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
             <strong id="licenseDate">—</strong>
-            <p>Controle simples por sessão.</p>
+            <p>O site agora está focado primeiro em preço confiável e cálculo correto.</p>
           </article>
         </div>
 
@@ -64,105 +62,169 @@
           <article class="card">
             <div class="section-header">
               <div>
-                <h3>Radar de item</h3>
-                <p class="muted">Pesquise um item específico e veja claramente onde comprar barato e onde vender melhor.</p>
+                <h3>Configuração de mercado</h3>
+                <p class="muted">Esses filtros afetam o radar de oportunidades e o radar de item.</p>
               </div>
             </div>
-            <div class="form-grid compact-grid radar-grid radar-grid-albion">
-              <label><span>Categoria</span><select id="radarCategory"></select></label>
-              <label><span>Grupo</span><select id="radarGroup"></select></label>
-              <label><span>Item</span><select id="radarItem"></select></label>
-              <label><span>Tier</span>
-                <select id="radarTier">
-                  <option value="T3">T3</option><option value="T4" selected>T4</option><option value="T5">T5</option><option value="T6">T6</option><option value="T7">T7</option><option value="T8">T8</option>
+            <div class="form-grid compact-grid">
+              <label>
+                <span>Servidor</span>
+                <select id="marketServer">
+                  <option value="west">Americas</option>
+                  <option value="europe">Europe</option>
+                  <option value="east">Asia</option>
                 </select>
               </label>
-              <label><span>Encantamento</span>
-                <select id="radarEnchant">
-                  <option value="0">Sem encantamento</option><option value="1">.1</option><option value="2">.2</option><option value="3">.3</option><option value="4">.4</option>
+              <label>
+                <span>Capital disponível</span>
+                <input id="marketCapital" type="number" min="0" step="1000" value="3000000" />
+              </label>
+              <label>
+                <span>Perfil</span>
+                <select id="marketProfile">
+                  <option value="balanced">Equilibrado</option>
+                  <option value="safe">Lucro consistente</option>
+                  <option value="max">Máximo lucro</option>
                 </select>
               </label>
-              <label><span>Qualidade</span>
-                <select id="radarQuality">
-                  <option value="1">Normal</option><option value="2">Bom</option><option value="3">Excepcional</option><option value="4">Excelente</option><option value="5">Obra-prima</option>
+              <label>
+                <span>Taxa de venda total (%)</span>
+                <input id="marketTax" type="number" min="0" max="30" step="0.1" value="6.5" />
+              </label>
+              <label>
+                <span>Qualidade</span>
+                <select id="marketQuality">
+                  <option value="1">Normal</option>
+                  <option value="2">Boa</option>
+                  <option value="3">Excelente</option>
+                  <option value="4">Obra-prima</option>
                 </select>
               </label>
             </div>
-            <p class="muted small-text">Estrutura igual à lógica do mercado do Albion: categoria → grupo → item → tier → encantamento → qualidade.</p>
-            <div class="inline-form top-gap">
-              <button id="loadMarketBtn" class="btn btn-primary">Buscar item</button>
+            <div class="button-row wrap">
+              <button id="scanPopularBtn" class="btn btn-primary">Varrer mercado agora</button>
+              <button id="scanFastBtn" class="btn btn-outline">300 mais líquidos</button>
             </div>
-            <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
+            <div class="progress-shell hidden" id="scanProgressShell">
+              <div class="progress-bar"><span id="scanProgressBar"></span></div>
+              <p class="muted" id="scanProgressText">0%</p>
+            </div>
           </article>
 
           <article class="card">
             <div class="section-header">
               <div>
-                <h3>Módulos planejados</h3>
-                <p class="muted">Clique para abrir os módulos que já existem nesta base.</p>
+                <h3>O que priorizar para bater 30M</h3>
+                <p class="muted">Leitura direta para sair de 3M e chegar forte nos próximos dias.</p>
               </div>
             </div>
-            <div class="tag-grid">
-              <button class="tag tag-button" data-target="craft">Craft</button>
-              <button class="tag tag-button" data-target="refino">Refino</button>
-              <button class="tag tag-button" data-target="ilhas">Ilhas</button>
-              <button class="tag tag-button" data-target="transporte">Transporte</button>
-              <button class="tag tag-button" data-target="mercado">Mercado</button>
-              <button class="tag tag-button" data-target="riqueza">Planejador</button>
-              <button class="tag tag-button" data-target="pesca">Pesca</button>
-              <span class="tag">Agricultura</span>
-              <span class="tag">Animais</span>
-              <span class="tag">Trabalhadores</span>
-              <span class="tag">Radar de guerra</span>
-              <span class="tag">Rotas Avalon</span>
+            <div id="marketAdviceBox" class="result-box muted">
+              Faça a primeira varredura de mercado. O sistema vai mostrar a melhor rota agora e se vale operar de forma segura ou agressiva.
             </div>
           </article>
         </div>
+      </section>
 
+      <section id="mercado" class="page-section">
         <article class="card">
           <div class="section-header">
             <div>
-              <h3>Radar de oportunidades</h3>
-              <p class="muted">Mostra as melhores oportunidades do mercado inteiro. Clique nas colunas para ordenar.</p>
+              <h2>Melhores oportunidades agora</h2>
+              <p class="muted">Ordenado por maior lucro total dentro do seu capital. Os dados vêm do Albion Data e são filtrados por consistência.</p>
             </div>
-            <div class="button-row">
-              <button id="loadOpportunityBtn" class="btn btn-primary">Itens populares</button>
-              <button id="loadOpportunityAllBtn" class="btn btn-outline">Mercado completo</button>
+            <div class="button-row wrap">
+              <button id="refreshMarketBtn" class="btn btn-primary">Atualizar oportunidades</button>
+              <button id="sortProfitBtn" class="btn btn-outline">Ordenar por lucro</button>
             </div>
           </div>
-          <div class="progress-shell">
-            <div class="progress-bar"><div id="marketProgressBar" class="progress-fill"></div></div>
-            <div id="marketProgressText" class="muted small-text">Aguardando consulta...</div>
-          </div>
-          <div id="opportunityResult" class="result-box">Carregando oportunidades...</div>
+          <div id="marketOpportunities" class="result-box">Nenhuma varredura feita ainda.</div>
         </article>
       </section>
 
-      <section id="craft" class="page-section"><div class="card module-card"><h2>Calculadora de Craft</h2><div class="form-grid"><label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label><label><span>Cidade</span><select id="craftCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label><label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label><label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button><div id="craftResult" class="result-box"></div></div></section>
-      <section id="refino" class="page-section"><div class="card module-card"><h2>Calculadora de Refino</h2><div class="form-grid"><label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label><label><span>Cidade</span><select id="refineCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label><label><span>Usa foco?</span><select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select></label><label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label><label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button><div id="refineResult" class="result-box"></div></div></section>
-      <section id="ilhas" class="page-section"><div class="card module-card"><h2>Simulador de Ilhas</h2><p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p><div class="form-grid"><label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label><label><span>Quantidade de ilhas</span><input id="islandCount" type="number" min="1" value="2" /></label><label><span>Plantações por ilha</span><input id="islandPlots" type="number" value="5" /></label><label><span>Pastos por ilha</span><input id="islandPastures" type="number" value="2" /></label><label><span>Usa foco?</span><select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select></label><label><span>Comida dos bichos</span><select id="islandFeedMode"><option value="produzir">Produzir a comida</option><option value="comprar">Comprar a comida</option></select></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilha</button><div id="islandResult" class="result-box"></div></div></section>
-      <section id="transporte" class="page-section"><div class="card module-card"><h2>Calculadora de Transporte</h2><div class="form-grid"><label><span>Cidade de compra</span><select id="transportBuyCity"><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option></select></label><label><span>Cidade de venda</span><select id="transportSellCity"><option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option></select></label><label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9000" /></label><label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="12400" /></label><label><span>Custo do transporte</span><input id="transportCost" type="number" value="700" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button><div id="transportResult" class="result-box"></div></div></section>
-      <section id="mercado" class="page-section"><div class="card module-card"><h2>Mercado</h2><p>Use o radar rápido e o radar de oportunidades na aba principal.</p></div></section>
-      <section id="riqueza" class="page-section"><div class="card module-card"><h2>Planejador de riqueza</h2><div class="form-grid"><label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label><label><span>Meta</span><input id="wealthGoal" type="number" value="100000000" /></label><label><span>Dias</span><input id="wealthDays" type="number" value="30" /></label></div><button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano</button><div id="wealthResult" class="result-box"></div></div></section>
+      <section id="radar-item" class="page-section">
+        <article class="card">
+          <div class="section-header">
+            <div>
+              <h2>Radar de item</h2>
+              <p class="muted">Use para descobrir a cidade mais barata para comprar e a melhor cidade para vender um item específico.</p>
+            </div>
+          </div>
+          <div class="form-grid compact-grid">
+            <label>
+              <span>Família</span>
+              <select id="itemFamily"></select>
+            </label>
+            <label>
+              <span>Item</span>
+              <select id="itemBase"></select>
+            </label>
+            <label>
+              <span>Tier</span>
+              <select id="itemTier"></select>
+            </label>
+            <label>
+              <span>Encantamento</span>
+              <select id="itemEnchant"></select>
+            </label>
+            <label>
+              <span>Qualidade</span>
+              <select id="itemQuality">
+                <option value="1">Normal</option>
+                <option value="2">Boa</option>
+                <option value="3">Excelente</option>
+                <option value="4">Obra-prima</option>
+              </select>
+            </label>
+          </div>
+          <div class="inline-form">
+            <input id="customItemId" type="text" placeholder="Opcional: digite um item ID direto, ex: T4_BAG@1" />
+            <button id="loadItemRadarBtn" class="btn btn-primary">Consultar item</button>
+          </div>
+          <div id="itemRadarResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
+        </article>
+      </section>
 
-      <section id="pesca" class="page-section">
+      <section id="craft" class="page-section">
         <div class="card module-card">
-          <h2>Calculadora de up de pesca</h2>
-          <p class="muted">Compara peixes pelo melhor custo-benefício usando preços ao vivo do Albion Data no servidor americano. A fama por peixe segue a tabela pública de power leveling com premium; você pode ajustar a fama necessária manualmente.</p>
-          <div class="form-grid">
-            <label><span>Nível atual</span><input id="fishingCurrentLevel" type="number" min="0" max="100" value="10" /></label>
-            <label><span>Nível alvo</span><input id="fishingTargetLevel" type="number" min="0" max="100" value="60" /></label>
-            <label><span>Fama necessária</span><input id="fishingFameNeeded" type="number" min="1" value="826000" /></label>
-            <label><span>Cidades analisadas</span><input id="fishingCities" type="text" value="Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford,Caerleon,Brecilien" /></label>
+          <h2>Craft</h2>
+          <p class="muted">Este módulo será reconstruído na próxima etapa. Primeiro estamos travando o motor de mercado para que os preços fiquem confiáveis.</p>
+          <div class="result-box muted">
+            Próximo passo do cronograma: perguntar sua experiência, tier liberado, foco, capital e então mostrar o item mais lucrativo para começar com cidade, bônus e custo dos materiais.
           </div>
-          <div class="button-row top-gap">
-            <button id="calcFishingBtn" class="btn btn-primary">Analisar melhor peixe</button>
-            <button id="presetFishingBtn" class="btn btn-outline">Usar preset 10 → 60</button>
-          </div>
-          <div id="fishingResult" class="result-box muted top-gap">Clique em <strong>Analisar melhor peixe</strong> para comparar os peixes automaticamente.</div>
         </div>
       </section>
 
+      <section id="refino" class="page-section">
+        <div class="card module-card">
+          <h2>Refino</h2>
+          <p class="muted">Depois do craft, o próximo bloco será refino com cidade ideal, bônus e lucro líquido automático.</p>
+          <div class="result-box muted">Por enquanto, use o mercado para levantar capital com dados mais confiáveis.</div>
+        </div>
+      </section>
+
+      <section id="ilhas" class="page-section">
+        <div class="card module-card">
+          <h2>Ilhas</h2>
+          <p class="muted">A base de ilhas continua disponível, mas o foco desta atualização foi mercado confiável.</p>
+          <div id="islandResult" class="result-box muted">Módulo de ilhas volta a ser melhorado depois que o núcleo de mercado estiver estável.</div>
+        </div>
+      </section>
+
+      <section id="transporte" class="page-section">
+        <div class="card module-card">
+          <h2>Transporte</h2>
+          <p class="muted">Use as oportunidades de mercado como base. Em seguida, o sistema vai recomendar a rota e a montaria ideais.</p>
+          <div id="transportResult" class="result-box muted">Em breve: rota segura, rota rápida e sugestão de montaria.</div>
+        </div>
+      </section>
+
+      <section id="riqueza" class="page-section">
+        <div class="card module-card">
+          <h2>Planejador de riqueza</h2>
+          <p class="muted">Este módulo vai ser reconstruído em cima do motor de mercado para gerar plano diário real.</p>
+          <div class="result-box muted">Quando o mercado estiver estável, o planejador vai dizer exatamente o que fazer no dia 1, dia 2 e assim por diante.</div>
+        </div>
+      </section>
     </main>
   </div>
 
