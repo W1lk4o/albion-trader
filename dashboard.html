@@ -61,7 +61,7 @@
                 <p class="muted">O sistema usa qualidade normal e taxa padrão do mercado por trás dos cálculos. Você só escolhe servidor, capital e perfil.</p>
               </div>
             </div>
-            <div class="form-grid compact-grid">
+            <div class="form-grid compact-grid market-filters-grid">
               <label><span>Servidor</span>
                 <select id="marketServer">
                   <option value="west">Americas</option>
@@ -70,16 +70,23 @@
                 </select>
               </label>
               <label><span>Capital disponível</span><input id="marketCapital" type="number" value="3000000" min="10000" step="1000" /></label>
-              <label><span>Perfil</span>
+              <label><span>Perfil do lucro</span>
                 <select id="marketProfile">
                   <option value="balanced">Equilibrado</option>
-                  <option value="consistent">Lucro consistente</option>
-                  <option value="max">Máximo lucro</option>
+                  <option value="consistent">Lucro seguro</option>
+                  <option value="max">Lucro máximo</option>
+                </select>
+              </label>
+              <label><span>Rota aceita</span>
+                <select id="marketRoute">
+                  <option value="safe">Somente zona safe</option>
+                  <option value="red">Pode usar rota vermelha / Caerleon</option>
+                  <option value="black">Aceita Black Market</option>
                 </select>
               </label>
             </div>
             <div class="button-row">
-              <button id="scanPopularBtn" class="btn btn-primary">Analisar itens com mais giro</button>
+              <button id="scanPopularBtn" class="btn btn-primary">Analisar 300 itens com mais saída</button>
               <button id="scanAllBtn" class="btn btn-outline">Pesquisar mercado completo</button>
             </div>
             <div class="progress-wrap">
@@ -87,8 +94,8 @@
               <p id="marketProgressText" class="muted">Nenhuma varredura iniciada.</p>
             </div>
             <div class="helper-box">
-              <strong>O que significa “itens com mais giro”?</strong>
-              <span>É a busca mais rápida e útil para novato. Ela foca nos itens com maior chance de venda e evita travar o capital em item parado.</span>
+              <strong>Como o sistema pensa agora?</strong>
+              <span>Primeiro ele pergunta o perfil de lucro e a rota que você aceita. Depois procura oportunidades que façam sentido para o seu capital, com quantidade segura estimada e prioridade para itens com saída.</span>
             </div>
           </article>
 
@@ -107,7 +114,7 @@
           <div class="section-header">
             <div>
               <h3>Radar de oportunidades</h3>
-              <p class="muted">Oportunidades classificadas por lucro seguro. O sistema filtra preço estranho e dados velhos antes de sugerir.</p>
+              <p class="muted">Oportunidades classificadas por lucro total seguro. Clique no nome da coluna para ordenar por custo, venda, lucro, quantidade segura, margem ou confiança.</p>
             </div>
           </div>
           <div id="opportunityResult" class="result-box">Clique em “Analisar itens com mais giro” para montar o radar.</div>
@@ -239,13 +246,17 @@
       <section id="riqueza" class="page-section">
         <div class="card module-card">
           <h2>Planejador de Riqueza</h2>
-          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
+          <p class="muted">Plano operacional por dia usando as melhores rotas que o mercado encontrou agora.</p>
           <div class="form-grid">
-            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
-            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
-            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="3000000" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="30000000" /></label>
+            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="8" /></label>
+            <label><span>Se morreu hoje e perdeu dinheiro</span>
+              <select id="wealthDied"><option value="nao">Não</option><option value="sim">Sim</option></select>
+            </label>
+            <label><span>Saldo ao fechar o dia</span><input id="wealthClose" type="number" value="3000000" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano diário</button>
           <div id="wealthResult" class="result-box"></div>
         </div>
       </section>

@@ -1,13 +1,16 @@
 
 (function () {
   const STORAGE_KEY = 'albionTraderSession';
-  const DEFAULT_LOCATIONS = ['Caerleon', 'Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford'];
+  const DEFAULT_LOCATIONS = ['Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford', 'Caerleon'];
+  const SAFE_LOCATIONS = ['Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford'];
+  const BM_LOCATION = 'Black Market';
   const SERVER_HOSTS = {
     west: 'https://west.albion-online-data.com',
     europe: 'https://europe.albion-online-data.com',
     east: 'https://east.albion-online-data.com'
   };
   const DEFAULT_FEE = 6.5;
+  const opportunityState = { list: [], sortKey: 'totalSafeProfit', sortDir: 'desc', lastMode: 'popular' };
 
   const ITEM_CATALOG = {
     'Bolsas e capas': {
@@ -336,6 +339,51 @@
     return 'Baixa';
   }
 
+  function confidenceScore(label) {
+    return label === 'Alta' ? 4 : label === 'Boa' ? 3 : label === 'Média' ? 2 : 1;
+  }
+
+  function currentRouteMode() {
+    return document.getElementById('marketRoute')?.value || 'safe';
+  }
+
+  function currentLocations() {
+    const route = currentRouteMode();
+    if (route === 'safe') return SAFE_LOCATIONS;
+    if (route === 'red') return [...SAFE_LOCATIONS, 'Caerleon'];
+    return [...SAFE_LOCATIONS, 'Caerleon', BM_LOCATION];
+  }
+
+  function estimateDailyVolume(itemId, route) {
+    const id = String(itemId || '').toUpperCase();
+    let base = 200;
+    if (/(WOOD|FIBER|ORE|HIDE|ROCK)$/.test(id)) base = 9000;
+    else if (/(PLANKS|CLOTH|METALBAR|LEATHER|STONEBLOCK)$/.test(id)) base = 5000;
+    else if (/(BAG|CAPE|MEAL|POTION)/.test(id)) base = 1800;
+    else if (/(ARMOR|SHOES|HEAD|MAIN_|2H_)/.test(id)) base = 700;
+    if (route === 'black') base *= 0.55;
+    else if (route === 'red') base *= 0.8;
+    return Math.max(50, Math.round(base));
+  }
+
+  function estimateSafeUnits({ itemId, buyPrice, capital, profile, route }) {
+    const capitalUnits = Math.floor(capital / Math.max(1, buyPrice));
+    const dailyVolume = estimateDailyVolume(itemId, route);
+    let fraction = 0.25;
+    if (profile === 'consistent') fraction = route === 'safe' ? 0.35 : 0.2;
+    else if (profile === 'balanced') fraction = route === 'safe' ? 0.55 : 0.35;
+    else fraction = route === 'safe' ? 0.8 : 0.55;
+    const packFloor = /(WOOD|FIBER|ORE|HIDE|ROCK|PLANKS|CLOTH|METALBAR|LEATHER|STONEBLOCK)/.test(String(itemId || '').toUpperCase()) ? 999 : 50;
+    let safeUnits = Math.min(capitalUnits, Math.floor(dailyVolume * fraction));
+    if (capitalUnits >= packFloor && safeUnits < packFloor * 0.5) safeUnits = Math.min(capitalUnits, packFloor);
+    return Math.max(0, safeUnits);
+  }
+
+  function getSortArrow(key) {
+    if (opportunityState.sortKey !== key) return '↕';
+    return opportunityState.sortDir === 'asc' ? '↑' : '↓';
+  }
+
   function buildSingleItemAnalysis(rows, feePct = DEFAULT_FEE) {
     const cleaned = sanitizeRows(rows);
     const validSells = cleaned.filter(r => Number(r.sell_price_min || 0) > 0);
@@ -368,7 +416,7 @@
     };
   }
 
-  function buildOpportunities(prices, capital = 3000000, profile = 'balanced', feePct = DEFAULT_FEE) {
+  function buildOpportunities(prices, capital = 3000000, profile = 'balanced', feePct = DEFAULT_FEE, route = 'safe') {
     const byItem = new Map();
     prices.forEach((row) => {
       if (!row.item_id) return;
@@ -381,16 +429,16 @@
       const analysis = buildSingleItemAnalysis(rows, feePct);
       if (!analysis.ok) return;
       if (analysis.buyCity === analysis.sellCity) return;
+      if (route === 'safe' && (analysis.buyCity === 'Caerleon' || analysis.sellCity === 'Caerleon' || analysis.sellCity === BM_LOCATION)) return;
+      if (route === 'red' && analysis.sellCity === BM_LOCATION) return;
       if (analysis.profit <= 0) return;
 
-      let safeUnits = Math.floor(capital / analysis.buyPrice);
-      if (profile === 'consistent') safeUnits = Math.min(safeUnits, 20);
-      else if (profile === 'balanced') safeUnits = Math.min(safeUnits, 35);
-      else safeUnits = Math.min(safeUnits, 50);
-      safeUnits = Math.max(0, safeUnits);
+      const safeUnits = estimateSafeUnits({ itemId, buyPrice: analysis.buyPrice, capital, profile, route });
+      if (safeUnits <= 0) return;
 
       const totalSafeProfit = analysis.profit * safeUnits;
-      if (safeUnits <= 0) return;
+      const minimumProfit = profile === 'max' ? 100000 : profile === 'balanced' ? 50000 : 25000;
+      if (totalSafeProfit < minimumProfit) return;
 
       opportunities.push({
         itemId,
@@ -399,18 +447,18 @@
         sellCity: analysis.sellCity,
         buyPrice: analysis.buyPrice,
         sellPrice: analysis.sellPrice,
+        netSell: analysis.netSell,
         profit: analysis.profit,
         margin: analysis.margin,
         confidence: analysis.confidence,
+        confidenceScore: confidenceScore(analysis.confidence),
         safeUnits,
-        totalSafeProfit
+        totalSafeProfit,
+        estimatedDailyVolume: estimateDailyVolume(itemId, route)
       });
     });
 
-    return opportunities.sort((a, b) => {
-      if (b.totalSafeProfit !== a.totalSafeProfit) return b.totalSafeProfit - a.totalSafeProfit;
-      return b.profit - a.profit;
-    });
+    return opportunities;
   }
 
   function prettyItemName(itemId) {
@@ -530,81 +578,111 @@
     if (!box) return;
     const capital = Number(document.getElementById('marketCapital').value || 0) || 3000000;
     const profile = document.getElementById('marketProfile').value || 'balanced';
+    const route = currentRouteMode();
+    const locations = currentLocations();
+    const routeLabel = route === 'safe' ? 'Somente zona safe' : route === 'red' ? 'Pode usar rota vermelha / Caerleon' : 'Aceita Black Market';
     document.getElementById('profileLabel').textContent =
-      profile === 'consistent' ? 'Lucro consistente' : profile === 'max' ? 'Máximo lucro' : 'Equilibrado';
+      profile === 'consistent' ? 'Lucro seguro' : profile === 'max' ? 'Lucro máximo' : 'Equilibrado';
 
-    const items = mode === 'all' ? POPULAR_ITEMS : POPULAR_ITEMS;
+    const items = POPULAR_ITEMS;
+    opportunityState.lastMode = mode;
     setProgress(5, 'Preparando consulta do mercado...');
     box.textContent = 'Consultando mercado...';
-    setStatus('AlbionData consultando oportunidades...', true);
+    setStatus(`AlbionData consultando oportunidades · ${routeLabel}`, true);
 
     try {
-      setProgress(25, `Consultando ${items.length} itens em ${DEFAULT_LOCATIONS.length} cidades...`);
-      const data = await api(`/api/albion-prices?items=${encodeURIComponent(items.join(','))}&locations=${encodeURIComponent(DEFAULT_LOCATIONS.join(','))}&qualities=1&server=${currentServer()}`);
-      setProgress(65, 'Filtrando preços estranhos e dados velhos...');
-      const opportunities = buildOpportunities(data.data || [], capital, profile, DEFAULT_FEE).slice(0, 20);
+      setProgress(25, `Consultando ${items.length} itens em ${locations.length} cidades...`);
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(items.join(','))}&locations=${encodeURIComponent(locations.join(','))}&qualities=1&server=${currentServer()}`);
+      setProgress(65, 'Filtrando preços estranhos, dados velhos e rota ruim...');
+      const opportunities = buildOpportunities(data.data || [], capital, profile, DEFAULT_FEE, route);
+      opportunityState.list = opportunities;
+      opportunityState.sortKey = 'totalSafeProfit';
+      opportunityState.sortDir = 'desc';
       setProgress(100, opportunities.length ? `Varredura concluída · ${opportunities.length} oportunidades` : 'Varredura concluída · sem oportunidade confiável');
 
       if (!opportunities.length) {
-        box.innerHTML = '<div class="warning-box">Nenhuma oportunidade confiável apareceu agora. Isso normalmente significa dado velho, pouco spread real ou mercado travado nesse momento.</div>';
+        box.innerHTML = '<div class="warning-box">Nenhuma oportunidade confiável apareceu agora. Isso normalmente significa dado velho, pouco spread real ou rota incompatível com o filtro escolhido.</div>';
         document.getElementById('bestOpportunityName').textContent = '—';
         document.getElementById('bestOpportunityText').textContent = 'Sem oportunidade confiável agora.';
-        document.getElementById('priorityPlan').textContent = 'Sem rota segura agora. Tente outra varredura em alguns minutos ou pesquise um item específico no Radar de item.';
+        document.getElementById('priorityPlan').textContent = 'Sem rota forte agora. Troque o perfil, aumente o capital, ou permita rota vermelha / Black Market.';
         setStatus('Sem oportunidade confiável agora', false);
         return;
       }
 
-      const best = opportunities[0];
+      const best = opportunities.slice().sort((a,b)=>b.totalSafeProfit-a.totalSafeProfit)[0];
       document.getElementById('bestOpportunityName').textContent = best.itemName;
       document.getElementById('bestOpportunityText').textContent =
         `Comprar em ${best.buyCity}, vender em ${best.sellCity} e mirar ${formatSilver(best.totalSafeProfit)} de lucro total seguro.`;
       document.getElementById('priorityPlan').innerHTML =
         `Melhor rota agora: <strong>${best.itemName}</strong>.<br>
          Compre em <strong>${best.buyCity}</strong> por <strong>${formatSilver(best.buyPrice)}</strong> e venda em <strong>${best.sellCity}</strong> pelo pedido de compra atual de <strong>${formatSilver(best.sellPrice)}</strong>.<br>
-         Dentro do seu capital, a quantidade segura estimada fica em <strong>${best.safeUnits}</strong> unidades, com lucro total estimado de <strong>${formatSilver(best.totalSafeProfit)}</strong>.`;
+         Quantidade segura estimada: <strong>${formatSilver(best.safeUnits)}</strong> unidades. Lucro por unidade: <strong>${formatSilver(best.profit)}</strong>. Lucro total seguro: <strong>${formatSilver(best.totalSafeProfit)}</strong>.<br>
+         Estratégia sugerida: ${route === 'safe' ? 'rotas entre cidades reais, sem entrar em zona vermelha.' : route === 'red' ? 'aceita passar por rota vermelha/Caerleon para ganhar mais.' : 'aceita rota até o Black Market para buscar o melhor spread possível.'}`;
 
-      box.innerHTML = `
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Comprar em</th>
-                <th>Preço compra</th>
-                <th>Vender em</th>
-                <th>Pedido de compra</th>
-                <th>Lucro/unid.</th>
-                <th>Qtde segura</th>
-                <th>Lucro total seguro</th>
-                <th>Margem</th>
-                <th>Confiança</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${opportunities.map(op => `
-                <tr>
-                  <td>${op.itemName}</td>
-                  <td>${op.buyCity}</td>
-                  <td>${formatSilver(op.buyPrice)}</td>
-                  <td>${op.sellCity}</td>
-                  <td>${formatSilver(op.sellPrice)}</td>
-                  <td>${formatSilver(op.profit)}</td>
-                  <td>${formatSilver(op.safeUnits)}</td>
-                  <td>${formatSilver(op.totalSafeProfit)}</td>
-                  <td>${formatPercent(op.margin)}</td>
-                  <td>${op.confidence}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
+      renderOpportunityTable();
       setStatus(`AlbionData online · ${opportunities.length} oportunidades confiáveis`, true);
     } catch (error) {
       setProgress(100, 'Falha ao consultar o mercado.');
       box.innerHTML = `<div class="warning-box">${error.message}</div>`;
       setStatus('Falha ao consultar o mercado', false);
     }
+  }
+
+  function sortOpportunitiesBy(key) {
+    if (opportunityState.sortKey === key) opportunityState.sortDir = opportunityState.sortDir === 'asc' ? 'desc' : 'asc';
+    else { opportunityState.sortKey = key; opportunityState.sortDir = 'desc'; }
+    renderOpportunityTable();
+  }
+
+  function renderOpportunityTable() {
+    const box = document.getElementById('opportunityResult');
+    if (!box) return;
+    const list = [...opportunityState.list];
+    if (!list.length) { box.innerHTML = '<div class="warning-box">Nenhuma oportunidade carregada.</div>'; return; }
+    const key = opportunityState.sortKey;
+    const dir = opportunityState.sortDir === 'asc' ? 1 : -1;
+    list.sort((a, b) => {
+      const av = a[key];
+      const bv = b[key];
+      if (typeof av === 'string') return av.localeCompare(bv, 'pt-BR') * dir;
+      return ((av || 0) - (bv || 0)) * dir;
+    });
+    box.innerHTML = `
+      <div class="table-wrap">
+        <table class="data-table sortable-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Comprar em</th>
+              <th><button class="sort-btn" data-sort="buyPrice">Custo ${getSortArrow('buyPrice')}</button></th>
+              <th>Vender em</th>
+              <th><button class="sort-btn" data-sort="sellPrice">Pedido ${getSortArrow('sellPrice')}</button></th>
+              <th><button class="sort-btn" data-sort="profit">Lucro/unid. ${getSortArrow('profit')}</button></th>
+              <th><button class="sort-btn" data-sort="safeUnits">Qtde segura ${getSortArrow('safeUnits')}</button></th>
+              <th><button class="sort-btn" data-sort="totalSafeProfit">Lucro total ${getSortArrow('totalSafeProfit')}</button></th>
+              <th><button class="sort-btn" data-sort="margin">Margem ${getSortArrow('margin')}</button></th>
+              <th><button class="sort-btn" data-sort="confidenceScore">Confiança ${getSortArrow('confidenceScore')}</button></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map(op => `
+              <tr>
+                <td>${op.itemName}</td>
+                <td>${op.buyCity}</td>
+                <td>${formatSilver(op.buyPrice)}</td>
+                <td>${op.sellCity}</td>
+                <td>${formatSilver(op.sellPrice)}</td>
+                <td>${formatSilver(op.profit)}</td>
+                <td>${formatSilver(op.safeUnits)}</td>
+                <td>${formatSilver(op.totalSafeProfit)}</td>
+                <td>${formatPercent(op.margin)}</td>
+                <td>${op.confidence}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    box.querySelectorAll('.sort-btn').forEach((btn) => btn.addEventListener('click', () => sortOpportunitiesBy(btn.dataset.sort)));
   }
 
   function populateItemSelectors() {
@@ -743,10 +821,25 @@
     const current = Number(document.getElementById('wealthCurrent').value || 0);
     const goal = Number(document.getElementById('wealthGoal').value || 0);
     const days = Math.max(1, Number(document.getElementById('wealthDays').value || 1));
-    const diff = Math.max(0, goal - current);
+    const died = document.getElementById('wealthDied').value === 'sim';
+    const close = Number(document.getElementById('wealthClose').value || current);
+    const diff = Math.max(0, goal - close);
     const daily = diff / days;
-    const verdict = daily <= current * 0.2 ? 'É possível com consistência.' : daily <= current * 0.5 ? 'É possível, mas exige execução forte.' : 'Meta agressiva. Vai precisar de giro pesado ou mais prazo.';
-    setHtml('wealthResult', `<strong>Plano para sair de ${formatSilver(current)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(daily)} prata por dia</strong><br>Veredito: <strong>${verdict}</strong><br><br>Melhor caminho agora:<br>Fase 1: usar mercado + transporte para acelerar o giro do capital.<br>Fase 2: escolher uma linha de craft ou refino e repetir.<br>Fase 3: usar ilhas como base estável de lucro e caixa.<br>Fase 4: reinvestir parte fixa do lucro e parar de operar item ruim.`);
+    const plans = opportunityState.list.slice(0, 3);
+    if (!plans.length) {
+      setHtml('wealthResult', 'Rode o mercado primeiro. O planejador agora depende das melhores oportunidades do dia para montar um plano de verdade.');
+      return;
+    }
+    const entries = [];
+    let running = close;
+    for (let day = 1; day <= Math.min(days, 7); day++) {
+      const op = plans[(day - 1) % plans.length];
+      const baseProfit = Math.max(op.totalSafeProfit, op.profit * Math.min(op.safeUnits, 2000));
+      const adjusted = died && day === 1 ? Math.max(0, baseProfit - current * 0.08) : baseProfit;
+      running += adjusted;
+      entries.push(`<div class="plan-day"><strong>Dia ${day}</strong><br>Hoje foque em <strong>${op.itemName}</strong>.<br>Compre em <strong>${op.buyCity}</strong> por <strong>${formatSilver(op.buyPrice)}</strong> e venda em <strong>${op.sellCity}</strong> por <strong>${formatSilver(op.sellPrice)}</strong> no pedido atual.<br>Quantidade segura sugerida: <strong>${formatSilver(op.safeUnits)}</strong> unidades.<br>Lucro esperado do dia: <strong>${formatSilver(adjusted)}</strong>.<br>Fechamento estimado do dia: <strong>${formatSilver(running)}</strong>.</div>`);
+    }
+    setHtml('wealthResult', `<strong>Plano para sair de ${formatSilver(close)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(daily)} prata por dia</strong>.<br>Se você morreu hoje: <strong>${died ? 'sim, o plano ficou mais agressivo para recuperar.' : 'não, seguimos com crescimento normal.'}</strong><br><br>${entries.join('')}<br><div class="helper-box"><strong>Como usar esse plano</strong><span>Faça a operação do dia, volte amanhã e preencha o saldo real de fechamento. Se morreu ou perdeu dinheiro, marque isso no formulário para o próximo plano reagir.</span></div>`);
   }
 
   window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection };
