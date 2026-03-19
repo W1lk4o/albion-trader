@@ -1,82 +1,171 @@
-(() => {
-  const STORAGE_KEY = 'albionTraderSession';
-  const DEVICE_KEY = 'albionTraderDeviceId';
-  const DEFAULT_LOCATIONS = ['Caerleon', 'Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford'];
-  const QUALITY_LABELS = { 1: 'Normal', 2: 'Boa', 3: 'Excelente', 4: 'Obra-prima', 5: 'Obra-prima' };
-  const SERVER_LABELS = { west: 'Americas', east: 'Asia', europe: 'Europe' };
-  const PROFILE_LABELS = { safe: 'Lucro consistente', balanced: 'Equilibrado', max: 'Máximo lucro' };
-  const MARKET_SCAN_LIMIT = 300;
 
-  const MARKET_FAMILIES = [
-    {
-      key: 'bag_cape',
-      name: 'Bolsas e capas',
-      tiers: [4, 5, 6, 7, 8],
-      items: [
-        { id: 'T4_BAG', label: 'Bolsa', familyLabel: 'Bolsa' },
-        { id: 'T4_CAPE', label: 'Capa', familyLabel: 'Capa' }
+(function () {
+  const STORAGE_KEY = 'albionTraderSession';
+  const DEFAULT_LOCATIONS = ['Caerleon', 'Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford'];
+  const SERVER_HOSTS = {
+    west: 'https://west.albion-online-data.com',
+    europe: 'https://europe.albion-online-data.com',
+    east: 'https://east.albion-online-data.com'
+  };
+  const DEFAULT_FEE = 6.5;
+
+  const ITEM_CATALOG = {
+    'Bolsas e capas': {
+      'Bolsas': [
+        { label: 'Bolsa', template: 'T{tier}_BAG' }
+      ],
+      'Capas comuns': [
+        { label: 'Capa', template: 'T{tier}_CAPE' }
+      ],
+      'Capas de cidade': [
+        { label: 'Capa de Caerleon', template: 'T{tier}_CAPEITEM_FW_CAERLEON' },
+        { label: 'Capa de Bridgewatch', template: 'T{tier}_CAPEITEM_FW_BRIDGEWATCH' },
+        { label: 'Capa de Fort Sterling', template: 'T{tier}_CAPEITEM_FW_FORTSTERLING' },
+        { label: 'Capa de Lymhurst', template: 'T{tier}_CAPEITEM_FW_LYMHURST' },
+        { label: 'Capa de Martlock', template: 'T{tier}_CAPEITEM_FW_MARTLOCK' },
+        { label: 'Capa de Thetford', template: 'T{tier}_CAPEITEM_FW_THETFORD' }
       ]
     },
-    {
-      key: 'raw',
-      name: 'Recursos brutos',
-      tiers: [4, 5, 6, 7, 8],
-      items: [
-        { id: 'T4_ORE', label: 'Minério bruto', familyLabel: 'Minério bruto' },
-        { id: 'T4_WOOD', label: 'Madeira bruta', familyLabel: 'Madeira bruta' },
-        { id: 'T4_FIBER', label: 'Fibra bruta', familyLabel: 'Fibra bruta' },
-        { id: 'T4_HIDE', label: 'Couro bruto', familyLabel: 'Couro bruto' },
-        { id: 'T4_ROCK', label: 'Pedra bruta', familyLabel: 'Pedra bruta' }
+    'Recursos brutos': {
+      'Coleta': [
+        { label: 'Madeira bruta', template: 'T{tier}_WOOD' },
+        { label: 'Fibra bruta', template: 'T{tier}_FIBER' },
+        { label: 'Minério bruto', template: 'T{tier}_ORE' },
+        { label: 'Couro bruto', template: 'T{tier}_HIDE' },
+        { label: 'Pedra bruta', template: 'T{tier}_ROCK' }
       ]
     },
-    {
-      key: 'refined',
-      name: 'Refinados',
-      tiers: [4, 5, 6, 7, 8],
-      items: [
-        { id: 'T4_METALBAR', label: 'Barra de metal', familyLabel: 'Barra de metal' },
-        { id: 'T4_PLANKS', label: 'Tábua', familyLabel: 'Tábua' },
-        { id: 'T4_CLOTH', label: 'Tecido', familyLabel: 'Tecido' },
-        { id: 'T4_LEATHER', label: 'Couro refinado', familyLabel: 'Couro refinado' },
-        { id: 'T4_STONEBLOCK', label: 'Bloco de pedra', familyLabel: 'Bloco de pedra' }
+    'Recursos refinados': {
+      'Refino': [
+        { label: 'Tábuas', template: 'T{tier}_PLANKS' },
+        { label: 'Tecido', template: 'T{tier}_CLOTH' },
+        { label: 'Barra de metal', template: 'T{tier}_METALBAR' },
+        { label: 'Couro refinado', template: 'T{tier}_LEATHER' },
+        { label: 'Bloco de pedra', template: 'T{tier}_STONEBLOCK' }
+      ]
+    },
+    'Armadura de placa': {
+      'Capuzes e elmos': [
+        { label: 'Capuz de soldado', template: 'T{tier}_HEAD_PLATE_SET1' },
+        { label: 'Capuz de guardião', template: 'T{tier}_HEAD_PLATE_SET2' },
+        { label: 'Capuz de cavaleiro', template: 'T{tier}_HEAD_PLATE_SET3' }
+      ],
+      'Armaduras': [
+        { label: 'Armadura de soldado', template: 'T{tier}_ARMOR_PLATE_SET1' },
+        { label: 'Armadura de guardião', template: 'T{tier}_ARMOR_PLATE_SET2' },
+        { label: 'Armadura de cavaleiro', template: 'T{tier}_ARMOR_PLATE_SET3' }
+      ],
+      'Botas': [
+        { label: 'Botas de soldado', template: 'T{tier}_SHOES_PLATE_SET1' },
+        { label: 'Botas de guardião', template: 'T{tier}_SHOES_PLATE_SET2' },
+        { label: 'Botas de cavaleiro', template: 'T{tier}_SHOES_PLATE_SET3' }
+      ]
+    },
+    'Armadura de couro': {
+      'Capuzes': [
+        { label: 'Capuz de mercenário', template: 'T{tier}_HEAD_LEATHER_SET1' },
+        { label: 'Capuz de caçador', template: 'T{tier}_HEAD_LEATHER_SET2' },
+        { label: 'Capuz de assassino', template: 'T{tier}_HEAD_LEATHER_SET3' }
+      ],
+      'Casacos': [
+        { label: 'Casaco de mercenário', template: 'T{tier}_ARMOR_LEATHER_SET1' },
+        { label: 'Casaco de caçador', template: 'T{tier}_ARMOR_LEATHER_SET2' },
+        { label: 'Casaco de assassino', template: 'T{tier}_ARMOR_LEATHER_SET3' }
+      ],
+      'Botas': [
+        { label: 'Botas de mercenário', template: 'T{tier}_SHOES_LEATHER_SET1' },
+        { label: 'Botas de caçador', template: 'T{tier}_SHOES_LEATHER_SET2' },
+        { label: 'Botas de assassino', template: 'T{tier}_SHOES_LEATHER_SET3' }
+      ]
+    },
+    'Armadura de pano': {
+      'Capuzes': [
+        { label: 'Capuz de estudioso', template: 'T{tier}_HEAD_CLOTH_SET1' },
+        { label: 'Capuz de clérigo', template: 'T{tier}_HEAD_CLOTH_SET2' },
+        { label: 'Capuz de mago', template: 'T{tier}_HEAD_CLOTH_SET3' }
+      ],
+      'Túnicas': [
+        { label: 'Túnica de estudioso', template: 'T{tier}_ARMOR_CLOTH_SET1' },
+        { label: 'Túnica de clérigo', template: 'T{tier}_ARMOR_CLOTH_SET2' },
+        { label: 'Túnica de mago', template: 'T{tier}_ARMOR_CLOTH_SET3' }
+      ],
+      'Sandálias': [
+        { label: 'Sandálias de estudioso', template: 'T{tier}_SHOES_CLOTH_SET1' },
+        { label: 'Sandálias de clérigo', template: 'T{tier}_SHOES_CLOTH_SET2' },
+        { label: 'Sandálias de mago', template: 'T{tier}_SHOES_CLOTH_SET3' }
+      ]
+    },
+    'Armas': {
+      'Lanças': [
+        { label: 'Lança', template: 'T{tier}_MAIN_SPEAR' },
+        { label: 'Arpão', template: 'T{tier}_2H_HARPOON' },
+        { label: 'Espírito de 1 mão', template: 'T{tier}_MAIN_SPEAR_KEEPER' }
+      ],
+      'Machados': [
+        { label: 'Machado de batalha', template: 'T{tier}_MAIN_AXE' },
+        { label: 'Machado grande', template: 'T{tier}_2H_AXE' },
+        { label: 'Machadinha', template: 'T{tier}_2H_HALBERD' }
+      ],
+      'Arcos': [
+        { label: 'Arco', template: 'T{tier}_2H_BOW' },
+        { label: 'Arco longo', template: 'T{tier}_2H_LONGBOW' },
+        { label: 'Arco sussurrante', template: 'T{tier}_2H_BOW_HELL' }
+      ]
+    },
+    'Consumíveis': {
+      'Comidas': [
+        { label: 'Omelete', template: 'T{tier}_MEAL_OMELETTE' },
+        { label: 'Ensopado', template: 'T{tier}_MEAL_STEW' },
+        { label: 'Sopa', template: 'T{tier}_MEAL_SOUP' }
+      ],
+      'Poções': [
+        { label: 'Poção venenosa', template: 'T{tier}_POTION_POISON' },
+        { label: 'Poção de cura', template: 'T{tier}_POTION_HEAL' },
+        { label: 'Poção de resistência', template: 'T{tier}_POTION_REVIVE' }
       ]
     }
-  ];
-
-  const ITEM_NAME_OVERRIDES = {
-    T4_BAG: 'Bolsa T4', T5_BAG: 'Bolsa T5', T6_BAG: 'Bolsa T6', T7_BAG: 'Bolsa T7', T8_BAG: 'Bolsa T8',
-    T4_CAPE: 'Capa T4', T5_CAPE: 'Capa T5', T6_CAPE: 'Capa T6', T7_CAPE: 'Capa T7', T8_CAPE: 'Capa T8',
-    T4_ORE: 'Minério bruto T4', T5_ORE: 'Minério bruto T5', T6_ORE: 'Minério bruto T6', T7_ORE: 'Minério bruto T7', T8_ORE: 'Minério bruto T8',
-    T4_WOOD: 'Madeira bruta T4', T5_WOOD: 'Madeira bruta T5', T6_WOOD: 'Madeira bruta T6', T7_WOOD: 'Madeira bruta T7', T8_WOOD: 'Madeira bruta T8',
-    T4_FIBER: 'Fibra bruta T4', T5_FIBER: 'Fibra bruta T5', T6_FIBER: 'Fibra bruta T6', T7_FIBER: 'Fibra bruta T7', T8_FIBER: 'Fibra bruta T8',
-    T4_HIDE: 'Couro bruto T4', T5_HIDE: 'Couro bruto T5', T6_HIDE: 'Couro bruto T6', T7_HIDE: 'Couro bruto T7', T8_HIDE: 'Couro bruto T8',
-    T4_ROCK: 'Pedra bruta T4', T5_ROCK: 'Pedra bruta T5', T6_ROCK: 'Pedra bruta T6', T7_ROCK: 'Pedra bruta T7', T8_ROCK: 'Pedra bruta T8',
-    T4_METALBAR: 'Barra de metal T4', T5_METALBAR: 'Barra de metal T5', T6_METALBAR: 'Barra de metal T6', T7_METALBAR: 'Barra de metal T7', T8_METALBAR: 'Barra de metal T8',
-    T4_PLANKS: 'Tábua T4', T5_PLANKS: 'Tábua T5', T6_PLANKS: 'Tábua T6', T7_PLANKS: 'Tábua T7', T8_PLANKS: 'Tábua T8',
-    T4_CLOTH: 'Tecido T4', T5_CLOTH: 'Tecido T5', T6_CLOTH: 'Tecido T6', T7_CLOTH: 'Tecido T7', T8_CLOTH: 'Tecido T8',
-    T4_LEATHER: 'Couro refinado T4', T5_LEATHER: 'Couro refinado T5', T6_LEATHER: 'Couro refinado T6', T7_LEATHER: 'Couro refinado T7', T8_LEATHER: 'Couro refinado T8',
-    T4_STONEBLOCK: 'Bloco de pedra T4', T5_STONEBLOCK: 'Bloco de pedra T5', T6_STONEBLOCK: 'Bloco de pedra T6', T7_STONEBLOCK: 'Bloco de pedra T7', T8_STONEBLOCK: 'Bloco de pedra T8'
   };
 
-  const MARKET_ITEM_IDS = (() => {
-    const ids = [];
-    MARKET_FAMILIES.forEach((family) => {
-      family.items.forEach((item) => {
-        family.tiers.forEach((tier) => ids.push(item.id.replace(/^T\d+_/, `T${tier}_`)));
-      });
-    });
-    return [...new Set(ids)];
-  })();
+  const POPULAR_ITEMS = Array.from(new Set([
+    'T4_BAG','T5_BAG','T6_BAG','T7_BAG',
+    'T4_CAPE','T5_CAPE','T6_CAPE',
+    'T4_WOOD','T5_WOOD','T6_WOOD','T4_FIBER','T5_FIBER','T6_FIBER',
+    'T4_ORE','T5_ORE','T6_ORE','T4_HIDE','T5_HIDE','T6_HIDE','T4_ROCK','T5_ROCK',
+    'T4_PLANKS','T5_PLANKS','T6_PLANKS','T4_CLOTH','T5_CLOTH','T6_CLOTH',
+    'T4_METALBAR','T5_METALBAR','T6_METALBAR','T4_LEATHER','T5_LEATHER','T6_LEATHER',
+    'T4_ARMOR_PLATE_SET1','T5_ARMOR_PLATE_SET1','T6_ARMOR_PLATE_SET1',
+    'T4_SHOES_PLATE_SET1','T5_SHOES_PLATE_SET1','T6_SHOES_PLATE_SET1',
+    'T4_ARMOR_LEATHER_SET2','T5_ARMOR_LEATHER_SET2','T6_ARMOR_LEATHER_SET2',
+    'T4_SHOES_LEATHER_SET2','T5_SHOES_LEATHER_SET2','T6_SHOES_LEATHER_SET2',
+    'T4_ARMOR_CLOTH_SET2','T5_ARMOR_CLOTH_SET2','T6_ARMOR_CLOTH_SET2',
+    'T4_2H_BOW','T5_2H_BOW','T6_2H_BOW',
+    'T4_MAIN_SPEAR','T5_MAIN_SPEAR','T6_MAIN_SPEAR',
+    'T4_MAIN_AXE','T5_MAIN_AXE','T6_MAIN_AXE',
+    'T4_POTION_POISON','T5_POTION_POISON','T6_POTION_POISON',
+    'T4_MEAL_OMELETTE','T5_MEAL_OMELETTE','T6_MEAL_OMELETTE'
+  ]));
 
-  let sortKey = 'profitTotal';
-  let sortDirection = 'desc';
-  let latestOpportunities = [];
+  const ISLAND_CROPS = [
+    { name: 'Cenoura', profit: 12000, risk: 'Baixo', note: 'ótima para começar e girar rápido' },
+    { name: 'Feijão', profit: 15000, risk: 'Baixo', note: 'boa margem e giro estável' },
+    { name: 'Trigo', profit: 17000, risk: 'Médio', note: 'boa combinação com produção de comida' },
+    { name: 'Erva medicinal', profit: 21000, risk: 'Médio', note: 'mais lucro, mas depende mais do mercado' },
+    { name: 'Abóbora', profit: 19000, risk: 'Médio', note: 'opção equilibrada para quem já tem capital' }
+  ];
+
+  const ISLAND_ANIMALS = [
+    { name: 'Galinha T3', profit: 14000, feed: 3500, risk: 'Baixo', note: 'simples e boa para começar' },
+    { name: 'Porco T5', profit: 22000, feed: 7000, risk: 'Médio', note: 'lucro interessante com alimentação barata' },
+    { name: 'Cabra T6', profit: 24000, feed: 8500, risk: 'Médio', note: 'boa margem quando o mercado está aquecido' },
+    { name: 'Cavalo T5', profit: 28000, feed: 12000, risk: 'Médio', note: 'bom para quem já tem mais giro' },
+    { name: 'Boi T4', profit: 30000, feed: 14000, risk: 'Alto', note: 'mais capital preso, mas pode render bem' }
+  ];
 
   function getDeviceId() {
-    let deviceId = localStorage.getItem(DEVICE_KEY);
+    let deviceId = localStorage.getItem('albionTraderDeviceId');
     if (!deviceId) {
-      deviceId = `device-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
-      localStorage.setItem(DEVICE_KEY, deviceId);
+      deviceId = 'device-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem('albionTraderDeviceId', deviceId);
     }
     return deviceId;
   }
@@ -86,22 +175,15 @@
   }
 
   function getSession() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch { return null; }
   }
 
-  function clearSession() {
-    localStorage.removeItem(STORAGE_KEY);
-  }
+  function clearSession() { localStorage.removeItem(STORAGE_KEY); }
 
   async function api(url, options = {}) {
     const session = getSession();
     const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
     if (session?.token) headers.Authorization = `Bearer ${session.token}`;
-
     const response = await fetch(url, Object.assign({}, options, { headers }));
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || 'Erro na requisição.');
@@ -110,21 +192,16 @@
 
   async function handleLogin(event) {
     event.preventDefault();
-    const email = document.getElementById('email')?.value.trim();
-    const senha = document.getElementById('senha')?.value;
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
     const message = document.getElementById('loginMessage');
-    if (message) message.textContent = 'Entrando...';
-
+    message.textContent = 'Entrando...';
     try {
-      const data = await api('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, senha, deviceId: getDeviceId() })
-      });
+      const data = await api('/api/login', { method: 'POST', body: JSON.stringify({ email, senha, deviceId: getDeviceId() }) });
       saveSession(data);
-      if (message) message.textContent = 'Login realizado com sucesso.';
       window.location.href = data.user.admin ? '/admin' : '/dashboard';
     } catch (error) {
-      if (message) message.textContent = error.message;
+      message.textContent = error.message;
     }
   }
 
@@ -132,17 +209,11 @@
     const page = document.body.dataset.page;
     if (!page) return null;
     const session = getSession();
-    if (!session?.token) {
-      window.location.href = '/';
-      return null;
-    }
+    if (!session?.token) { window.location.href = '/'; return null; }
     try {
       const data = await api('/api/me');
       const user = data.user;
-      if (page === 'admin' && !user.admin) {
-        window.location.href = '/dashboard';
-        return null;
-      }
+      if (page === 'admin' && !user.admin) { window.location.href = '/dashboard'; return null; }
       return user;
     } catch {
       clearSession();
@@ -154,509 +225,433 @@
   function bindLogout() {
     const btn = document.getElementById('logoutBtn');
     if (!btn) return;
-    btn.addEventListener('click', () => {
-      clearSession();
-      window.location.href = '/';
-    });
+    btn.addEventListener('click', () => { clearSession(); window.location.href = '/'; });
   }
 
   function activateSection(targetId) {
     const navItems = document.querySelectorAll('.nav-item[data-target]');
     const sections = document.querySelectorAll('.page-section');
-    navItems.forEach((node) => node.classList.toggle('active', node.dataset.target === targetId));
-    sections.forEach((node) => node.classList.toggle('active', node.id === targetId));
+    navItems.forEach((i) => i.classList.toggle('active', i.dataset.target === targetId));
+    sections.forEach((s) => s.classList.toggle('active', s.id === targetId));
   }
 
   function bindNav() {
-    document.querySelectorAll('[data-target]').forEach((node) => {
-      node.addEventListener('click', () => activateSection(node.dataset.target));
-    });
+    document.querySelectorAll('[data-target]').forEach((item) => item.addEventListener('click', () => activateSection(item.dataset.target)));
   }
 
   function formatSilver(value) {
-    return new Intl.NumberFormat('pt-BR').format(Math.round(Number(value) || 0));
+    return new Intl.NumberFormat('pt-BR').format(Math.round(value || 0));
   }
 
   function formatPercent(value) {
-    return `${(Number(value) || 0).toFixed(1)}%`;
+    return `${(value || 0).toFixed(1)}%`;
   }
 
-  function setHtml(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
+  function formatBrazilTime(isoString) {
+    if (!isoString) return '—';
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime()) || date.getUTCFullYear() < 2000) return '—';
+    return new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    }).format(date);
   }
 
-  function setText(id, text) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  }
-
-  function updateStatus(text, secondary = false) {
-    setText(secondary ? 'scanStatusBadge' : 'apiStatusBadge', text);
-  }
-
-  function qualityLabel(value) {
-    return QUALITY_LABELS[String(value)] || QUALITY_LABELS[value] || 'Normal';
-  }
-
-  function profileLabel(key) {
-    return PROFILE_LABELS[key] || 'Equilibrado';
-  }
-
-  function normalizeServer(value) {
-    return ['west', 'east', 'europe'].includes(value) ? value : 'west';
-  }
-
-  function parseNumber(value, fallback = 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-  }
-
-  function parseDate(value) {
+  function parseTime(value) {
     if (!value) return null;
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? null : date;
+    if (Number.isNaN(date.getTime()) || date.getUTCFullYear() < 2000) return null;
+    return date;
   }
 
-  function ageHours(date) {
+  function hoursSince(date) {
     if (!date) return Infinity;
-    return Math.abs(Date.now() - date.getTime()) / 36e5;
+    return (Date.now() - date.getTime()) / 36e5;
   }
 
-  function buildItemId(baseId, tier, enchant) {
-    const clean = (baseId || '').split('@')[0].replace(/^T\d+_/, `T${tier}_`);
-    return Number(enchant) > 0 ? `${clean}@${Number(enchant)}` : clean;
+  function setStatus(text, positive = true) {
+    const badge = document.getElementById('apiStatusBadge');
+    if (!badge) return;
+    badge.textContent = text;
+    badge.classList.toggle('status-warning', !positive);
   }
 
-  function displayItemName(itemId) {
-    const [base, enchantRaw] = String(itemId || '').split('@');
-    const enchant = Number(enchantRaw || 0);
-    const baseName = ITEM_NAME_OVERRIDES[base] || base.replace(/_/g, ' ');
-    return enchant > 0 ? `${baseName}.${enchant}` : baseName;
+  function setProgress(percent, text) {
+    const bar = document.getElementById('marketProgressBar');
+    const line = document.getElementById('marketProgressText');
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+    if (line) line.textContent = text;
   }
 
-  function recencyScore(hours) {
-    if (hours <= 3) return 1;
-    if (hours <= 8) return 0.85;
-    if (hours <= 18) return 0.65;
-    if (hours <= 36) return 0.4;
-    return 0;
+  function sanitizeRows(rows) {
+    const grouped = new Map();
+    (rows || []).forEach((row) => {
+      if (!row.city) return;
+      if (!grouped.has(row.city)) grouped.set(row.city, []);
+      grouped.get(row.city).push(row);
+    });
+
+    const cleaned = [];
+    grouped.forEach((cityRows, city) => {
+      // one row per city/item/quality expected, but keep latest/most complete
+      cityRows.sort((a, b) => {
+        const ta = parseTime(a.sell_price_min_date)?.getTime() || 0;
+        const tb = parseTime(b.sell_price_min_date)?.getTime() || 0;
+        return tb - ta;
+      });
+      cleaned.push(cityRows[0]);
+    });
+
+    const validSellValues = cleaned.map(r => Number(r.sell_price_min || 0)).filter(v => v > 0);
+    const validBuyValues = cleaned.map(r => Number(r.buy_price_max || 0)).filter(v => v > 0);
+    const sellMedian = median(validSellValues);
+    const buyMedian = median(validBuyValues);
+
+    return cleaned.filter((row) => {
+      const sell = Number(row.sell_price_min || 0);
+      const buy = Number(row.buy_price_max || 0);
+      const sellFresh = hoursSince(parseTime(row.sell_price_min_date)) <= 72;
+      const buyFresh = hoursSince(parseTime(row.buy_price_max_date)) <= 72;
+
+      const sellOk = sell > 0 && sellFresh && (!sellMedian || (sell >= sellMedian * 0.2 && sell <= sellMedian * 4));
+      const buyOk = buy > 0 && buyFresh && (!buyMedian || (buy >= buyMedian * 0.2 && buy <= buyMedian * 4));
+
+      // keep row if at least one side is valid
+      return sellOk || buyOk;
+    });
   }
 
-  function deriveExitPrice(row, profile, taxRate) {
-    const buyMax = parseNumber(row.buy_price_max);
-    const sellMin = parseNumber(row.sell_price_min);
-    const buyAge = ageHours(parseDate(row.buy_price_max_date));
-    const sellAge = ageHours(parseDate(row.sell_price_min_date));
+  function median(values) {
+    if (!values.length) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  }
 
-    const recentBuy = buyMax > 0 && buyAge <= 24;
-    const recentSell = sellMin > 0 && sellAge <= 24;
+  function confidenceLabel(spreadPct, validCities) {
+    if (validCities >= 5 && spreadPct >= 8) return 'Alta';
+    if (validCities >= 4 && spreadPct >= 4) return 'Boa';
+    if (validCities >= 3 && spreadPct >= 2) return 'Média';
+    return 'Baixa';
+  }
 
-    if (profile === 'safe') {
-      if (!recentBuy) return null;
-      return { method: 'buy-order', gross: buyMax, net: buyMax * (1 - taxRate), score: recencyScore(buyAge) };
+  function buildSingleItemAnalysis(rows, feePct = DEFAULT_FEE) {
+    const cleaned = sanitizeRows(rows);
+    const validSells = cleaned.filter(r => Number(r.sell_price_min || 0) > 0);
+    const validBuys = cleaned.filter(r => Number(r.buy_price_max || 0) > 0);
+
+    if (!validSells.length || !validBuys.length) {
+      return { ok: false, reason: 'Os preços vieram muito velhos, inconsistentes ou sem spread útil.' };
     }
 
-    if (profile === 'max') {
-      if (recentSell) {
-        const undercut = 0.01;
-        return { method: 'sell-order', gross: sellMin, net: sellMin * (1 - taxRate - undercut), score: recencyScore(sellAge) * 0.95 };
-      }
-      if (recentBuy) return { method: 'buy-order', gross: buyMax, net: buyMax * (1 - taxRate), score: recencyScore(buyAge) * 0.8 };
-      return null;
-    }
+    const cheapest = validSells.reduce((best, row) => Number(row.sell_price_min) < Number(best.sell_price_min) ? row : best, validSells[0]);
+    const highest = validBuys.reduce((best, row) => Number(row.buy_price_max) > Number(best.buy_price_max) ? row : best, validBuys[0]);
 
-    if (recentBuy && recentSell) {
-      const sellNet = sellMin * (1 - taxRate - 0.015);
-      const buyNet = buyMax * (1 - taxRate);
-      if (sellNet >= buyNet) return { method: 'sell-order', gross: sellMin, net: sellNet, score: Math.min(recencyScore(sellAge), 0.9) };
-      return { method: 'buy-order', gross: buyMax, net: buyNet, score: recencyScore(buyAge) };
-    }
+    const buyPrice = Number(cheapest.sell_price_min || 0);
+    const sellPrice = Number(highest.buy_price_max || 0);
+    const netSell = sellPrice * (1 - feePct / 100);
+    const profit = netSell - buyPrice;
+    const margin = buyPrice > 0 ? (profit / buyPrice) * 100 : 0;
 
-    if (recentSell) return { method: 'sell-order', gross: sellMin, net: sellMin * (1 - taxRate - 0.02), score: recencyScore(sellAge) * 0.8 };
-    if (recentBuy) return { method: 'buy-order', gross: buyMax, net: buyMax * (1 - taxRate), score: recencyScore(buyAge) * 0.9 };
-    return null;
-  }
-
-  function deriveBuyCost(row) {
-    const sellMin = parseNumber(row.sell_price_min);
-    const sellDate = parseDate(row.sell_price_min_date);
-    const hours = ageHours(sellDate);
-    if (!(sellMin > 0) || hours > 36) return null;
-    return { gross: sellMin, hours, score: recencyScore(hours) };
-  }
-
-  function computeConfidence(buyCost, exitInfo, spread) {
-    const baseScore = ((buyCost?.score || 0) + (exitInfo?.score || 0)) / 2;
-    const spreadScore = spread >= 0.15 ? 1 : spread >= 0.08 ? 0.75 : spread >= 0.03 ? 0.5 : 0.2;
-    const total = (baseScore * 0.7 + spreadScore * 0.3) * 100;
-    if (total >= 80) return { label: 'Alta', value: total };
-    if (total >= 55) return { label: 'Média', value: total };
-    return { label: 'Baixa', value: total };
-  }
-
-  function getMarketSettings() {
     return {
-      server: normalizeServer(document.getElementById('marketServer')?.value || 'west'),
-      capital: parseNumber(document.getElementById('marketCapital')?.value || 0),
-      profile: document.getElementById('marketProfile')?.value || 'balanced',
-      taxRate: parseNumber(document.getElementById('marketTax')?.value || 6.5) / 100,
-      quality: document.getElementById('marketQuality')?.value || '1'
+      ok: true,
+      cleaned,
+      buyCity: cheapest.city,
+      sellCity: highest.city,
+      buyPrice,
+      sellPrice,
+      netSell,
+      profit,
+      margin,
+      confidence: confidenceLabel(margin, cleaned.length)
     };
   }
 
-  function buildOpportunities(prices, settings) {
+  function buildOpportunities(prices, capital = 3000000, profile = 'balanced', feePct = DEFAULT_FEE) {
     const byItem = new Map();
     prices.forEach((row) => {
       if (!row.item_id) return;
-      const key = `${row.item_id}|${row.quality || settings.quality}`;
-      if (!byItem.has(key)) byItem.set(key, []);
-      byItem.get(key).push(row);
+      if (!byItem.has(row.item_id)) byItem.set(row.item_id, []);
+      byItem.get(row.item_id).push(row);
     });
 
     const opportunities = [];
-    byItem.forEach((rows) => {
-      const itemId = rows[0].item_id;
-      let best = null;
+    byItem.forEach((rows, itemId) => {
+      const analysis = buildSingleItemAnalysis(rows, feePct);
+      if (!analysis.ok) return;
+      if (analysis.buyCity === analysis.sellCity) return;
+      if (analysis.profit <= 0) return;
 
-      rows.forEach((buyRow) => {
-        const buyCost = deriveBuyCost(buyRow);
-        if (!buyCost) return;
+      let safeUnits = Math.floor(capital / analysis.buyPrice);
+      if (profile === 'consistent') safeUnits = Math.min(safeUnits, 20);
+      else if (profile === 'balanced') safeUnits = Math.min(safeUnits, 35);
+      else safeUnits = Math.min(safeUnits, 50);
+      safeUnits = Math.max(0, safeUnits);
 
-        rows.forEach((sellRow) => {
-          if (buyRow.city === sellRow.city) return;
-          const exitInfo = deriveExitPrice(sellRow, settings.profile, settings.taxRate);
-          if (!exitInfo) return;
+      const totalSafeProfit = analysis.profit * safeUnits;
+      if (safeUnits <= 0) return;
 
-          const units = buyCost.gross > 0 ? Math.max(1, Math.floor(settings.capital / buyCost.gross)) : 0;
-          const profitUnit = exitInfo.net - buyCost.gross;
-          const spread = buyCost.gross > 0 ? profitUnit / buyCost.gross : 0;
-          if (profitUnit <= 0 || spread <= 0.01) return;
-
-          const confidence = computeConfidence(buyCost, exitInfo, spread);
-          const candidate = {
-            itemId,
-            itemName: displayItemName(itemId),
-            qualityLabel: qualityLabel(rows[0].quality || settings.quality),
-            buyCity: buyRow.city,
-            sellCity: sellRow.city,
-            buyPrice: buyCost.gross,
-            sellGross: exitInfo.gross,
-            sellNet: exitInfo.net,
-            method: exitInfo.method,
-            profitUnit,
-            profitTotal: profitUnit * units,
-            margin: spread * 100,
-            units,
-            confidence: confidence.label,
-            confidenceValue: confidence.value,
-            updatedBuy: buyRow.sell_price_min_date,
-            updatedSell: exitInfo.method === 'buy-order' ? sellRow.buy_price_max_date : sellRow.sell_price_min_date
-          };
-
-          if (!best || candidate.profitTotal > best.profitTotal) best = candidate;
-        });
+      opportunities.push({
+        itemId,
+        itemName: prettyItemName(itemId),
+        buyCity: analysis.buyCity,
+        sellCity: analysis.sellCity,
+        buyPrice: analysis.buyPrice,
+        sellPrice: analysis.sellPrice,
+        profit: analysis.profit,
+        margin: analysis.margin,
+        confidence: analysis.confidence,
+        safeUnits,
+        totalSafeProfit
       });
-
-      if (best) opportunities.push(best);
     });
 
-    return opportunities;
-  }
-
-  function sortOpportunities(list) {
-    const factor = sortDirection === 'desc' ? -1 : 1;
-    return [...list].sort((a, b) => {
-      const left = a[sortKey];
-      const right = b[sortKey];
-      if (typeof left === 'string') return left.localeCompare(right, 'pt-BR') * factor;
-      return (left - right) * factor;
+    return opportunities.sort((a, b) => {
+      if (b.totalSafeProfit !== a.totalSafeProfit) return b.totalSafeProfit - a.totalSafeProfit;
+      return b.profit - a.profit;
     });
   }
 
-  function renderOpportunities(opportunities, settings) {
-    latestOpportunities = opportunities;
-    const sorted = sortOpportunities(opportunities);
-    const summary = sorted[0];
-    const target = document.getElementById('marketOpportunities');
-    if (!target) return;
-
-    if (!sorted.length) {
-      target.innerHTML = '<div class="muted">Nenhuma oportunidade confiável apareceu agora. Tente novamente em alguns minutos ou mude o perfil para Equilibrado.</div>';
-      setText('heroOpportunityTitle', 'Sem oportunidade clara');
-      setText('heroOpportunityText', 'Os preços recentes não formaram spread confiável suficiente.');
-      setText('marketAdviceBox', 'Sem spread útil agora. Foque em giro e espere uma leitura melhor do mercado.');
-      return;
+  function prettyItemName(itemId) {
+    const clean = itemId.replace(/@(\d)/, '');
+    for (const [family, groups] of Object.entries(ITEM_CATALOG)) {
+      for (const [group, items] of Object.entries(groups)) {
+        for (const item of items) {
+          for (let tier = 4; tier <= 8; tier++) {
+            if (buildItemId(item.template, tier, 0) === clean) return `${item.label} T${tier}`;
+          }
+        }
+      }
     }
-
-    setText('heroOpportunityTitle', summary.itemName);
-    setText('heroOpportunityText', `Comprar em ${summary.buyCity}, vender em ${summary.sellCity} e mirar ${formatSilver(summary.profitTotal)} de lucro total.`);
-    setText('heroProfile', profileLabel(settings.profile));
-    setText('marketAdviceBox', `Melhor rota agora: ${summary.itemName}. Compre em ${summary.buyCity} por ${formatSilver(summary.buyPrice)} e venda em ${summary.sellCity} usando ${summary.method === 'buy-order' ? 'compra imediata' : 'ordem de venda'}. Dentro do seu capital, o lucro total estimado fica em ${formatSilver(summary.profitTotal)}.`);
-
-    target.innerHTML = `
-      <div class="table-wrap">
-        <table class="data-table compact-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Cidade compra</th>
-              <th>Cidade venda</th>
-              <th>Custo un.</th>
-              <th>Saída un.</th>
-              <th>Lucro un.</th>
-              <th>Lucro total</th>
-              <th>Margem</th>
-              <th>Confiança</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sorted.map((row) => `
-              <tr>
-                <td><strong>${row.itemName}</strong><div class="table-sub">Qualidade ${row.qualityLabel}</div></td>
-                <td>${row.buyCity}</td>
-                <td>${row.sellCity}</td>
-                <td>${formatSilver(row.buyPrice)}</td>
-                <td>${formatSilver(row.sellNet)}</td>
-                <td>${formatSilver(row.profitUnit)}</td>
-                <td>${formatSilver(row.profitTotal)}<div class="table-sub">${row.units} un.</div></td>
-                <td>${formatPercent(row.margin)}</td>
-                <td>${row.confidence}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
+    return clean
+      .replace(/^T(\d+)_/, 'T$1 ')
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (m) => m.toUpperCase());
   }
 
-  async function scanMarket(mode = 'popular') {
-    const settings = getMarketSettings();
-    const itemIds = MARKET_ITEM_IDS.slice(0, mode === 'popular' ? MARKET_SCAN_LIMIT : MARKET_ITEM_IDS.length);
-    const chunkSize = 30;
-    const allRows = [];
-
-    updateStatus(`AlbionData consultando ${SERVER_LABELS[settings.server]}`, false);
-    updateStatus('Varredura iniciada', true);
-    document.getElementById('scanProgressShell')?.classList.remove('hidden');
-
-    for (let index = 0; index < itemIds.length; index += chunkSize) {
-      const chunk = itemIds.slice(index, index + chunkSize);
-      const pct = Math.min(100, Math.round(((index + chunk.length) / itemIds.length) * 100));
-      const progressText = `Consultando mercado: ${pct}%`;
-      setText('scanProgressText', progressText);
-      const bar = document.getElementById('scanProgressBar');
-      if (bar) bar.style.width = `${pct}%`;
-      updateStatus(progressText, true);
-
-      const query = new URLSearchParams({
-        items: chunk.join(','),
-        locations: DEFAULT_LOCATIONS.join(','),
-        qualities: settings.quality,
-        server: settings.server
-      });
-
-      const response = await api(`/api/albion-prices?${query.toString()}`);
-      allRows.push(...(response.data || []));
-    }
-
-    const opportunities = buildOpportunities(allRows, settings);
-    renderOpportunities(opportunities, settings);
-    updateStatus(`AlbionData online · ${allRows.length} preços lidos`, false);
-    updateStatus(`Varredura concluída · ${opportunities.length} oportunidades`, true);
+  function buildItemId(template, tier, enchant) {
+    let id = template.replace('{tier}', tier);
+    if (Number(enchant) > 0) id += `@${enchant}`;
+    return id;
   }
 
-  function buildRadarRows(rows, settings, itemId) {
-    const candidates = rows
-      .map((row) => {
-        const buyCost = deriveBuyCost(row);
-        const exitInfo = deriveExitPrice(row, settings.profile, settings.taxRate);
-        return {
-          city: row.city,
-          quality: qualityLabel(row.quality || settings.quality),
-          sellPrice: parseNumber(row.sell_price_min),
-          buyPrice: parseNumber(row.buy_price_max),
-          sellDate: row.sell_price_min_date,
-          buyDate: row.buy_price_max_date,
-          buyCost,
-          exitInfo
-        };
-      })
-      .filter((row) => row.sellPrice > 0 || row.buyPrice > 0);
-
-    const cheapest = [...candidates].filter((row) => row.buyCost).sort((a, b) => a.sellPrice - b.sellPrice)[0] || null;
-    let bestSell = null;
-    candidates.forEach((row) => {
-      if (row.city === cheapest?.city) return;
-      if (!row.exitInfo) return;
-      if (!bestSell || row.exitInfo.net > bestSell.exitInfo.net) bestSell = row;
-    });
-
-    return {
-      itemName: displayItemName(itemId),
-      cheapest,
-      bestSell,
-      rows: candidates.sort((a, b) => a.sellPrice - b.sellPrice)
-    };
+  function currentServer() {
+    return document.getElementById('marketServer')?.value || 'west';
   }
 
-  function renderItemRadar(result, settings) {
-    const target = document.getElementById('itemRadarResult');
-    if (!target) return;
+  async function loadMarket() {
+    const family = document.getElementById('itemFamily').value;
+    const group = document.getElementById('itemGroup').value;
+    const idx = Number(document.getElementById('itemSelect').value);
+    const tier = Number(document.getElementById('itemTier').value || 4);
+    const enchant = Number(document.getElementById('itemEnchant').value || 0);
+    const quality = document.getElementById('itemQuality').value || '1';
+    const manual = document.getElementById('marketItemId').value.trim();
+    const box = document.getElementById('marketResult');
+    box.textContent = 'Buscando preços do item...';
+    setStatus('Consultando AlbionData para o item...', true);
 
-    if (!result.cheapest) {
-      target.innerHTML = '<div class="muted">Esse item não retornou venda mínima recente nas cidades monitoradas. Tente outra qualidade ou outro servidor.</div>';
-      return;
-    }
+    try {
+      let itemId = manual;
+      if (!itemId) {
+        const item = ITEM_CATALOG[family]?.[group]?.[idx];
+        if (!item) throw new Error('Escolha um item válido.');
+        itemId = buildItemId(item.template, tier, enchant);
+      }
 
-    const cheapest = result.cheapest;
-    const sell = result.bestSell;
-    const profitUnit = sell ? sell.exitInfo.net - cheapest.sellPrice : 0;
-    const margin = cheapest.sellPrice > 0 ? (profitUnit / cheapest.sellPrice) * 100 : 0;
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(itemId)}&locations=${encodeURIComponent(DEFAULT_LOCATIONS.join(','))}&qualities=${quality}&server=${currentServer()}`);
+      const rows = data.data || [];
+      const analysis = buildSingleItemAnalysis(rows, DEFAULT_FEE);
 
-    target.innerHTML = `
-      <div class="result-grid">
-        <div>
-          <h3>${result.itemName}</h3>
-          <p><strong>Cidade mais barata para comprar:</strong> ${cheapest.city}</p>
-          <p><strong>Preço de compra:</strong> ${formatSilver(cheapest.sellPrice)} prata</p>
-          <p><strong>Qualidade analisada:</strong> ${qualityLabel(document.getElementById('itemQuality')?.value || settings.quality)}</p>
+      if (!analysis.ok) {
+        box.innerHTML = `<div class="warning-box">Não encontrei arbitragem confiável agora para <strong>${prettyItemName(itemId)}</strong>. ${analysis.reason}</div>`;
+        setStatus('Item consultado, mas sem spread confiável', false);
+        return;
+      }
+
+      const itemName = prettyItemName(itemId);
+      const tableRows = analysis.cleaned.map((row) => {
+        const sell = Number(row.sell_price_min || 0);
+        const buy = Number(row.buy_price_max || 0);
+        const askValid = sell > 0 && hoursSince(parseTime(row.sell_price_min_date)) <= 72;
+        const buyValid = buy > 0 && hoursSince(parseTime(row.buy_price_max_date)) <= 72;
+        return `
+          <tr>
+            <td>${row.city}</td>
+            <td>${askValid ? formatSilver(sell) : '—'}</td>
+            <td>${buyValid ? formatSilver(buy) : '—'}</td>
+            <td>${buyValid ? formatSilver(buy * (1 - DEFAULT_FEE / 100)) : '—'}</td>
+            <td>${formatBrazilTime(row.sell_price_min_date)}</td>
+            <td>${formatBrazilTime(row.buy_price_max_date)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      box.innerHTML = `
+        <div class="market-summary">
+          <div><strong>${itemName}</strong></div>
+          <div><span class="label">Cidade mais barata para comprar:</span> ${analysis.buyCity}</div>
+          <div><span class="label">Valor de compra:</span> ${formatSilver(analysis.buyPrice)} prata</div>
+          <div><span class="label">Melhor cidade para vender:</span> ${analysis.sellCity}</div>
+          <div><span class="label">Pedido de compra atual:</span> ${formatSilver(analysis.sellPrice)} prata</div>
+          <div><span class="label">Venda líquida estimada após taxa:</span> ${formatSilver(analysis.netSell)} prata</div>
+          <div><span class="label">Lucro líquido estimado por unidade:</span> ${formatSilver(analysis.profit)} prata</div>
+          <div><span class="label">Margem estimada:</span> ${formatPercent(analysis.margin)}</div>
+          <div><span class="label">Qualidade analisada:</span> ${document.getElementById('itemQuality').selectedOptions[0].textContent}</div>
+          <div><span class="label">Confiança:</span> ${analysis.confidence}</div>
         </div>
-        <div>
-          <p><strong>Melhor cidade para vender:</strong> ${sell ? sell.city : 'Sem saída confiável agora'}</p>
-          <p><strong>Preço de saída estimado:</strong> ${sell ? `${formatSilver(sell.exitInfo.net)} prata` : '—'}</p>
-          <p><strong>Lucro líquido estimado por unidade:</strong> ${sell ? `${formatSilver(profitUnit)} prata` : '—'}</p>
-          <p><strong>Margem estimada:</strong> ${sell ? formatPercent(margin) : '—'}</p>
-        </div>
-      </div>
-      <div class="table-wrap mt-16">
-        <table class="data-table compact-table">
-          <thead>
-            <tr>
-              <th>Cidade</th>
-              <th>Venda mínima</th>
-              <th>Compra máxima</th>
-              <th>Saída estimada</th>
-              <th>Atualização venda</th>
-              <th>Atualização compra</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${result.rows.map((row) => `
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td>${row.city}</td>
-                <td>${row.sellPrice ? formatSilver(row.sellPrice) : '—'}</td>
-                <td>${row.buyPrice ? formatSilver(row.buyPrice) : '—'}</td>
-                <td>${row.exitInfo ? formatSilver(row.exitInfo.net) : '—'}</td>
-                <td>${row.sellDate ? new Date(row.sellDate).toLocaleString('pt-BR') : '—'}</td>
-                <td>${row.buyDate ? new Date(row.buyDate).toLocaleString('pt-BR') : '—'}</td>
+                <th>Cidade</th>
+                <th>Menor preço de venda</th>
+                <th>Maior pedido de compra</th>
+                <th>Venda líquida estimada</th>
+                <th>Atualização venda (Brasil)</th>
+                <th>Atualização compra (Brasil)</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  async function loadItemRadar() {
-    const settings = getMarketSettings();
-    const familyKey = document.getElementById('itemFamily')?.value;
-    const baseSelect = document.getElementById('itemBase');
-    const tier = Number(document.getElementById('itemTier')?.value || 4);
-    const enchant = Number(document.getElementById('itemEnchant')?.value || 0);
-    const quality = document.getElementById('itemQuality')?.value || settings.quality;
-    const custom = document.getElementById('customItemId')?.value.trim();
-    const family = MARKET_FAMILIES.find((entry) => entry.key === familyKey) || MARKET_FAMILIES[0];
-    const baseId = custom || baseSelect?.value || family.items[0].id;
-    const itemId = custom || buildItemId(baseId, tier, enchant);
-
-    updateStatus(`Consultando item ${displayItemName(itemId)}`, false);
-    const query = new URLSearchParams({
-      items: itemId,
-      locations: DEFAULT_LOCATIONS.join(','),
-      qualities: quality,
-      server: settings.server
-    });
-
-    const response = await api(`/api/albion-prices?${query.toString()}`);
-    const rows = (response.data || []).filter((row) => row.item_id === itemId);
-    const result = buildRadarRows(rows, Object.assign({}, settings, { quality }), itemId);
-    renderItemRadar(result, Object.assign({}, settings, { quality }));
-    updateStatus(`AlbionData online · item ${displayItemName(itemId)}`, false);
-  }
-
-  function fillRadarSelectors() {
-    const familySelect = document.getElementById('itemFamily');
-    const baseSelect = document.getElementById('itemBase');
-    const tierSelect = document.getElementById('itemTier');
-    const enchantSelect = document.getElementById('itemEnchant');
-    if (!familySelect || !baseSelect || !tierSelect || !enchantSelect) return;
-
-    familySelect.innerHTML = MARKET_FAMILIES.map((family) => `<option value="${family.key}">${family.name}</option>`).join('');
-    tierSelect.innerHTML = [4, 5, 6, 7, 8].map((tier) => `<option value="${tier}">T${tier}</option>`).join('');
-    enchantSelect.innerHTML = [0, 1, 2, 3, 4].map((value) => `<option value="${value}">${value === 0 ? 'Sem encantamento' : `.${value}`}</option>`).join('');
-
-    const refillBase = () => {
-      const family = MARKET_FAMILIES.find((entry) => entry.key === familySelect.value) || MARKET_FAMILIES[0];
-      baseSelect.innerHTML = family.items.map((item) => `<option value="${item.id}">${item.label}</option>`).join('');
-    };
-
-    refillBase();
-    familySelect.addEventListener('change', refillBase);
-  }
-
-  function toggleSort(key) {
-    if (sortKey === key) sortDirection = sortDirection === 'desc' ? 'asc' : 'desc';
-    else {
-      sortKey = key;
-      sortDirection = 'desc';
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+      `;
+      setStatus(`AlbionData online · item ${itemName}`, true);
+    } catch (error) {
+      box.innerHTML = `<div class="warning-box">${error.message}</div>`;
+      setStatus('Falha ao consultar item', false);
     }
-    if (latestOpportunities.length) renderOpportunities(latestOpportunities, getMarketSettings());
+  }
+
+  async function loadOpportunityRadar(mode = 'popular') {
+    const box = document.getElementById('opportunityResult');
+    if (!box) return;
+    const capital = Number(document.getElementById('marketCapital').value || 0) || 3000000;
+    const profile = document.getElementById('marketProfile').value || 'balanced';
+    document.getElementById('profileLabel').textContent =
+      profile === 'consistent' ? 'Lucro consistente' : profile === 'max' ? 'Máximo lucro' : 'Equilibrado';
+
+    const items = mode === 'all' ? POPULAR_ITEMS : POPULAR_ITEMS;
+    setProgress(5, 'Preparando consulta do mercado...');
+    box.textContent = 'Consultando mercado...';
+    setStatus('AlbionData consultando oportunidades...', true);
+
+    try {
+      setProgress(25, `Consultando ${items.length} itens em ${DEFAULT_LOCATIONS.length} cidades...`);
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(items.join(','))}&locations=${encodeURIComponent(DEFAULT_LOCATIONS.join(','))}&qualities=1&server=${currentServer()}`);
+      setProgress(65, 'Filtrando preços estranhos e dados velhos...');
+      const opportunities = buildOpportunities(data.data || [], capital, profile, DEFAULT_FEE).slice(0, 20);
+      setProgress(100, opportunities.length ? `Varredura concluída · ${opportunities.length} oportunidades` : 'Varredura concluída · sem oportunidade confiável');
+
+      if (!opportunities.length) {
+        box.innerHTML = '<div class="warning-box">Nenhuma oportunidade confiável apareceu agora. Isso normalmente significa dado velho, pouco spread real ou mercado travado nesse momento.</div>';
+        document.getElementById('bestOpportunityName').textContent = '—';
+        document.getElementById('bestOpportunityText').textContent = 'Sem oportunidade confiável agora.';
+        document.getElementById('priorityPlan').textContent = 'Sem rota segura agora. Tente outra varredura em alguns minutos ou pesquise um item específico no Radar de item.';
+        setStatus('Sem oportunidade confiável agora', false);
+        return;
+      }
+
+      const best = opportunities[0];
+      document.getElementById('bestOpportunityName').textContent = best.itemName;
+      document.getElementById('bestOpportunityText').textContent =
+        `Comprar em ${best.buyCity}, vender em ${best.sellCity} e mirar ${formatSilver(best.totalSafeProfit)} de lucro total seguro.`;
+      document.getElementById('priorityPlan').innerHTML =
+        `Melhor rota agora: <strong>${best.itemName}</strong>.<br>
+         Compre em <strong>${best.buyCity}</strong> por <strong>${formatSilver(best.buyPrice)}</strong> e venda em <strong>${best.sellCity}</strong> pelo pedido de compra atual de <strong>${formatSilver(best.sellPrice)}</strong>.<br>
+         Dentro do seu capital, a quantidade segura estimada fica em <strong>${best.safeUnits}</strong> unidades, com lucro total estimado de <strong>${formatSilver(best.totalSafeProfit)}</strong>.`;
+
+      box.innerHTML = `
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Comprar em</th>
+                <th>Preço compra</th>
+                <th>Vender em</th>
+                <th>Pedido de compra</th>
+                <th>Lucro/unid.</th>
+                <th>Qtde segura</th>
+                <th>Lucro total seguro</th>
+                <th>Margem</th>
+                <th>Confiança</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${opportunities.map(op => `
+                <tr>
+                  <td>${op.itemName}</td>
+                  <td>${op.buyCity}</td>
+                  <td>${formatSilver(op.buyPrice)}</td>
+                  <td>${op.sellCity}</td>
+                  <td>${formatSilver(op.sellPrice)}</td>
+                  <td>${formatSilver(op.profit)}</td>
+                  <td>${formatSilver(op.safeUnits)}</td>
+                  <td>${formatSilver(op.totalSafeProfit)}</td>
+                  <td>${formatPercent(op.margin)}</td>
+                  <td>${op.confidence}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      setStatus(`AlbionData online · ${opportunities.length} oportunidades confiáveis`, true);
+    } catch (error) {
+      setProgress(100, 'Falha ao consultar o mercado.');
+      box.innerHTML = `<div class="warning-box">${error.message}</div>`;
+      setStatus('Falha ao consultar o mercado', false);
+    }
+  }
+
+  function populateItemSelectors() {
+    const familyEl = document.getElementById('itemFamily');
+    const groupEl = document.getElementById('itemGroup');
+    const itemEl = document.getElementById('itemSelect');
+    if (!familyEl || !groupEl || !itemEl) return;
+
+    familyEl.innerHTML = Object.keys(ITEM_CATALOG).map(f => `<option value="${f}">${f}</option>`).join('');
+
+    function updateGroups() {
+      const family = familyEl.value;
+      const groups = Object.keys(ITEM_CATALOG[family] || {});
+      groupEl.innerHTML = groups.map(g => `<option value="${g}">${g}</option>`).join('');
+      updateItems();
+    }
+    function updateItems() {
+      const family = familyEl.value;
+      const group = groupEl.value;
+      const items = ITEM_CATALOG[family]?.[group] || [];
+      itemEl.innerHTML = items.map((it, idx) => `<option value="${idx}">${it.label}</option>`).join('');
+    }
+    familyEl.addEventListener('change', updateGroups);
+    groupEl.addEventListener('change', updateItems);
+    updateGroups();
   }
 
   async function initDashboard() {
     const user = await requireAuth();
     if (!user) return;
-
-    setText('welcomeTitle', `Olá, ${user.nome || user.email}`);
-    setText('licenseDate', new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR'));
-    setText('heroProfile', profileLabel(getMarketSettings().profile));
-
-    if (user.admin) document.getElementById('goAdminBtn')?.classList.remove('hidden');
+    const welcomeTitle = document.getElementById('welcomeTitle');
+    const licenseDate = document.getElementById('licenseDate');
+    if (welcomeTitle) welcomeTitle.textContent = `Olá, ${user.nome || user.email}`;
+    if (licenseDate) licenseDate.textContent = new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR');
 
     bindLogout();
     bindNav();
-    fillRadarSelectors();
+    populateItemSelectors();
 
-    document.getElementById('scanPopularBtn')?.addEventListener('click', () => scanMarket('popular').catch((error) => {
-      updateStatus('Erro ao consultar AlbionData', false);
-      updateStatus(error.message, true);
-      setHtml('marketOpportunities', `<div class="muted">${error.message}</div>`);
-    }));
-    document.getElementById('scanFastBtn')?.addEventListener('click', () => scanMarket('popular').catch((error) => {
-      updateStatus('Erro ao consultar AlbionData', false);
-      updateStatus(error.message, true);
-      setHtml('marketOpportunities', `<div class="muted">${error.message}</div>`);
-    }));
-    document.getElementById('refreshMarketBtn')?.addEventListener('click', () => scanMarket('popular').catch((error) => {
-      updateStatus('Erro ao consultar AlbionData', false);
-      updateStatus(error.message, true);
-      setHtml('marketOpportunities', `<div class="muted">${error.message}</div>`);
-    }));
-    document.getElementById('sortProfitBtn')?.addEventListener('click', () => toggleSort('profitTotal'));
-    document.getElementById('loadItemRadarBtn')?.addEventListener('click', () => loadItemRadar().catch((error) => {
-      updateStatus('Erro ao consultar item', false);
-      setHtml('itemRadarResult', `<div class="muted">${error.message}</div>`);
-    }));
-    document.getElementById('marketProfile')?.addEventListener('change', (event) => {
-      setText('heroProfile', profileLabel(event.target.value));
-    });
+    const loadBtn = document.getElementById('loadMarketBtn');
+    if (loadBtn) loadBtn.addEventListener('click', loadMarket);
+    const popularBtn = document.getElementById('scanPopularBtn');
+    if (popularBtn) popularBtn.addEventListener('click', () => loadOpportunityRadar('popular'));
+    const allBtn = document.getElementById('scanAllBtn');
+    if (allBtn) allBtn.addEventListener('click', () => loadOpportunityRadar('all'));
 
-    await scanMarket('popular').catch((error) => {
-      updateStatus('Erro ao consultar AlbionData', false);
-      updateStatus(error.message, true);
-      setHtml('marketOpportunities', `<div class="muted">${error.message}</div>`);
-    });
+    loadOpportunityRadar('popular');
   }
 
   async function initAdmin() {
@@ -665,7 +660,6 @@
     const title = document.getElementById('adminTitle');
     if (title) title.textContent = `Painel admin — ${user.nome || user.email}`;
     bindLogout();
-
     try {
       const data = await api('/api/users');
       const tbody = document.getElementById('adminUsersTable');
@@ -679,9 +673,8 @@
             <td>${u.nome || '-'}</td>
             <td>${u.email}</td>
             <td>${u.admin ? 'Admin' : 'Usuário'}</td>
-            <td>${new Date(u.licencaExpiraEm).toLocaleDateString('pt-BR')}</td>
-          </tr>
-        `).join('');
+            <td>${u.licenca || '-'}</td>
+          </tr>`).join('');
       }
     } catch (error) {
       const notice = document.getElementById('adminNotice');
@@ -689,12 +682,79 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+  function setHtml(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
 
-    const page = document.body.dataset.page;
-    if (page === 'dashboard') initDashboard();
-    if (page === 'admin') initAdmin();
+  function sortByProfitDesc(list) { return list.sort((a, b) => b.profit - a.profit); }
+
+  function calcCraft() {
+    const level = Number(document.getElementById('craftLevel').value || 0);
+    const city = document.getElementById('craftCity').value;
+    const cost = Number(document.getElementById('craftCost').value || 0);
+    const sell = Number(document.getElementById('craftSell').value || 0);
+    const bonus = level >= 80 ? 1.07 : level >= 50 ? 1.04 : 1.01;
+    const fee = Math.round(sell * 0.065);
+    const adjustedCost = cost / bonus;
+    const lucro = sell - adjustedCost - fee;
+    const margem = cost > 0 ? (lucro / cost) * 100 : 0;
+    setHtml('craftResult', `<strong>Resultado do craft em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong><br>Margem: <strong>${margem.toFixed(1)}%</strong><br>Leitura: ${lucro > 0 ? 'vale testar itens de giro rápido, como bolsas e capas.' : 'esse craft está apertado; melhore custo dos materiais ou venda.'}`);
+  }
+
+  function calcRefine() {
+    const level = Number(document.getElementById('refineLevel').value || 0);
+    const city = document.getElementById('refineCity').value;
+    const focus = document.getElementById('refineFocus').value === 'sim';
+    const cost = Number(document.getElementById('refineCost').value || 0);
+    const sell = Number(document.getElementById('refineSell').value || 0);
+    const efficiency = focus ? 0.86 : 1;
+    const xpBonus = level >= 75 ? 0.95 : 1;
+    const fee = Math.round(sell * 0.065);
+    const lucro = sell - cost * efficiency * xpBonus - fee;
+    setHtml('refineResult', `<strong>Resultado do refino em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong> ${focus ? 'com foco' : 'sem foco'}<br>Melhor leitura: ${focus ? 'aproveite itens com retorno de recursos e venda rápida.' : 'sem foco, prefira spreads maiores e muito giro.'}`);
+  }
+
+  function calcIsland() {
+    const level = Number(document.getElementById('islandLevel').value || 0);
+    const plots = Number(document.getElementById('islandPlots').value || 0);
+    const pastures = Number(document.getElementById('islandPastures').value || 0);
+    const focus = document.getElementById('islandFocus').value === 'sim';
+    const cropOptions = ISLAND_CROPS.map((crop) => ({ ...crop, totalProfit: Math.round(crop.profit * plots * (1 + level * 0.03) * (focus ? 1.12 : 1)) }));
+    const animalOptions = ISLAND_ANIMALS.map((animal) => ({ ...animal, totalProfit: Math.round((animal.profit - animal.feed) * pastures * (1 + level * 0.025) * (focus ? 1.08 : 1)) }));
+    const bestCrop = sortByProfitDesc(cropOptions)[0] || { name: 'Nenhuma', totalProfit: 0, note: '-' };
+    const bestAnimal = sortByProfitDesc(animalOptions)[0] || { name: 'Nenhum', totalProfit: 0, note: '-' };
+    const total = bestCrop.totalProfit + bestAnimal.totalProfit;
+    setHtml('islandResult', `<strong>Melhor plano para sua ilha</strong><br><br>Melhor plantação: <strong>${bestCrop.name}</strong> — lucro estimado por ciclo: <strong>${formatSilver(bestCrop.totalProfit)}</strong><br>Melhor criação: <strong>${bestAnimal.name}</strong> — lucro estimado por ciclo: <strong>${formatSilver(bestAnimal.totalProfit)}</strong><br>Lucro total estimado: <strong>${formatSilver(total)} prata</strong><br><br>• Use as plantações para <strong>${bestCrop.name}</strong>.<br>• Nos pastos, priorize <strong>${bestAnimal.name}</strong>.<br>• ${focus ? 'Como você usa foco, vale concentrar a produção no que tiver maior margem.' : 'Sem foco, prefira opções estáveis e simples de revender.'}<br><br>Observação da plantação: ${bestCrop.note}.<br>Observação do animal: ${bestAnimal.note}.`);
+  }
+
+  function calcTransport() {
+    const buyCity = document.getElementById('transportBuyCity').value;
+    const sellCity = document.getElementById('transportSellCity').value;
+    const buy = Number(document.getElementById('transportBuyPrice').value || 0);
+    const sell = Number(document.getElementById('transportSellPrice').value || 0);
+    const cost = Number(document.getElementById('transportCost').value || 0);
+    const tax = Math.round(sell * 0.065);
+    const lucro = sell - buy - cost - tax;
+    setHtml('transportResult', `<strong>Resultado do transporte</strong><br>Rota: <strong>${buyCity} → ${sellCity}</strong><br>Lucro líquido estimado: <strong>${formatSilver(lucro)} prata</strong><br>Leitura: ${lucro > 0 ? 'boa rota para testar em volume controlado.' : 'não vale essa operação nesse formato.'}`);
+  }
+
+  function calcWealth() {
+    const current = Number(document.getElementById('wealthCurrent').value || 0);
+    const goal = Number(document.getElementById('wealthGoal').value || 0);
+    const days = Math.max(1, Number(document.getElementById('wealthDays').value || 1));
+    const diff = Math.max(0, goal - current);
+    const daily = diff / days;
+    const verdict = daily <= current * 0.2 ? 'É possível com consistência.' : daily <= current * 0.5 ? 'É possível, mas exige execução forte.' : 'Meta agressiva. Vai precisar de giro pesado ou mais prazo.';
+    setHtml('wealthResult', `<strong>Plano para sair de ${formatSilver(current)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(daily)} prata por dia</strong><br>Veredito: <strong>${verdict}</strong><br><br>Melhor caminho agora:<br>Fase 1: usar mercado + transporte para acelerar o giro do capital.<br>Fase 2: escolher uma linha de craft ou refino e repetir.<br>Fase 3: usar ilhas como base estável de lucro e caixa.<br>Fase 4: reinvestir parte fixa do lucro e parar de operar item ruim.`);
+  }
+
+  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('loginForm');
+    if (form) form.addEventListener('submit', handleLogin);
+    if (document.body.dataset.page === 'dashboard') initDashboard();
+    if (document.body.dataset.page === 'admin') initAdmin();
   });
 })();

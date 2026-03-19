@@ -1,11 +1,3 @@
-function normalizeServer(raw) {
-  const value = String(raw || 'west').toLowerCase();
-  if (value === 'americas' || value === 'west') return 'west';
-  if (value === 'asia' || value === 'east') return 'east';
-  if (value === 'eu' || value === 'europe') return 'europe';
-  return 'west';
-}
-
 module.exports = async (req, res) => {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Método não permitido.' });
@@ -20,8 +12,7 @@ module.exports = async (req, res) => {
       server = 'west'
     } = req.query || {};
 
-    const serverKey = normalizeServer(server);
-    const itemIds = (item || items)
+    const itemIds = String(item || items)
       .split(',')
       .map((value) => value.trim())
       .filter(Boolean)
@@ -31,17 +22,18 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Informe ao menos um item.' });
     }
 
-    const host = serverKey === 'europe'
-      ? 'https://europe.albion-online-data.com'
-      : serverKey === 'east'
-        ? 'https://east.albion-online-data.com'
-        : 'https://west.albion-online-data.com';
+    const hostMap = {
+      west: 'https://west.albion-online-data.com',
+      europe: 'https://europe.albion-online-data.com',
+      east: 'https://east.albion-online-data.com'
+    };
 
-    const endpoint = `${host}/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
+    const base = hostMap[server] || hostMap.west;
+    const endpoint = `${base}/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
 
     const response = await fetch(endpoint, {
       headers: {
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Accept-Encoding': 'gzip, deflate, br'
       }
     });
@@ -51,14 +43,14 @@ module.exports = async (req, res) => {
     }
 
     const data = await response.json();
+
     return res.status(200).json({
       ok: true,
       data,
       meta: {
         source: 'albion-data',
-        server: serverKey,
-        itemCount: itemIds.split(',').length,
-        fetchedAt: new Date().toISOString()
+        server,
+        itemCount: itemIds.split(',').length
       }
     });
   } catch (error) {

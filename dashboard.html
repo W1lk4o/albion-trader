@@ -15,15 +15,13 @@
       </div>
       <nav class="nav-list">
         <button class="nav-item active" data-target="overview">Dashboard</button>
-        <button class="nav-item" data-target="mercado">Mercado</button>
-        <button class="nav-item" data-target="radar-item">Radar de item</button>
         <button class="nav-item" data-target="craft">Craft</button>
         <button class="nav-item" data-target="refino">Refino</button>
         <button class="nav-item" data-target="ilhas">Ilhas</button>
         <button class="nav-item" data-target="transporte">Transporte</button>
+        <button class="nav-item" data-target="mercado">Mercado</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
       </nav>
-      <a href="/admin" id="goAdminBtn" class="btn btn-outline btn-full hidden">Ir para admin</a>
       <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
@@ -33,81 +31,64 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-stack">
-          <div class="status-pill" id="apiStatusBadge">AlbionData aguardando consulta</div>
-          <div class="status-pill status-subtle" id="scanStatusBadge">Sem varredura em andamento</div>
-        </div>
+        <div class="status-pill" id="apiStatusBadge">Mercado aguardando consulta</div>
       </header>
 
       <section id="overview" class="page-section active">
         <div class="stats-grid">
           <article class="card stat-card">
             <span class="stat-label">Melhor oportunidade agora</span>
-            <strong id="heroOpportunityTitle">Aguardando varredura</strong>
-            <p id="heroOpportunityText">O sistema vai buscar spreads reais e ordenar pelo maior lucro.</p>
+            <strong id="bestOpportunityName">—</strong>
+            <p id="bestOpportunityText">Rode a varredura para ver uma oportunidade confiável.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Modo de operação</span>
-            <strong id="heroProfile">Equilibrado</strong>
+            <strong id="profileLabel">Equilibrado</strong>
             <p>Você escolhe o perfil na hora: máximo lucro, consistente ou equilibrado.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
             <strong id="licenseDate">—</strong>
-            <p>O site agora está focado primeiro em preço confiável e cálculo correto.</p>
+            <p>Mercado focado em preço confiável, lucro líquido e leitura clara.</p>
           </article>
         </div>
 
-        <div class="cards-grid">
+        <div class="cards-grid market-layout">
           <article class="card">
             <div class="section-header">
               <div>
                 <h3>Configuração de mercado</h3>
-                <p class="muted">Esses filtros afetam o radar de oportunidades e o radar de item.</p>
+                <p class="muted">O sistema usa qualidade normal e taxa padrão do mercado por trás dos cálculos. Você só escolhe servidor, capital e perfil.</p>
               </div>
             </div>
             <div class="form-grid compact-grid">
-              <label>
-                <span>Servidor</span>
+              <label><span>Servidor</span>
                 <select id="marketServer">
                   <option value="west">Americas</option>
                   <option value="europe">Europe</option>
                   <option value="east">Asia</option>
                 </select>
               </label>
-              <label>
-                <span>Capital disponível</span>
-                <input id="marketCapital" type="number" min="0" step="1000" value="3000000" />
-              </label>
-              <label>
-                <span>Perfil</span>
+              <label><span>Capital disponível</span><input id="marketCapital" type="number" value="3000000" min="10000" step="1000" /></label>
+              <label><span>Perfil</span>
                 <select id="marketProfile">
                   <option value="balanced">Equilibrado</option>
-                  <option value="safe">Lucro consistente</option>
+                  <option value="consistent">Lucro consistente</option>
                   <option value="max">Máximo lucro</option>
                 </select>
               </label>
-              <label>
-                <span>Taxa de venda total (%)</span>
-                <input id="marketTax" type="number" min="0" max="30" step="0.1" value="6.5" />
-              </label>
-              <label>
-                <span>Qualidade</span>
-                <select id="marketQuality">
-                  <option value="1">Normal</option>
-                  <option value="2">Boa</option>
-                  <option value="3">Excelente</option>
-                  <option value="4">Obra-prima</option>
-                </select>
-              </label>
             </div>
-            <div class="button-row wrap">
-              <button id="scanPopularBtn" class="btn btn-primary">Varrer mercado agora</button>
-              <button id="scanFastBtn" class="btn btn-outline">300 mais líquidos</button>
+            <div class="button-row">
+              <button id="scanPopularBtn" class="btn btn-primary">Analisar itens com mais giro</button>
+              <button id="scanAllBtn" class="btn btn-outline">Pesquisar mercado completo</button>
             </div>
-            <div class="progress-shell hidden" id="scanProgressShell">
-              <div class="progress-bar"><span id="scanProgressBar"></span></div>
-              <p class="muted" id="scanProgressText">0%</p>
+            <div class="progress-wrap">
+              <div class="progress-bar"><div id="marketProgressBar"></div></div>
+              <p id="marketProgressText" class="muted">Nenhuma varredura iniciada.</p>
+            </div>
+            <div class="helper-box">
+              <strong>O que significa “itens com mais giro”?</strong>
+              <span>É a busca mais rápida e útil para novato. Ela foca nos itens com maior chance de venda e evita travar o capital em item parado.</span>
             </div>
           </article>
 
@@ -118,111 +99,154 @@
                 <p class="muted">Leitura direta para sair de 3M e chegar forte nos próximos dias.</p>
               </div>
             </div>
-            <div id="marketAdviceBox" class="result-box muted">
-              Faça a primeira varredura de mercado. O sistema vai mostrar a melhor rota agora e se vale operar de forma segura ou agressiva.
-            </div>
+            <div id="priorityPlan" class="result-box">Primeiro rode a varredura. Depois o sistema vai sugerir a melhor rota segura dentro do seu capital.</div>
           </article>
         </div>
-      </section>
 
-      <section id="mercado" class="page-section">
         <article class="card">
           <div class="section-header">
             <div>
-              <h2>Melhores oportunidades agora</h2>
-              <p class="muted">Ordenado por maior lucro total dentro do seu capital. Os dados vêm do Albion Data e são filtrados por consistência.</p>
-            </div>
-            <div class="button-row wrap">
-              <button id="refreshMarketBtn" class="btn btn-primary">Atualizar oportunidades</button>
-              <button id="sortProfitBtn" class="btn btn-outline">Ordenar por lucro</button>
+              <h3>Radar de oportunidades</h3>
+              <p class="muted">Oportunidades classificadas por lucro seguro. O sistema filtra preço estranho e dados velhos antes de sugerir.</p>
             </div>
           </div>
-          <div id="marketOpportunities" class="result-box">Nenhuma varredura feita ainda.</div>
+          <div id="opportunityResult" class="result-box">Clique em “Analisar itens com mais giro” para montar o radar.</div>
         </article>
-      </section>
 
-      <section id="radar-item" class="page-section">
         <article class="card">
           <div class="section-header">
             <div>
-              <h2>Radar de item</h2>
-              <p class="muted">Use para descobrir a cidade mais barata para comprar e a melhor cidade para vender um item específico.</p>
+              <h3>Radar de item</h3>
+              <p class="muted">Descubra a cidade mais barata para comprar e a melhor cidade para vender 1 item específico.</p>
             </div>
           </div>
-          <div class="form-grid compact-grid">
-            <label>
-              <span>Família</span>
-              <select id="itemFamily"></select>
+          <div class="radar-grid">
+            <label><span>Família</span><select id="itemFamily"></select></label>
+            <label><span>Grupo</span><select id="itemGroup"></select></label>
+            <label><span>Item</span><select id="itemSelect"></select></label>
+            <label><span>Tier</span>
+              <select id="itemTier">
+                <option value="4">T4</option><option value="5">T5</option><option value="6">T6</option><option value="7">T7</option><option value="8">T8</option>
+              </select>
             </label>
-            <label>
-              <span>Item</span>
-              <select id="itemBase"></select>
+            <label><span>Encantamento</span>
+              <select id="itemEnchant">
+                <option value="0">Sem encantamento</option>
+                <option value="1">.1</option>
+                <option value="2">.2</option>
+                <option value="3">.3</option>
+                <option value="4">.4</option>
+              </select>
             </label>
-            <label>
-              <span>Tier</span>
-              <select id="itemTier"></select>
-            </label>
-            <label>
-              <span>Encantamento</span>
-              <select id="itemEnchant"></select>
-            </label>
-            <label>
-              <span>Qualidade</span>
+            <label><span>Qualidade</span>
               <select id="itemQuality">
                 <option value="1">Normal</option>
-                <option value="2">Boa</option>
+                <option value="2">Bom</option>
                 <option value="3">Excelente</option>
-                <option value="4">Obra-prima</option>
+                <option value="4">Excepcional</option>
+                <option value="5">Obra-prima</option>
               </select>
             </label>
           </div>
           <div class="inline-form">
-            <input id="customItemId" type="text" placeholder="Opcional: digite um item ID direto, ex: T4_BAG@1" />
-            <button id="loadItemRadarBtn" class="btn btn-primary">Consultar item</button>
+            <input id="marketItemId" type="text" placeholder="Opcional: digite um item ID direto, ex: T4_BAG ou T6_2H_SPEAR@3" />
+            <button id="loadMarketBtn" class="btn btn-primary">Consultar item</button>
           </div>
-          <div id="itemRadarResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
+          <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
         </article>
       </section>
 
       <section id="craft" class="page-section">
         <div class="card module-card">
-          <h2>Craft</h2>
-          <p class="muted">Este módulo será reconstruído na próxima etapa. Primeiro estamos travando o motor de mercado para que os preços fiquem confiáveis.</p>
-          <div class="result-box muted">
-            Próximo passo do cronograma: perguntar sua experiência, tier liberado, foco, capital e então mostrar o item mais lucrativo para começar com cidade, bônus e custo dos materiais.
+          <h2>Calculadora de Craft</h2>
+          <div class="form-grid">
+            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
+            <label><span>Cidade</span>
+              <select id="craftCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
+              </select>
+            </label>
+            <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
+            <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
           </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
+          <div id="craftResult" class="result-box"></div>
         </div>
       </section>
 
       <section id="refino" class="page-section">
         <div class="card module-card">
-          <h2>Refino</h2>
-          <p class="muted">Depois do craft, o próximo bloco será refino com cidade ideal, bônus e lucro líquido automático.</p>
-          <div class="result-box muted">Por enquanto, use o mercado para levantar capital com dados mais confiáveis.</div>
+          <h2>Calculadora de Refino</h2>
+          <div class="form-grid">
+            <label><span>Nível de refino</span><input id="refineLevel" type="number" min="1" max="100" value="60" /></label>
+            <label><span>Cidade</span>
+              <select id="refineCity">
+                <option>Bridgewatch</option><option>Martlock</option><option>Lymhurst</option>
+                <option>Fort Sterling</option><option>Thetford</option><option>Caerleon</option>
+              </select>
+            </label>
+            <label><span>Usa foco?</span>
+              <select id="refineFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+            <label><span>Custo bruto</span><input id="refineCost" type="number" value="8000" /></label>
+            <label><span>Venda refinado</span><input id="refineSell" type="number" value="10900" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcRefine()">Calcular refino</button>
+          <div id="refineResult" class="result-box"></div>
         </div>
       </section>
 
       <section id="ilhas" class="page-section">
         <div class="card module-card">
-          <h2>Ilhas</h2>
-          <p class="muted">A base de ilhas continua disponível, mas o foco desta atualização foi mercado confiável.</p>
-          <div id="islandResult" class="result-box muted">Módulo de ilhas volta a ser melhorado depois que o núcleo de mercado estiver estável.</div>
+          <h2>Simulador de Ilhas</h2>
+          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
+          <div class="form-grid">
+            <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
+            <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
+            <label><span>Pastos</span><input id="islandPastures" type="number" value="2" /></label>
+            <label><span>Usa foco?</span>
+              <select id="islandFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcIsland()">Calcular ilhas</button>
+          <div id="islandResult" class="result-box"></div>
         </div>
       </section>
 
       <section id="transporte" class="page-section">
         <div class="card module-card">
-          <h2>Transporte</h2>
-          <p class="muted">Use as oportunidades de mercado como base. Em seguida, o sistema vai recomendar a rota e a montaria ideais.</p>
-          <div id="transportResult" class="result-box muted">Em breve: rota segura, rota rápida e sugestão de montaria.</div>
+          <h2>Calculadora de Transporte</h2>
+          <div class="form-grid">
+            <label><span>Cidade de compra</span><input id="transportBuyCity" type="text" value="Bridgewatch" /></label>
+            <label><span>Cidade de venda</span><input id="transportSellCity" type="text" value="Caerleon" /></label>
+            <label><span>Preço de compra</span><input id="transportBuyPrice" type="number" value="9800" /></label>
+            <label><span>Preço de venda</span><input id="transportSellPrice" type="number" value="14200" /></label>
+            <label><span>Custo de transporte</span><input id="transportCost" type="number" value="600" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcTransport()">Calcular transporte</button>
+          <div id="transportResult" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="mercado" class="page-section">
+        <div class="card module-card">
+          <h2>Mercado</h2>
+          <div class="result-box">Use o Dashboard para rodar a leitura principal do mercado e o Radar de item para validar uma operação específica.</div>
         </div>
       </section>
 
       <section id="riqueza" class="page-section">
         <div class="card module-card">
-          <h2>Planejador de riqueza</h2>
-          <p class="muted">Este módulo vai ser reconstruído em cima do motor de mercado para gerar plano diário real.</p>
-          <div class="result-box muted">Quando o mercado estiver estável, o planejador vai dizer exatamente o que fazer no dia 1, dia 2 e assim por diante.</div>
+          <h2>Planejador de Riqueza</h2>
+          <p class="muted">Agora ele dá uma estratégia em etapas, não só um sim ou não.</p>
+          <div class="form-grid">
+            <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="1000000" /></label>
+            <label><span>Meta</span><input id="wealthGoal" type="number" value="1000000000" /></label>
+            <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="30" /></label>
+          </div>
+          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Planejar</button>
+          <div id="wealthResult" class="result-box"></div>
         </div>
       </section>
     </main>
