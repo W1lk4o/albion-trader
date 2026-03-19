@@ -44,7 +44,7 @@
           <article class="card stat-card">
             <span class="stat-label">Modo de operação</span>
             <strong id="profileLabel">Equilibrado</strong>
-            <p>Você escolhe o perfil na hora: máximo lucro, consistente ou equilibrado.</p>
+            <p>Agora o sistema separa lucro seguro, equilibrado e máximo lucro.</p>
           </article>
           <article class="card stat-card">
             <span class="stat-label">Licença</span>
@@ -58,10 +58,10 @@
             <div class="section-header">
               <div>
                 <h3>Configuração de mercado</h3>
-                <p class="muted">O sistema usa qualidade normal e taxa padrão do mercado por trás dos cálculos. Você só escolhe servidor, capital e perfil.</p>
+                <p class="muted">O sistema puxa os preços sozinho. Você escolhe servidor, capital, perfil e tipo de rota.</p>
               </div>
             </div>
-            <div class="form-grid compact-grid market-filters-grid">
+            <div class="form-grid compact-grid">
               <label><span>Servidor</span>
                 <select id="marketServer">
                   <option value="west">Americas</option>
@@ -70,7 +70,7 @@
                 </select>
               </label>
               <label><span>Capital disponível</span><input id="marketCapital" type="number" value="3000000" min="10000" step="1000" /></label>
-              <label><span>Perfil do lucro</span>
+              <label><span>Perfil</span>
                 <select id="marketProfile">
                   <option value="balanced">Equilibrado</option>
                   <option value="consistent">Lucro seguro</option>
@@ -86,7 +86,7 @@
               </label>
             </div>
             <div class="button-row">
-              <button id="scanPopularBtn" class="btn btn-primary">Analisar 300 itens com mais saída</button>
+              <button id="scanPopularBtn" class="btn btn-primary">Analisar 300 itens com mais giro</button>
               <button id="scanAllBtn" class="btn btn-outline">Pesquisar mercado completo</button>
             </div>
             <div class="progress-wrap">
@@ -94,8 +94,8 @@
               <p id="marketProgressText" class="muted">Nenhuma varredura iniciada.</p>
             </div>
             <div class="helper-box">
-              <strong>Como o sistema pensa agora?</strong>
-              <span>Primeiro ele pergunta o perfil de lucro e a rota que você aceita. Depois procura oportunidades que façam sentido para o seu capital, com quantidade segura estimada e prioridade para itens com saída.</span>
+              <strong>300 itens com mais giro</strong>
+              <span>É a busca rápida para achar dinheiro de verdade sem travar capital em item parado.</span>
             </div>
           </article>
 
@@ -103,10 +103,10 @@
             <div class="section-header">
               <div>
                 <h3>O que priorizar para bater 30M</h3>
-                <p class="muted">Leitura direta para sair de 3M e chegar forte nos próximos dias.</p>
+                <p class="muted">Leitura direta para sair de 3M e crescer com mais inteligência.</p>
               </div>
             </div>
-            <div id="priorityPlan" class="result-box">Primeiro rode a varredura. Depois o sistema vai sugerir a melhor rota segura dentro do seu capital.</div>
+            <div id="priorityPlan" class="result-box">Primeiro rode a varredura. Depois o sistema vai sugerir a melhor rota para o seu capital.</div>
           </article>
         </div>
 
@@ -114,28 +114,25 @@
           <div class="section-header">
             <div>
               <h3>Radar de oportunidades</h3>
-              <p class="muted">Oportunidades classificadas por lucro total seguro. Clique no nome da coluna para ordenar por custo, venda, lucro, quantidade segura, margem ou confiança.</p>
+              <p class="muted">Oportunidades classificadas. Clique no título de cada coluna para ordenar.</p>
             </div>
           </div>
-          <div id="opportunityResult" class="result-box">Clique em “Analisar itens com mais giro” para montar o radar.</div>
+          <div id="opportunityResult" class="result-box">Clique em “Analisar 300 itens com mais giro” para montar o radar.</div>
         </article>
 
         <article class="card">
           <div class="section-header">
             <div>
               <h3>Radar de item</h3>
-              <p class="muted">Descubra a cidade mais barata para comprar e a melhor cidade para vender 1 item específico.</p>
+              <p class="muted">Pesquisa 1 item por vez e mostra claramente onde comprar e onde vender.</p>
             </div>
           </div>
-          <div class="radar-grid">
+          <div class="radar-grid radar-grid-extended">
             <label><span>Família</span><select id="itemFamily"></select></label>
             <label><span>Grupo</span><select id="itemGroup"></select></label>
-            <label><span>Item</span><select id="itemSelect"></select></label>
-            <label><span>Tier</span>
-              <select id="itemTier">
-                <option value="4">T4</option><option value="5">T5</option><option value="6">T6</option><option value="7">T7</option><option value="8">T8</option>
-              </select>
-            </label>
+            <label class="wide-field"><span>Buscar item</span><input id="itemSearch" type="text" placeholder="Digite parte do nome ou do código do item" /></label>
+            <label class="wide-field"><span>Item</span><select id="itemSelect"></select></label>
+            <label><span>Tier</span><select id="itemTier"></select></label>
             <label><span>Encantamento</span>
               <select id="itemEnchant">
                 <option value="0">Sem encantamento</option>
@@ -156,9 +153,10 @@
             </label>
           </div>
           <div class="inline-form">
-            <input id="marketItemId" type="text" placeholder="Opcional: digite um item ID direto, ex: T4_BAG ou T6_2H_SPEAR@3" />
+            <input id="marketItemId" type="text" placeholder="Opcional: item ID direto, ex: T4_BAG ou T6_2H_BOW@3" />
             <button id="loadMarketBtn" class="btn btn-primary">Consultar item</button>
           </div>
+          <p class="muted" id="itemCatalogCount">—</p>
           <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
         </article>
       </section>
@@ -207,7 +205,6 @@
       <section id="ilhas" class="page-section">
         <div class="card module-card">
           <h2>Simulador de Ilhas</h2>
-          <p class="muted">Agora ele já recomenda o que plantar, o que criar e como usar a ilha.</p>
           <div class="form-grid">
             <label><span>Nível da ilha</span><input id="islandLevel" type="number" min="1" max="8" value="6" /></label>
             <label><span>Plantações</span><input id="islandPlots" type="number" value="5" /></label>
@@ -245,18 +242,16 @@
 
       <section id="riqueza" class="page-section">
         <div class="card module-card">
-          <h2>Planejador de Riqueza</h2>
-          <p class="muted">Plano operacional por dia usando as melhores rotas que o mercado encontrou agora.</p>
-          <div class="form-grid">
+          <h2>Planejador de Riqueza — 1 dia por vez</h2>
+          <p class="muted">Agora o planejador só monta o dia atual. No fim do dia você fecha o resultado e aí o sistema prepara o próximo.</p>
+          <div class="form-grid compact-grid">
             <label><span>Prata atual</span><input id="wealthCurrent" type="number" value="3000000" /></label>
             <label><span>Meta</span><input id="wealthGoal" type="number" value="30000000" /></label>
             <label><span>Dias disponíveis</span><input id="wealthDays" type="number" value="8" /></label>
-            <label><span>Se morreu hoje e perdeu dinheiro</span>
-              <select id="wealthDied"><option value="nao">Não</option><option value="sim">Sim</option></select>
-            </label>
-            <label><span>Saldo ao fechar o dia</span><input id="wealthClose" type="number" value="3000000" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcWealth()">Gerar plano diário</button>
+          <div class="button-row">
+            <button id="startDayPlanBtn" class="btn btn-primary">Gerar plano de hoje</button>
+          </div>
           <div id="wealthResult" class="result-box"></div>
         </div>
       </section>
