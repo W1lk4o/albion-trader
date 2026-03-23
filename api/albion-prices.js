@@ -17,8 +17,9 @@ module.exports = async (req, res) => {
       .map((value) => value.trim())
       .filter(Boolean);
 
-    const itemIdsList = [...new Set(rawItemIds)].slice(0, 1200);
+    const itemIdsList = [...new Set(rawItemIds)].slice(0, 1500);
     const itemIds = itemIdsList.join(',');
+    const qualityIds = [...new Set(String(qualities).split(',').map((value) => value.trim()).filter(Boolean))].join(',') || '1';
 
     if (!itemIds) {
       return res.status(400).json({ error: 'Informe ao menos um item.' });
@@ -31,7 +32,7 @@ module.exports = async (req, res) => {
     };
 
     const base = hostMap[server] || hostMap.west;
-    const endpoint = `${base}/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
+    const endpoint = `${base}/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualityIds)}`;
 
     const response = await fetch(endpoint, {
       headers: {
@@ -52,7 +53,9 @@ module.exports = async (req, res) => {
       meta: {
         source: 'albion-data',
         server,
-        itemCount: itemIdsList.length
+        itemCount: itemIdsList.length,
+        qualities: qualityIds,
+        host: base
       }
     });
   } catch (error) {
