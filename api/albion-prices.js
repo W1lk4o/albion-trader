@@ -12,11 +12,13 @@ module.exports = async (req, res) => {
       server = 'west'
     } = req.query || {};
 
-    const itemIds = String(item || items)
+    const rawItemIds = String(item || items)
       .split(',')
       .map((value) => value.trim())
-      .filter(Boolean)
-      .join(',');
+      .filter(Boolean);
+
+    const itemIdsList = Array.from(new Set(rawItemIds)).slice(0, 1200);
+    const itemIds = itemIdsList.join(',');
 
     if (!itemIds) {
       return res.status(400).json({ error: 'Informe ao menos um item.' });
@@ -50,7 +52,7 @@ module.exports = async (req, res) => {
       meta: {
         source: 'albion-data',
         server,
-        itemCount: itemIds.split(',').length
+        itemCount: itemIdsList.length
       }
     });
   } catch (error) {
