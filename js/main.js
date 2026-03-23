@@ -11,8 +11,6 @@
   };
   const DEFAULT_FEE = 6.5;
   const opportunityState = { list: [], sortKey: 'totalSafeProfit', sortDir: 'desc', lastMode: 'popular' };
-  const MAX_DATA_AGE_HOURS = 24;
-  const STRICT_DATA_AGE_HOURS = 12;
 
   const ITEM_CATALOG = {
     'Bolsas e capas': {
@@ -293,61 +291,37 @@
     const grouped = new Map();
     (rows || []).forEach((row) => {
       if (!row.city) return;
-      const city = String(row.city).trim();
-      if (!grouped.has(city)) grouped.set(city, []);
-      grouped.get(city).push(row);
+      if (!grouped.has(row.city)) grouped.set(row.city, []);
+      grouped.get(row.city).push(row);
     });
 
-    const normalized = [];
+    const cleaned = [];
     grouped.forEach((cityRows, city) => {
-      const bestSellRow = cityRows
-        .filter((row) => Number(row.sell_price_min || 0) > 0 && hoursSince(parseTime(row.sell_price_min_date)) <= MAX_DATA_AGE_HOURS)
-        .sort((a, b) => {
-          const priceDiff = Number(a.sell_price_min || 0) - Number(b.sell_price_min || 0);
-          if (priceDiff !== 0) return priceDiff;
-          const ta = parseTime(a.sell_price_min_date)?.getTime() || 0;
-          const tb = parseTime(b.sell_price_min_date)?.getTime() || 0;
-          return tb - ta;
-        })[0] || null;
-
-      const bestBuyRow = cityRows
-        .filter((row) => Number(row.buy_price_max || 0) > 0 && hoursSince(parseTime(row.buy_price_max_date)) <= MAX_DATA_AGE_HOURS)
-        .sort((a, b) => {
-          const priceDiff = Number(b.buy_price_max || 0) - Number(a.buy_price_max || 0);
-          if (priceDiff !== 0) return priceDiff;
-          const ta = parseTime(a.buy_price_max_date)?.getTime() || 0;
-          const tb = parseTime(b.buy_price_max_date)?.getTime() || 0;
-          return tb - ta;
-        })[0] || null;
-
-      normalized.push({
-        city,
-        item_id: bestSellRow?.item_id || bestBuyRow?.item_id || cityRows[0]?.item_id || '',
-        quality: bestSellRow?.quality || bestBuyRow?.quality || cityRows[0]?.quality || 1,
-        sell_price_min: Number(bestSellRow?.sell_price_min || 0),
-        sell_price_min_date: bestSellRow?.sell_price_min_date || '',
-        buy_price_max: Number(bestBuyRow?.buy_price_max || 0),
-        buy_price_max_date: bestBuyRow?.buy_price_max_date || ''
+      // one row per city/item/quality expected, but keep latest/most complete
+      cityRows.sort((a, b) => {
+        const ta = parseTime(a.sell_price_min_date)?.getTime() || 0;
+        const tb = parseTime(b.sell_price_min_date)?.getTime() || 0;
+        return tb - ta;
       });
+      cleaned.push(cityRows[0]);
     });
 
-    const validSellValues = normalized.map(r => Number(r.sell_price_min || 0)).filter(v => v > 0);
-    const validBuyValues = normalized.map(r => Number(r.buy_price_max || 0)).filter(v => v > 0);
+    const validSellValues = cleaned.map(r => Number(r.sell_price_min || 0)).filter(v => v > 0);
+    const validBuyValues = cleaned.map(r => Number(r.buy_price_max || 0)).filter(v => v > 0);
     const sellMedian = median(validSellValues);
     const buyMedian = median(validBuyValues);
 
-    return normalized.filter((row) => {
+    return cleaned.filter((row) => {
       const sell = Number(row.sell_price_min || 0);
       const buy = Number(row.buy_price_max || 0);
-      const sellAge = hoursSince(parseTime(row.sell_price_min_date));
-      const buyAge = hoursSince(parseTime(row.buy_price_max_date));
-      const sellFresh = sellAge <= MAX_DATA_AGE_HOURS;
-      const buyFresh = buyAge <= MAX_DATA_AGE_HOURS;
-      const sellOk = sell > 0 && sellFresh && (!sellMedian || (sell >= sellMedian * 0.5 && sell <= sellMedian * 2.2));
-      const buyOk = buy > 0 && buyFresh && (!buyMedian || (buy >= buyMedian * 0.5 && buy <= buyMedian * 2.2));
-      if (!sellOk && !buyOk) return false;
-      if (sellOk && buyOk && buy > sell * 1.25) return false;
-      return true;
+      const sellFresh = hoursSince(parseTime(row.sell_price_min_date)) <= 72;
+      const buyFresh = hoursSince(parseTime(row.buy_price_max_date)) <= 72;
+
+      const sellOk = sell > 0 && sellFresh && (!sellMedian || (sell >= sellMedian * 0.2 && sell <= sellMedian * 4));
+      const buyOk = buy > 0 && buyFresh && (!buyMedian || (buy >= buyMedian * 0.2 && buy <= buyMedian * 4));
+
+      // keep row if at least one side is valid
+      return sellOk || buyOk;
     });
   }
 
@@ -358,12 +332,10 @@
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }
 
-  function confidenceLabel(spreadPct, validCities, bestBuyAge = Infinity, bestSellAge = Infinity) {
-    const freshStrong = bestBuyAge <= STRICT_DATA_AGE_HOURS && bestSellAge <= STRICT_DATA_AGE_HOURS;
-    const freshOk = bestBuyAge <= MAX_DATA_AGE_HOURS && bestSellAge <= MAX_DATA_AGE_HOURS;
-    if (validCities >= 5 && spreadPct >= 10 && freshStrong) return 'Alta';
-    if (validCities >= 4 && spreadPct >= 6 && freshOk) return 'Boa';
-    if (validCities >= 3 && spreadPct >= 3 && freshOk) return 'Média';
+  function confidenceLabel(spreadPct, validCities) {
+    if (validCities >= 5 && spreadPct >= 8) return 'Alta';
+    if (validCities >= 4 && spreadPct >= 4) return 'Boa';
+    if (validCities >= 3 && spreadPct >= 2) return 'Média';
     return 'Baixa';
   }
 
@@ -429,25 +401,6 @@
     const netSell = sellPrice * (1 - feePct / 100);
     const profit = netSell - buyPrice;
     const margin = buyPrice > 0 ? (profit / buyPrice) * 100 : 0;
-    const bestSellAge = hoursSince(parseTime(cheapest.sell_price_min_date));
-    const bestBuyAge = hoursSince(parseTime(highest.buy_price_max_date));
-    const cityCount = cleaned.filter(r => Number(r.sell_price_min || 0) > 0 || Number(r.buy_price_max || 0) > 0).length;
-
-    if (profit <= 0) {
-      return { ok: false, reason: 'O melhor pedido de compra válido não cobre o custo de compra com taxa.' };
-    }
-
-    if (bestSellAge > MAX_DATA_AGE_HOURS || bestBuyAge > MAX_DATA_AGE_HOURS) {
-      return { ok: false, reason: 'Os melhores preços encontrados já estão velhos demais.' };
-    }
-
-    if (cityCount < 3) {
-      return { ok: false, reason: 'Poucas cidades válidas para confiar nessa leitura agora.' };
-    }
-
-    if (margin > 35) {
-      return { ok: false, reason: 'Spread exagerado demais para confiar sem risco de preço fake.' };
-    }
 
     return {
       ok: true,
@@ -459,10 +412,7 @@
       netSell,
       profit,
       margin,
-      bestSellAge,
-      bestBuyAge,
-      cityCount,
-      confidence: confidenceLabel(margin, cityCount, bestBuyAge, bestSellAge)
+      confidence: confidenceLabel(margin, cleaned.length)
     };
   }
 
@@ -487,10 +437,8 @@
       if (safeUnits <= 0) return;
 
       const totalSafeProfit = analysis.profit * safeUnits;
-      const minimumProfit = profile === 'max' ? 150000 : profile === 'balanced' ? 80000 : 40000;
+      const minimumProfit = profile === 'max' ? 100000 : profile === 'balanced' ? 50000 : 25000;
       if (totalSafeProfit < minimumProfit) return;
-      if (analysis.confidence === 'Baixa') return;
-      if (analysis.margin < 4) return;
 
       opportunities.push({
         itemId,
@@ -538,20 +486,22 @@
   }
 
 
-  function buildAllCatalogItemIds() {
-    const all = [];
-    Object.values(ITEM_CATALOG).forEach((groups) => {
-      Object.values(groups).forEach((items) => {
-        items.forEach((item) => {
-          for (let tier = 4; tier <= 8; tier++) {
-            for (let enchant = 0; enchant <= 4; enchant++) {
-              all.push(buildItemId(item.template, tier, enchant));
+  function getAllCatalogItems(options = {}) {
+    const tiers = options.tiers || [4, 5, 6, 7, 8];
+    const enchants = options.enchants || [0, 1, 2, 3, 4];
+    const items = [];
+    for (const groups of Object.values(ITEM_CATALOG)) {
+      for (const groupItems of Object.values(groups)) {
+        for (const item of groupItems) {
+          for (const tier of tiers) {
+            for (const enchant of enchants) {
+              items.push(buildItemId(item.template, tier, enchant));
             }
           }
-        });
-      });
-    });
-    return Array.from(new Set(all));
+        }
+      }
+    }
+    return [...new Set(items)];
   }
 
   function currentServer() {
@@ -653,7 +603,9 @@
     document.getElementById('profileLabel').textContent =
       profile === 'consistent' ? 'Lucro seguro' : profile === 'max' ? 'Lucro máximo' : 'Equilibrado';
 
-    const items = mode === 'all' ? buildAllCatalogItemIds() : POPULAR_ITEMS;
+    const items = mode === 'all'
+      ? getAllCatalogItems({ tiers: [4, 5, 6, 7, 8], enchants: [0, 1, 2, 3, 4] })
+      : POPULAR_ITEMS;
     opportunityState.lastMode = mode;
     setProgress(5, 'Preparando consulta do mercado...');
     box.textContent = 'Consultando mercado...';
@@ -661,9 +613,17 @@
 
     try {
       setProgress(25, `Consultando ${items.length} itens em ${locations.length} cidades...`);
-      const data = await api(`/api/albion-prices?items=${encodeURIComponent(items.join(','))}&locations=${encodeURIComponent(locations.join(','))}&qualities=1&server=${currentServer()}`);
+      const chunkSize = 120;
+      const rows = [];
+      for (let index = 0; index < items.length; index += chunkSize) {
+        const chunk = items.slice(index, index + chunkSize);
+        const pct = 25 + Math.round((index / Math.max(items.length, 1)) * 35);
+        setProgress(pct, `Consultando mercado... lote ${Math.floor(index / chunkSize) + 1}/${Math.ceil(items.length / chunkSize)}`);
+        const data = await api(`/api/albion-prices?items=${encodeURIComponent(chunk.join(','))}&locations=${encodeURIComponent(locations.join(','))}&qualities=1&server=${currentServer()}`);
+        rows.push(...(data.data || []));
+      }
       setProgress(65, 'Filtrando preços estranhos, dados velhos e rota ruim...');
-      const opportunities = buildOpportunities(data.data || [], capital, profile, DEFAULT_FEE, route);
+      const opportunities = buildOpportunities(rows, capital, profile, DEFAULT_FEE, route);
       opportunityState.list = opportunities;
       opportunityState.sortKey = 'totalSafeProfit';
       opportunityState.sortDir = 'desc';
@@ -681,7 +641,7 @@
       const best = opportunities.slice().sort((a,b)=>b.totalSafeProfit-a.totalSafeProfit)[0];
       document.getElementById('bestOpportunityName').textContent = best.itemName;
       document.getElementById('bestOpportunityText').textContent =
-        `Comprar em ${best.buyCity}, vender em ${best.sellCity} e mirar ${formatSilver(best.totalSafeProfit)} de lucro total seguro.`;
+        `Comprar em ${best.buyCity}, vender em ${best.sellCity} e mirar ${formatSilver(best.totalSafeProfit)} de lucro total seguro (${opportunityState.lastMode === 'all' ? 'mercado completo' : 'itens populares'}).`;
       document.getElementById('priorityPlan').innerHTML =
         `Melhor rota agora: <strong>${best.itemName}</strong>.<br>
          Compre em <strong>${best.buyCity}</strong> por <strong>${formatSilver(best.buyPrice)}</strong> e venda em <strong>${best.sellCity}</strong> pelo pedido de compra atual de <strong>${formatSilver(best.sellPrice)}</strong>.<br>

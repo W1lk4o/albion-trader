@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
       .map((value) => value.trim())
       .filter(Boolean);
 
-    const itemIdsList = Array.from(new Set(rawItemIds)).slice(0, 1200);
+    const itemIdsList = [...new Set(rawItemIds)].slice(0, 1200);
     const itemIds = itemIdsList.join(',');
 
     if (!itemIds) {
