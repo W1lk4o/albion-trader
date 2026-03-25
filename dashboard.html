@@ -166,7 +166,7 @@
       <section id="craft" class="page-section">
         <div class="card module-card">
           <h2>Planejador de Craft</h2>
-          <p class="muted">Primeiro bloco do craft profissional: você escolhe item, cidade, tier e quantidade. O sistema já mostra o bônus local da cidade e calcula lucro por unidade e no lote. A próxima etapa vai puxar as receitas reais e ranquear o melhor craft do dia.</p>
+          <p class="muted">Agora o craft já puxa o preço do item final e dos materiais direto da Albion Data. Você escolhe o item, define onde compra material, onde crafta e onde vende. Depois monta a lista de materiais e o sistema calcula o lote, o custo total e o lucro.</p>
           <div class="form-grid">
             <label><span>Família</span><select id="craftFamily"></select></label>
             <label><span>Grupo</span><select id="craftGroup"></select></label>
@@ -185,21 +185,56 @@
                 <option value="4">.4</option>
               </select>
             </label>
+            <label><span>Qualidade de venda</span>
+              <select id="craftQuality">
+                <option value="1">Normal</option>
+                <option value="2">Bom</option>
+                <option value="3">Excelente</option>
+                <option value="4">Excepcional</option>
+                <option value="5">Obra-prima</option>
+              </select>
+            </label>
             <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="120" value="50" /></label>
-            <label><span>Cidade</span>
+            <label><span>Cidade de craft</span>
               <select id="craftCity">
                 <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
                 <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Brecilien</option>
+              </select>
+            </label>
+            <label><span>Cidade para comprar materiais</span>
+              <select id="craftMaterialCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Brecilien</option>
+              </select>
+            </label>
+            <label><span>Cidade para vender</span>
+              <select id="craftSellCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Brecilien</option>
+              </select>
+            </label>
+            <label><span>Modo de venda</span>
+              <select id="craftSellMode">
+                <option value="sell">Ordem de venda</option>
+                <option value="buy">Pedido de compra atual</option>
               </select>
             </label>
             <label><span>Usa foco?</span>
               <select id="craftFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
             </label>
             <label><span>Quantidade</span><input id="craftQuantity" type="number" min="1" value="10" /></label>
-            <label><span>Custo dos materiais por unidade</span><input id="craftCost" type="number" value="12000" /></label>
-            <label><span>Valor de venda por unidade</span><input id="craftSell" type="number" value="16500" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
+
+          <div class="helper-box">
+            <strong>Lista de materiais do craft</strong>
+            <span>Preencha o item ID do material e a quantidade por craft. Exemplo: T6_CLOTH, T6_LEATHER, T6_METALBAR, T6_PLANKS.</span>
+          </div>
+          <datalist id="craftMaterialSuggestions"></datalist>
+          <div id="craftMaterialsBox"></div>
+          <div class="inline-form">
+            <button class="btn btn-outline" onclick="AlbionTrader.addCraftMaterialRow()">Adicionar material</button>
+            <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Buscar preços do craft</button>
+          </div>
           <div id="craftResult" class="result-box"></div>
         </div>
       </section>

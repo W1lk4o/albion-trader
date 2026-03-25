@@ -22,6 +22,8 @@
     'Brecilien': ['Capas', 'Bolsas', 'Poções']
   };
   const opportunityState = { list: [], sortKey: 'totalSafeProfit', sortDir: 'desc', lastMode: 'popular' };
+  const CRAFT_MATERIAL_ROW_TEMPLATE = () => ({ itemId: '', qty: 1 });
+  const craftState = { rows: [CRAFT_MATERIAL_ROW_TEMPLATE(), CRAFT_MATERIAL_ROW_TEMPLATE()] };
 
   const ITEM_CATALOG = {
     'Bolsas e capas': {
@@ -866,34 +868,182 @@
 
   function sortByProfitDesc(list) { return list.sort((a, b) => b.profit - a.profit); }
 
-  function calcCraft() {
-    const level = Number(document.getElementById('craftLevel').value || 0);
-    const city = document.getElementById('craftCity').value;
-    const cost = Number(document.getElementById('craftCost').value || 0);
-    const sell = Number(document.getElementById('craftSell').value || 0);
-    const quantity = Number(document.getElementById('craftQuantity')?.value || 1);
-    const focus = document.getElementById('craftFocus')?.value === 'sim';
+  function getCraftSelectedItem() {
     const family = document.getElementById('craftFamily')?.value;
     const group = document.getElementById('craftGroup')?.value;
     const idx = Number(document.getElementById('craftItem')?.value || 0);
     const tier = Number(document.getElementById('craftTier')?.value || 4);
     const enchant = Number(document.getElementById('craftEnchant')?.value || 0);
+    const quality = Number(document.getElementById('craftQuality')?.value || 1);
     const item = ITEM_CATALOG[family]?.[group]?.[idx];
+    const itemId = item ? buildItemId(item.template, tier, enchant) : '';
     const itemName = item ? `${item.label} T${tier}${enchant ? `.${enchant}` : ''}` : 'Item selecionado';
-    const bonusList = getCraftCityHint(city);
-    const masteryBonus = level >= 100 ? 1.1 : level >= 80 ? 1.07 : level >= 50 ? 1.04 : 1.01;
-    const focusBonus = focus ? 1.06 : 1;
-    const fee = Math.round(sell * 0.065);
-    const adjustedCost = cost / (masteryBonus * focusBonus);
-    const lucroUnit = sell - adjustedCost - fee;
-    const lucroTotal = lucroUnit * Math.max(1, quantity);
-    const margem = cost > 0 ? (lucroUnit / cost) * 100 : 0;
-    const checklist = [
-      `Materiais totais informados: ${formatSilver(cost * Math.max(1, quantity))} prata`,
-      `Venda total estimada: ${formatSilver(sell * Math.max(1, quantity))} prata`,
-      `Taxa total estimada: ${formatSilver(fee * Math.max(1, quantity))} prata`
-    ];
-    setHtml('craftResult', `<strong>Resultado do craft em ${city}</strong><br>Item: <strong>${itemName}</strong><br>Quantidade: <strong>${formatSilver(quantity)}</strong><br>Lucro estimado por unidade: <strong>${formatSilver(lucroUnit)} prata</strong><br>Lucro total estimado: <strong>${formatSilver(lucroTotal)} prata</strong><br>Margem: <strong>${margem.toFixed(1)}%</strong><br>Bônus locais da cidade: <strong>${bonusList}</strong><br>Leitura: ${lucroUnit > 0 ? 'o craft está viável nos valores que você informou.' : 'nos valores informados, esse craft não está bom.'}<br><br><strong>Checklist do crafter</strong><br>${checklist.map(line => '- ' + line).join('<br>')}<br><br><span class="muted">Neste patch eu já deixei o craft mais útil e com bônus locais. A próxima etapa é ligar cada item à receita real para puxar matéria-prima automaticamente e ranquear o melhor craft do dia.</span>`);
+    return { family, group, idx, tier, enchant, quality, item, itemId, itemName };
+  }
+
+  function buildCraftMaterialSuggestionIds() {
+    const ids = [];
+    for (let tier = 2; tier <= 8; tier++) {
+      ids.push(`T${tier}_PLANKS`, `T${tier}_CLOTH`, `T${tier}_METALBAR`, `T${tier}_LEATHER`, `T${tier}_STONEBLOCK`);
+      ids.push(`T${tier}_WOOD`, `T${tier}_FIBER`, `T${tier}_ORE`, `T${tier}_HIDE`, `T${tier}_ROCK`);
+      for (let enchant = 1; enchant <= 4; enchant++) {
+        ids.push(`T${tier}_PLANKS@${enchant}`, `T${tier}_CLOTH@${enchant}`, `T${tier}_METALBAR@${enchant}`, `T${tier}_LEATHER@${enchant}`);
+      }
+    }
+    getAllCatalogItems({ tiers: [4, 5, 6, 7, 8], enchants: [0, 1, 2, 3, 4] }).forEach((id) => ids.push(id));
+    return Array.from(new Set(ids)).sort();
+  }
+
+  function renderCraftMaterialRows() {
+    const box = document.getElementById('craftMaterialsBox');
+    if (!box) return;
+    box.innerHTML = craftState.rows.map((row, index) => `
+      <div class="inline-form" style="margin-bottom:8px; align-items:end;">
+        <label style="flex:2;"><span>Material ${index + 1}</span><input data-craft-material-id="${index}" list="craftMaterialSuggestions" type="text" placeholder="Ex: T6_CLOTH" value="${row.itemId || ''}" /></label>
+        <label style="width:160px;"><span>Qtd por craft</span><input data-craft-material-qty="${index}" type="number" min="0.01" step="0.01" value="${Number(row.qty || 0)}" /></label>
+        <button class="btn btn-outline" onclick="AlbionTrader.removeCraftMaterialRow(${index})">Remover</button>
+      </div>
+    `).join('');
+    box.querySelectorAll('[data-craft-material-id]').forEach((el) => el.addEventListener('input', (event) => {
+      const idx = Number(event.target.dataset.craftMaterialId);
+      if (!craftState.rows[idx]) return;
+      craftState.rows[idx].itemId = event.target.value.trim().toUpperCase();
+    }));
+    box.querySelectorAll('[data-craft-material-qty]').forEach((el) => el.addEventListener('input', (event) => {
+      const idx = Number(event.target.dataset.craftMaterialQty);
+      if (!craftState.rows[idx]) return;
+      craftState.rows[idx].qty = Math.max(0, Number(event.target.value || 0));
+    }));
+  }
+
+  function addCraftMaterialRow() {
+    craftState.rows.push(CRAFT_MATERIAL_ROW_TEMPLATE());
+    renderCraftMaterialRows();
+  }
+
+  function removeCraftMaterialRow(index) {
+    if (craftState.rows.length <= 1) return;
+    craftState.rows.splice(index, 1);
+    renderCraftMaterialRows();
+  }
+
+  function getCraftRows() {
+    return craftState.rows
+      .map((row) => ({ itemId: String(row.itemId || '').trim().toUpperCase(), qty: Number(row.qty || 0) }))
+      .filter((row) => row.itemId && row.qty > 0);
+  }
+
+  function buildCraftMarketLookup(rows, itemId) {
+    const ids = rows.map((row) => row.itemId);
+    if (itemId) ids.unshift(itemId);
+    return Array.from(new Set(ids));
+  }
+
+  function pickCityPrice(rows, city, mode = 'sell') {
+    const list = (rows || []).filter((row) => row.city === city);
+    if (!list.length) return null;
+    if (mode === 'buy') {
+      const valid = list.filter((row) => normalizePrice(row.buy_price_max) > 0 && hoursSince(parseTime(row.buy_price_max_date)) <= 24);
+      if (!valid.length) return null;
+      const best = valid.reduce((acc, row) => normalizePrice(row.buy_price_max) > normalizePrice(acc.buy_price_max) ? row : acc, valid[0]);
+      return { price: normalizePrice(best.buy_price_max), date: best.buy_price_max_date, mode: 'Pedido de compra atual' };
+    }
+    const valid = list.filter((row) => normalizePrice(row.sell_price_min) > 0 && hoursSince(parseTime(row.sell_price_min_date)) <= 24);
+    if (!valid.length) return null;
+    const best = valid.reduce((acc, row) => normalizePrice(row.sell_price_min) < normalizePrice(acc.sell_price_min) ? row : acc, valid[0]);
+    return { price: normalizePrice(best.sell_price_min), date: best.sell_price_min_date, mode: 'Ordem de venda' };
+  }
+
+  async function fetchCraftMarketData() {
+    const selected = getCraftSelectedItem();
+    const materialRows = getCraftRows();
+    if (!selected.itemId) throw new Error('Selecione o item que sera craftado.');
+    if (!materialRows.length) throw new Error('Adicione pelo menos um material com item ID e quantidade por craft.');
+    const ids = buildCraftMarketLookup(materialRows, selected.itemId);
+    const sellCity = document.getElementById('craftSellCity')?.value || 'Caerleon';
+    const materialCity = document.getElementById('craftMaterialCity')?.value || sellCity;
+    const qualities = Array.from(new Set([1, selected.quality])).join(',');
+    const data = await api(`/api/albion-prices?items=${encodeURIComponent(ids.join(','))}&locations=${encodeURIComponent([sellCity, materialCity].join(','))}&qualities=${qualities}&server=${currentServer()}`);
+    return { selected, materialRows, rows: data.data || [], meta: data.meta || {} };
+  }
+
+  async function calcCraft() {
+    const level = Number(document.getElementById('craftLevel').value || 0);
+    const craftCity = document.getElementById('craftCity').value;
+    const materialCity = document.getElementById('craftMaterialCity').value;
+    const sellCity = document.getElementById('craftSellCity').value;
+    const quantity = Math.max(1, Number(document.getElementById('craftQuantity')?.value || 1));
+    const focus = document.getElementById('craftFocus')?.value === 'sim';
+    const sellMode = document.getElementById('craftSellMode')?.value || 'sell';
+    setHtml('craftResult', 'Buscando precos do craft na Albion Data...');
+
+    try {
+      const { selected, materialRows, rows, meta } = await fetchCraftMarketData();
+      updateServerHelper(meta);
+      const outputRows = rows.filter((row) => row.item_id === selected.itemId && Number(row.quality || 1) === Number(selected.quality || 1));
+      const outputPrice = pickCityPrice(outputRows, sellCity, sellMode);
+      if (!outputPrice) throw new Error(`Nao achei preco valido para vender ${selected.itemName} em ${sellCity} na qualidade ${qualityLabel(selected.quality)}.`);
+
+      const materialPlan = materialRows.map((mat) => {
+        const itemRows = rows.filter((row) => row.item_id === mat.itemId);
+        const market = pickCityPrice(itemRows, materialCity, 'sell');
+        return { ...mat, market, totalQty: mat.qty * quantity, totalCost: (market?.price || 0) * mat.qty * quantity };
+      });
+      const missing = materialPlan.filter((mat) => !mat.market);
+      if (missing.length) throw new Error(`Faltou preco de material em ${materialCity}: ${missing.map((mat) => mat.itemId).join(', ')}`);
+
+      const totalMaterialCost = materialPlan.reduce((sum, mat) => sum + mat.totalCost, 0);
+      const unitMaterialCost = totalMaterialCost / quantity;
+      const grossSellUnit = outputPrice.price;
+      const feeUnit = grossSellUnit * (DEFAULT_FEE / 100);
+      const netSellUnit = grossSellUnit - feeUnit;
+      const profitUnit = netSellUnit - unitMaterialCost;
+      const totalProfit = profitUnit * quantity;
+      const margin = unitMaterialCost > 0 ? (profitUnit / unitMaterialCost) * 100 : 0;
+      const masteryText = level >= 100 ? 'muito alta' : level >= 80 ? 'alta' : level >= 50 ? 'media' : 'baixa';
+      const lines = materialPlan.map((mat) => `
+        <tr>
+          <td>${mat.itemId}</td>
+          <td>${mat.qty}</td>
+          <td>${formatSilver(mat.totalQty)}</td>
+          <td>${formatSilver(mat.market.price)}</td>
+          <td>${formatSilver(mat.totalCost)}</td>
+          <td>${formatBrazilTime(mat.market.date)}</td>
+        </tr>
+      `).join('');
+      setHtml('craftResult', `
+        <strong>Plano de craft - ${selected.itemName}</strong><br>
+        Cidade de craft: <strong>${craftCity}</strong> · compra de materiais: <strong>${materialCity}</strong> · venda: <strong>${sellCity}</strong><br>
+        Qualidade analisada: <strong>${qualityLabel(selected.quality)}</strong> · modo de venda: <strong>${outputPrice.mode}</strong><br>
+        Preco de venda por unidade: <strong>${formatSilver(grossSellUnit)}</strong> · taxa por unidade: <strong>${formatSilver(feeUnit)}</strong> · liquido por unidade: <strong>${formatSilver(netSellUnit)}</strong><br>
+        Custo de materiais por unidade: <strong>${formatSilver(unitMaterialCost)}</strong><br>
+        Lucro por unidade: <strong>${formatSilver(profitUnit)}</strong> · lucro do lote: <strong>${formatSilver(totalProfit)}</strong> · margem: <strong>${margin.toFixed(1)}%</strong><br>
+        Atualizacao da venda: <strong>${formatBrazilTime(outputPrice.date)}</strong><br><br>
+        <strong>Shopping list do lote</strong>
+        <div style="overflow:auto; margin-top:8px;">
+          <table class="market-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Qtd/craft</th>
+                <th>Qtd total</th>
+                <th>Preco unit.</th>
+                <th>Custo total</th>
+                <th>Atualizacao</th>
+              </tr>
+            </thead>
+            <tbody>${lines}</tbody>
+          </table>
+        </div>
+        <br><strong>Leitura do crafter</strong><br>
+        • Bonus locais da cidade de craft: <strong>${getCraftCityHint(craftCity)}</strong><br>
+        • Seu nivel de craft esta em faixa <strong>${masteryText}</strong> e ${focus ? '<strong>usa foco</strong>' : '<strong>nao usa foco</strong>'}.<br>
+        • Neste patch o calculo esta <strong>conservador</strong>: ele usa preco real do item final e dos materiais na Albion Data, mas <strong>ainda nao desconta automaticamente retorno de recursos/foco</strong> para nao inventar valor.<br>
+        • Para um uso profissional, preencha a receita real do item e compare o lote entre <strong>${materialCity}</strong> e <strong>${sellCity}</strong>.
+      `);
+    } catch (error) {
+      setHtml('craftResult', `<strong>Craft com erro</strong><br>${error.message}`);
+    }
   }
 
   function populateCraftSelectors() {
@@ -918,9 +1068,13 @@
     familyEl.addEventListener('change', updateGroups);
     groupEl.addEventListener('change', updateItems);
     updateGroups();
+    const suggestions = document.getElementById('craftMaterialSuggestions');
+    if (suggestions) suggestions.innerHTML = buildCraftMaterialSuggestionIds().map((id) => `<option value="${id}"></option>`).join('');
+    renderCraftMaterialRows();
   }
 
   function calcRefine() {
+
     const level = Number(document.getElementById('refineLevel').value || 0);
     const city = document.getElementById('refineCity').value;
     const focus = document.getElementById('refineFocus').value === 'sim';
@@ -982,7 +1136,7 @@
     setHtml('wealthResult', `<strong>Plano para sair de ${formatSilver(close)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(daily)} prata por dia</strong>.<br>Se você morreu hoje: <strong>${died ? 'sim, o plano ficou mais agressivo para recuperar.' : 'não, seguimos com crescimento normal.'}</strong><br><br>${entries.join('')}<br><div class="helper-box"><strong>Como usar esse plano</strong><span>Faça a operação do dia, volte amanhã e preencha o saldo real de fechamento. Se morreu ou perdeu dinheiro, marque isso no formulário para o próximo plano reagir.</span></div>`);
   }
 
-  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection };
+  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection, addCraftMaterialRow, removeCraftMaterialRow };
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('loginForm');
