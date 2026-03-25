@@ -535,22 +535,64 @@
     return opportunities;
   }
 
+  function parseItemCode(itemId) {
+    const match = String(itemId || '').match(/^T(\d+)_([A-Z0-9_]+?)(?:@(\d))?$/);
+    if (!match) return null;
+    return { tier: Number(match[1]), token: match[2], enchant: Number(match[3] || 0) };
+  }
+
+  function tokenToPtBrLabel(token) {
+    const labels = {
+      BAG: 'Bolsa',
+      CAPE: 'Capa',
+      CAPEITEM_FW_CAERLEON: 'Capa de Caerleon',
+      CAPEITEM_FW_BRIDGEWATCH: 'Capa de Bridgewatch',
+      CAPEITEM_FW_FORTSTERLING: 'Capa de Fort Sterling',
+      CAPEITEM_FW_LYMHURST: 'Capa de Lymhurst',
+      CAPEITEM_FW_MARTLOCK: 'Capa de Martlock',
+      CAPEITEM_FW_THETFORD: 'Capa de Thetford',
+      WOOD: 'Madeira bruta',
+      FIBER: 'Fibra bruta',
+      ORE: 'Minério bruto',
+      HIDE: 'Couro bruto',
+      ROCK: 'Pedra bruta',
+      PLANKS: 'Tábuas',
+      CLOTH: 'Tecido',
+      METALBAR: 'Barra de metal',
+      LEATHER: 'Couro refinado',
+      STONEBLOCK: 'Bloco de pedra',
+      MEAL_OMELETTE: 'Omelete',
+      MEAL_STEW: 'Ensopado',
+      MEAL_SOUP: 'Sopa',
+      POTION_POISON: 'Poção venenosa',
+      POTION_HEAL: 'Poção de cura',
+      POTION_REVIVE: 'Poção de resistência'
+    };
+    if (labels[token]) return labels[token];
+    return token
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\w/g, (m) => m.toUpperCase());
+  }
+
   function prettyItemName(itemId) {
-    const clean = itemId.replace(/@(\d)/, '');
-    for (const [family, groups] of Object.entries(ITEM_CATALOG)) {
-      for (const [group, items] of Object.entries(groups)) {
+    const parsed = parseItemCode(itemId);
+    const clean = String(itemId || '').replace(/@(\d)/, '');
+    for (const [, groups] of Object.entries(ITEM_CATALOG)) {
+      for (const [, items] of Object.entries(groups)) {
         for (const item of items) {
           for (let tier = 4; tier <= 8; tier++) {
-            if (buildItemId(item.template, tier, 0) === clean) return `${item.label} T${tier}`;
+            if (buildItemId(item.template, tier, 0) === clean) return `${item.label} T${tier}${parsed?.enchant ? `.${parsed.enchant}` : ''}`;
           }
         }
       }
     }
+    if (parsed) return `${tokenToPtBrLabel(parsed.token)} T${parsed.tier}${parsed.enchant ? `.${parsed.enchant}` : ''}`;
     return clean
       .replace(/^T(\d+)_/, 'T$1 ')
       .replace(/_/g, ' ')
       .toLowerCase()
-      .replace(/\b\w/g, (m) => m.toUpperCase());
+      .replace(/\w/g, (m) => m.toUpperCase());
   }
 
   function buildItemId(template, tier, enchant) {
@@ -957,7 +999,7 @@
   function sortByProfitDesc(list) { return list.sort((a, b) => b.profit - a.profit); }
 
   function getMaterialSelectOptions() {
-    return buildCraftMaterialSuggestionIds().map((id) => ({ id, label: `${prettyItemName(id)} [${id}]` }));
+    return buildCraftMaterialSuggestionIds().map((id) => ({ id, label: prettyItemName(id) }));
   }
 
   function guessBestCraftCities(family, group) {
