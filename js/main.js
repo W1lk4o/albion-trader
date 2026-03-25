@@ -24,6 +24,14 @@
   const opportunityState = { list: [], sortKey: 'totalSafeProfit', sortDir: 'desc', lastMode: 'popular' };
   const CRAFT_MATERIAL_ROW_TEMPLATE = () => ({ itemId: '', qty: 1 });
   const craftState = { rows: [CRAFT_MATERIAL_ROW_TEMPLATE(), CRAFT_MATERIAL_ROW_TEMPLATE()] };
+  const CRAFT_FAMILY_CITY_HINTS = {
+    'Armas': ['Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford', 'Caerleon'],
+    'Armadura de placa': ['Bridgewatch', 'Fort Sterling'],
+    'Armadura de couro': ['Lymhurst', 'Thetford'],
+    'Armadura de pano': ['Bridgewatch', 'Martlock', 'Fort Sterling', 'Thetford'],
+    'Bolsas e capas': ['Brecilien', 'Caerleon'],
+    'Consumíveis': ['Caerleon', 'Brecilien']
+  };
 
   const ITEM_CATALOG = {
     'Bolsas e capas': {
@@ -253,6 +261,11 @@
 
   function bindNav() {
     document.querySelectorAll('[data-target]').forEach((item) => item.addEventListener('click', () => activateSection(item.dataset.target)));
+    document.querySelectorAll('[data-admin-target]').forEach((item) => item.addEventListener('click', () => {
+      const target = item.dataset.adminTarget;
+      document.querySelectorAll('.nav-item[data-admin-target]').forEach((nav) => nav.classList.toggle('active', nav.dataset.adminTarget === target));
+      document.querySelectorAll('.page-section').forEach((section) => section.classList.toggle('active', section.id === target));
+    }));
   }
 
   function formatSilver(value) {
@@ -566,7 +579,7 @@
   }
 
   function currentServer() {
-    return document.getElementById('marketServer')?.value || 'west';
+    return document.getElementById('marketServer')?.value || localStorage.getItem('albionTraderPreferredServer') || 'west';
   }
 
   async function loadMarket() {
@@ -816,11 +829,17 @@
     const licenseDate = document.getElementById('licenseDate');
     if (welcomeTitle) welcomeTitle.textContent = `Olá, ${user.nome || user.email}`;
     if (licenseDate) licenseDate.textContent = new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR');
+    document.querySelectorAll('.admin-access-btn').forEach((adminBtn) => {
+      if (user.admin) adminBtn.style.display = 'inline-flex';
+    });
 
     bindLogout();
     bindNav();
     populateItemSelectors();
     populateCraftSelectors();
+    const marketServer = document.getElementById('marketServer');
+    const preferredServer = localStorage.getItem('albionTraderPreferredServer');
+    if (marketServer && preferredServer) marketServer.value = preferredServer;
     updateServerHelper();
 
     const loadBtn = document.getElementById('loadMarketBtn');
@@ -829,6 +848,8 @@
     if (popularBtn) popularBtn.addEventListener('click', () => loadOpportunityRadar('popular'));
     const allBtn = document.getElementById('scanAllBtn');
     if (allBtn) allBtn.addEventListener('click', () => loadOpportunityRadar('all'));
+    const autoCraftBtn = document.getElementById('craftAutoBtn');
+    if (autoCraftBtn) autoCraftBtn.addEventListener('click', autoSuggestCraft);
 
     loadOpportunityRadar('popular');
   }
@@ -839,26 +860,93 @@
     const title = document.getElementById('adminTitle');
     if (title) title.textContent = `Painel admin — ${user.nome || user.email}`;
     bindLogout();
-    try {
-      const data = await api('/api/users');
-      const tbody = document.getElementById('adminUsersTable');
-      const count = document.getElementById('adminUserCount');
-      const notice = document.getElementById('adminNotice');
-      if (notice) notice.textContent = data.notice || '';
-      if (count) count.textContent = data.users.length;
-      if (tbody) {
-        tbody.innerHTML = data.users.map((u) => `
-          <tr>
-            <td>${u.nome || '-'}</td>
-            <td>${u.email}</td>
-            <td>${u.admin ? 'Admin' : 'Usuário'}</td>
-            <td>${u.licenca || '-'}</td>
-          </tr>`).join('');
+    bindNav();
+
+    async function refreshAdminUsers(message = '') {
+      try {
+        const data = await api('/api/users');
+        const tbody = document.getElementById('adminUsersTable');
+        const count = document.getElementById('adminUserCount');
+        const pendingCount = document.getElementById('adminPendingCount');
+        const notice = document.getElementById('adminNotice');
+        const licensesBody = document.getElementById('adminLicensesTable');
+        if (notice) notice.textContent = message || data.notice || '';
+        if (count) count.textContent = data.users.length;
+        const pendingUsers = (data.users || []).filter((u) => u.firstAccessPending);
+        if (pendingCount) pendingCount.textContent = pendingUsers.length;
+        if (tbody) {
+          tbody.innerHTML = data.users.map((u) => `
+            <tr>
+              <td>${u.nome || '-'}</td>
+              <td>${u.email}</td>
+              <td>${u.telefone || '-'}</td>
+              <td>${u.admin ? 'Admin' : 'Usuário'}</td>
+              <td>${u.licencaDias || '-'} dias</td>
+              <td>${u.firstAccessPending ? 'Primeiro acesso pendente' : 'Ativo'}</td>
+            </tr>`).join('');
+        }
+        if (licensesBody) {
+          licensesBody.innerHTML = data.users.map((u) => {
+            const expire = u.licencaExpiraEm ? new Date(u.licencaExpiraEm) : null;
+            const remaining = expire ? Math.max(0, Math.ceil((expire.getTime() - Date.now()) / 86400000)) : 0;
+            return `
+              <tr>
+                <td>${u.nome || '-'}</td>
+                <td>${u.email}</td>
+                <td>${expire ? expire.toLocaleDateString('pt-BR') : '-'}</td>
+                <td>${remaining}</td>
+                <td>${u.firstAccessPending ? 'Pendente' : 'Ativa'}</td>
+              </tr>`;
+          }).join('');
+        }
+      } catch (error) {
+        const notice = document.getElementById('adminNotice');
+        if (notice) notice.textContent = error.message;
       }
-    } catch (error) {
-      const notice = document.getElementById('adminNotice');
-      if (notice) notice.textContent = error.message;
     }
+
+    const createForm = document.getElementById('adminCreateUserForm');
+    if (createForm) {
+      createForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const messageEl = document.getElementById('adminCreateMessage');
+        if (messageEl) messageEl.textContent = 'Cadastrando usuário...';
+        try {
+          const payload = {
+            nome: document.getElementById('newUserName')?.value?.trim(),
+            email: document.getElementById('newUserEmail')?.value?.trim(),
+            telefone: document.getElementById('newUserPhone')?.value?.trim(),
+            licencaDias: Number(document.getElementById('newUserLicense')?.value || 30),
+            admin: document.getElementById('newUserRole')?.value === 'admin'
+          };
+          const data = await api('/api/users', { method: 'POST', body: JSON.stringify(payload) });
+          if (messageEl) messageEl.textContent = data.message || 'Usuário cadastrado.';
+          createForm.reset();
+          const licenseEl = document.getElementById('newUserLicense');
+          const roleEl = document.getElementById('newUserRole');
+          if (licenseEl) licenseEl.value = '30';
+          if (roleEl) roleEl.value = 'user';
+          await refreshAdminUsers('Lista atualizada após novo cadastro.');
+        } catch (error) {
+          if (messageEl) messageEl.textContent = error.message;
+        }
+      });
+    }
+
+    const settingsForm = document.getElementById('adminSettingsForm');
+    if (settingsForm) {
+      settingsForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const msg = document.getElementById('adminSettingsMessage');
+        const server = document.getElementById('settingServer')?.value || 'west';
+        const fee = Number(document.getElementById('settingMarketFee')?.value || DEFAULT_FEE);
+        localStorage.setItem('albionTraderPreferredServer', server);
+        localStorage.setItem('albionTraderPreferredFee', String(fee));
+        if (msg) msg.textContent = 'Configurações salvas nesta base local do navegador.';
+      });
+    }
+
+    await refreshAdminUsers();
   }
 
   function setHtml(id, html) {
@@ -867,6 +955,72 @@
   }
 
   function sortByProfitDesc(list) { return list.sort((a, b) => b.profit - a.profit); }
+
+  function getMaterialSelectOptions() {
+    return buildCraftMaterialSuggestionIds().map((id) => ({ id, label: `${prettyItemName(id)} [${id}]` }));
+  }
+
+  function guessBestCraftCities(family, group) {
+    const preferred = new Set(CRAFT_FAMILY_CITY_HINTS[family] || []);
+    const normalizedGroup = String(group || '').toLowerCase();
+    Object.entries(CITY_PRODUCTION_BONUSES).forEach(([city, bonuses]) => {
+      if (bonuses.some((bonus) => normalizedGroup.includes(String(bonus).toLowerCase()) || String(bonus).toLowerCase().includes(normalizedGroup))) {
+        preferred.add(city);
+      }
+    });
+    return Array.from(preferred);
+  }
+
+  function updateCraftRecommendationBox() {
+    const box = document.getElementById('craftRecommendationBox');
+    if (!box) return;
+    const selected = getCraftSelectedItem();
+    if (!selected.itemId) {
+      box.innerHTML = 'Escolha um item no craft para o sistema sugerir a cidade com bonus e o fluxo ideal.';
+      return;
+    }
+    const cities = guessBestCraftCities(selected.family, selected.group);
+    const cityHtml = cities.length ? cities.map((city) => `<strong>${city}</strong>`).join(', ') : 'sem cidade mapeada';
+    box.innerHTML = `<strong>Leitura rapida do craft</strong><br>Item analisado: <strong>${selected.itemName}</strong><br>Cidades com melhor encaixe de bonus nesta fase: ${cityHtml}.<br>Use o modo automatico para o sistema testar venda e compra de materiais nas cidades escolhidas.`;
+  }
+
+  async function autoSuggestCraft() {
+    const selected = getCraftSelectedItem();
+    const level = Number(document.getElementById('craftLevel')?.value || 0);
+    const quantity = Math.max(1, Number(document.getElementById('craftQuantity')?.value || 1));
+    const sellCity = document.getElementById('craftSellCity')?.value || 'Caerleon';
+    const materialCity = document.getElementById('craftMaterialCity')?.value || sellCity;
+    const box = document.getElementById('craftAutoResult');
+    if (!box) return;
+    if (!selected.itemId) {
+      box.innerHTML = 'Selecione um item no planejador de craft antes de usar o modo automatico.';
+      return;
+    }
+    box.innerHTML = 'Analisando melhor cidade de craft e melhor venda para o item selecionado...';
+    try {
+      const candidateCities = guessBestCraftCities(selected.family, selected.group);
+      const locations = Array.from(new Set([...candidateCities, materialCity, sellCity, ...SAFE_LOCATIONS, 'Caerleon']));
+      const sellMode = document.getElementById('craftSellMode')?.value || 'sell';
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(selected.itemId)}&locations=${encodeURIComponent(locations.join(','))}&qualities=${encodeURIComponent(String(selected.quality || 1))}&server=${currentServer()}`);
+      const rows = sanitizeRows(data.data || []);
+      if (!rows.length) throw new Error('Nao veio preco confiavel do item final.');
+      const bestSellRow = sellMode === 'buy'
+        ? rows.filter((row) => normalizePrice(row.buy_price_max) > 0).sort((a,b) => normalizePrice(b.buy_price_max) - normalizePrice(a.buy_price_max))[0]
+        : rows.filter((row) => normalizePrice(row.sell_price_min) > 0).sort((a,b) => normalizePrice(b.sell_price_min) - normalizePrice(a.sell_price_min))[0];
+      if (!bestSellRow) throw new Error('Nao encontrei venda confiavel para o item final.');
+      const suggestedCraftCity = candidateCities[0] || document.getElementById('craftCity')?.value || sellCity;
+      const masteryText = level >= 100 ? 'muito alta' : level >= 70 ? 'alta' : level >= 40 ? 'media' : 'inicial';
+      box.innerHTML = `<strong>Modo automatico - leitura do dia</strong><br>Item: <strong>${selected.itemName}</strong><br>Cidade mais forte para craftar nesta fase: <strong>${suggestedCraftCity}</strong><br>Melhor cidade de venda detectada agora: <strong>${bestSellRow.city}</strong><br>Preco de saida usado: <strong>${formatSilver(sellMode === 'buy' ? bestSellRow.buy_price_max : bestSellRow.sell_price_min)}</strong> · qualidade <strong>${qualityLabel(selected.quality)}</strong><br>Compra de materiais mantida em: <strong>${materialCity}</strong><br>Seu nivel de craft foi lido como faixa <strong>${masteryText}</strong>.<br><br><strong>Importante:</strong> nesta fase o modo automatico ja sugere a <strong>cidade de craft</strong> e a <strong>cidade de venda</strong>, mas o lucro final continua dependendo da receita preenchida no planejador manual. Eu preferi fazer assim para nao inventar material nem lucro falso.`;
+      const craftCityEl = document.getElementById('craftCity');
+      if (craftCityEl) craftCityEl.value = suggestedCraftCity;
+      const craftSellCityEl = document.getElementById('craftSellCity');
+      if (craftSellCityEl) craftSellCityEl.value = bestSellRow.city;
+      const quantityEl = document.getElementById('craftQuantity');
+      if (quantityEl) quantityEl.value = quantity;
+    } catch (error) {
+      box.innerHTML = `<strong>Modo automatico com erro</strong><br>${error.message}`;
+    }
+  }
 
   function getCraftSelectedItem() {
     const family = document.getElementById('craftFamily')?.value;
@@ -897,17 +1051,23 @@
   function renderCraftMaterialRows() {
     const box = document.getElementById('craftMaterialsBox');
     if (!box) return;
-    box.innerHTML = craftState.rows.map((row, index) => `
+    const options = getMaterialSelectOptions();
+    box.innerHTML = craftState.rows.map((row, index) => {
+      const selectOptions = ['<option value="">Selecione um material</option>']
+        .concat(options.map((option) => `<option value="${option.id}" ${option.id === row.itemId ? 'selected' : ''}>${option.label}</option>`))
+        .join('');
+      return `
       <div class="inline-form" style="margin-bottom:8px; align-items:end;">
-        <label style="flex:2;"><span>Material ${index + 1}</span><input data-craft-material-id="${index}" list="craftMaterialSuggestions" type="text" placeholder="Ex: T6_CLOTH" value="${row.itemId || ''}" /></label>
+        <label style="flex:2;"><span>Material ${index + 1}</span><select data-craft-material-id="${index}">${selectOptions}</select></label>
         <label style="width:160px;"><span>Qtd por craft</span><input data-craft-material-qty="${index}" type="number" min="0.01" step="0.01" value="${Number(row.qty || 0)}" /></label>
         <button class="btn btn-outline" onclick="AlbionTrader.removeCraftMaterialRow(${index})">Remover</button>
       </div>
-    `).join('');
-    box.querySelectorAll('[data-craft-material-id]').forEach((el) => el.addEventListener('input', (event) => {
+    `;
+    }).join('');
+    box.querySelectorAll('[data-craft-material-id]').forEach((el) => el.addEventListener('change', (event) => {
       const idx = Number(event.target.dataset.craftMaterialId);
       if (!craftState.rows[idx]) return;
-      craftState.rows[idx].itemId = event.target.value.trim().toUpperCase();
+      craftState.rows[idx].itemId = event.target.value;
     }));
     box.querySelectorAll('[data-craft-material-qty]').forEach((el) => el.addEventListener('input', (event) => {
       const idx = Number(event.target.dataset.craftMaterialQty);
@@ -1065,12 +1225,16 @@
       const items = ITEM_CATALOG[family]?.[group] || [];
       itemEl.innerHTML = items.map((it, idx) => `<option value="${idx}">${it.label}</option>`).join('');
     }
-    familyEl.addEventListener('change', updateGroups);
-    groupEl.addEventListener('change', updateItems);
+    familyEl.addEventListener('change', () => { updateGroups(); updateCraftRecommendationBox(); });
+    groupEl.addEventListener('change', () => { updateItems(); updateCraftRecommendationBox(); });
+    itemEl.addEventListener('change', updateCraftRecommendationBox);
+    const tierEl = document.getElementById('craftTier');
+    const enchantEl = document.getElementById('craftEnchant');
+    if (tierEl) tierEl.addEventListener('change', updateCraftRecommendationBox);
+    if (enchantEl) enchantEl.addEventListener('change', updateCraftRecommendationBox);
     updateGroups();
-    const suggestions = document.getElementById('craftMaterialSuggestions');
-    if (suggestions) suggestions.innerHTML = buildCraftMaterialSuggestionIds().map((id) => `<option value="${id}"></option>`).join('');
     renderCraftMaterialRows();
+    updateCraftRecommendationBox();
   }
 
   function calcRefine() {
@@ -1136,7 +1300,7 @@
     setHtml('wealthResult', `<strong>Plano para sair de ${formatSilver(close)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(daily)} prata por dia</strong>.<br>Se você morreu hoje: <strong>${died ? 'sim, o plano ficou mais agressivo para recuperar.' : 'não, seguimos com crescimento normal.'}</strong><br><br>${entries.join('')}<br><div class="helper-box"><strong>Como usar esse plano</strong><span>Faça a operação do dia, volte amanhã e preencha o saldo real de fechamento. Se morreu ou perdeu dinheiro, marque isso no formulário para o próximo plano reagir.</span></div>`);
   }
 
-  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection, addCraftMaterialRow, removeCraftMaterialRow };
+  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection, addCraftMaterialRow, removeCraftMaterialRow, autoSuggestCraft };
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('loginForm');

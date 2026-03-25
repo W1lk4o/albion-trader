@@ -22,6 +22,7 @@
         <button class="nav-item" data-target="mercado">Mercado</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
       </nav>
+      <a id="adminAccessSidebarBtn" href="/admin.html" class="btn btn-outline btn-full admin-access-btn" style="display:none;">Modo admin</a>
       <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
@@ -31,7 +32,7 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-pill" id="apiStatusBadge">Mercado aguardando consulta</div>
+        <div class="button-row wrap-right"><a id="adminAccessTopBtn" href="/admin.html" class="btn btn-outline admin-access-btn" style="display:none;">Modo admin</a><div class="status-pill" id="apiStatusBadge">Mercado aguardando consulta</div></div>
       </header>
 
       <section id="overview" class="page-section active">
@@ -80,7 +81,7 @@
               <label><span>Rota aceita</span>
                 <select id="marketRoute">
                   <option value="safe">Somente zona azul/amarela</option>
-                  <option value="risk">Aceita RED + Black Market</option>
+                  <option value="black">Aceita RED + Black Market</option>
                 </select>
               </label>
             </div>
@@ -166,7 +167,7 @@
       <section id="craft" class="page-section">
         <div class="card module-card">
           <h2>Planejador de Craft</h2>
-          <p class="muted">Agora o craft já puxa o preço do item final e dos materiais direto da Albion Data. Você escolhe o item, define onde compra material, onde crafta e onde vende. Depois monta a lista de materiais e o sistema calcula o lote, o custo total e o lucro.</p>
+          <p class="muted">Agora o craft ficou em dois modos: <strong>manual</strong>, para você preencher toda a operação, e <strong>automático</strong>, para o sistema sugerir a melhor cidade de craft e de venda do item escolhido sem inventar receita falsa.</p>
           <div class="form-grid">
             <label><span>Família</span><select id="craftFamily"></select></label>
             <label><span>Grupo</span><select id="craftGroup"></select></label>
@@ -225,17 +226,30 @@
             <label><span>Quantidade</span><input id="craftQuantity" type="number" min="1" value="10" /></label>
           </div>
 
-          <div class="helper-box">
-            <strong>Lista de materiais do craft</strong>
-            <span>Preencha o item ID do material e a quantidade por craft. Exemplo: T6_CLOTH, T6_LEATHER, T6_METALBAR, T6_PLANKS.</span>
+          <div id="craftRecommendationBox" class="helper-box">
+            <strong>Leitura rápida do craft</strong>
+            <span>Escolha um item para o sistema sugerir as cidades com melhor encaixe de bônus nesta fase.</span>
           </div>
-          <datalist id="craftMaterialSuggestions"></datalist>
+
+          <div class="helper-box">
+            <strong>Modo manual do crafter</strong>
+            <span>Agora os materiais aparecem em nome legível. Você não precisa decorar código. O sistema usa o valor interno certo por trás, mas mostra o nome do item na tela.</span>
+          </div>
           <div id="craftMaterialsBox"></div>
           <div class="inline-form">
             <button class="btn btn-outline" onclick="AlbionTrader.addCraftMaterialRow()">Adicionar material</button>
             <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Buscar preços do craft</button>
           </div>
           <div id="craftResult" class="result-box"></div>
+
+          <div class="helper-box" style="margin-top:18px;">
+            <strong>Modo automático do sistema</strong>
+            <span>Ele já olha o item escolhido, seu nível de craft e sugere a cidade de craft com melhor encaixe de bônus e a cidade de venda mais forte do momento. Nesta fase eu não forcei lucro automático sem receita real para não mentir material nem margem.</span>
+          </div>
+          <div class="inline-form">
+            <button id="craftAutoBtn" class="btn btn-outline">Rodar modo automático</button>
+          </div>
+          <div id="craftAutoResult" class="result-box">Nenhuma leitura automática feita ainda.</div>
         </div>
       </section>
 
