@@ -23,7 +23,7 @@
         <button class="nav-item" data-target="riqueza">Planejador</button>
       </nav>
       <a id="adminAccessSidebarBtn" href="/admin.html" class="btn btn-outline btn-full admin-access-btn" style="display:none;">Modo admin</a>
-      <button id="logoutBtn" class="btn btn-outline btn-full">Trocar conta depois</button>
+      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
     </aside>
 
     <main class="content">
@@ -165,11 +165,6 @@
           </div>
           <div class="inline-form">
             <input id="marketItemId" type="text" placeholder="Opcional: digite um item ID direto, ex: T4_BAG ou T6_2H_SPEAR@3" />
-            <select id="itemSellMode" style="max-width:260px;">
-              <option value="best">Melhor dos dois</option>
-              <option value="sell">Revenda direta</option>
-              <option value="buy">Pedido de compra atual</option>
-            </select>
             <button id="loadMarketBtn" class="btn btn-primary">Consultar item</button>
           </div>
           <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
@@ -179,7 +174,7 @@
       <section id="craft" class="page-section">
         <div class="card module-card">
           <h2>Planejador de Craft</h2>
-          <p class="muted">O craft voltou ao modo mais forte desta base: <strong>manual</strong> para montar a operação completa sem usar código cru, e <strong>automático</strong> para sugerir cidade de craft e venda do item escolhido sem quebrar o site.</p>
+          <p class="muted">Agora o craft ficou em dois modos: <strong>manual</strong>, para você preencher toda a operação, e <strong>automático</strong>, para o sistema sugerir a melhor cidade de craft e de venda do item escolhido sem inventar receita falsa.</p>
           <div class="form-grid">
             <label><span>Família</span><select id="craftFamily"></select></label>
             <label><span>Grupo</span><select id="craftGroup"></select></label>
@@ -346,6 +341,6 @@
     </main>
   </div>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js?v=11"></script>
 </body>
 </html>
