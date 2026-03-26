@@ -22,7 +22,8 @@
         <button class="nav-item" data-target="mercado">Mercado</button>
         <button class="nav-item" data-target="riqueza">Planejador</button>
       </nav>
-      <button id="logoutBtn" class="btn btn-outline btn-full">Sair</button>
+      <a id="adminAccessSidebarBtn" href="/admin.html" class="btn btn-outline btn-full admin-access-btn" style="display:none;">Modo admin</a>
+      <button id="logoutBtn" class="btn btn-outline btn-full">Trocar conta depois</button>
     </aside>
 
     <main class="content">
@@ -31,7 +32,7 @@
           <p class="muted">Bem-vindo</p>
           <h1 id="welcomeTitle">Carregando...</h1>
         </div>
-        <div class="status-pill" id="apiStatusBadge">Mercado aguardando consulta</div>
+        <div class="button-row wrap-right"><a id="adminAccessTopBtn" href="/admin.html" class="btn btn-outline admin-access-btn" style="display:none;">Modo admin</a><div class="status-pill" id="apiStatusBadge">Mercado aguardando consulta</div></div>
       </header>
 
       <section id="overview" class="page-section active">
@@ -58,7 +59,7 @@
             <div class="section-header">
               <div>
                 <h3>Configuração de mercado</h3>
-                <p class="muted">O sistema usa qualidade normal e taxa padrão do mercado por trás dos cálculos. Você só escolhe servidor, capital e perfil.</p>
+                <p class="muted">O sistema consulta a Albion Data com servidor, rota e qualidade controlados. Neste patch o radar de oportunidades passou a mostrar também a qualidade do item e o host do servidor ativo.</p>
               </div>
             </div>
             <div class="form-grid compact-grid market-filters-grid">
@@ -83,11 +84,19 @@
                   <option value="black">Aceita RED + Black Market</option>
                 </select>
               </label>
+              <label><span>Modo de venda</span>
+                <select id="marketSellMode">
+                  <option value="best">Melhor dos dois</option>
+                  <option value="sell">Revenda direta</option>
+                  <option value="buy">Pedido de compra atual</option>
+                </select>
+              </label>
             </div>
             <div class="button-row">
               <button id="scanPopularBtn" class="btn btn-primary">Analisar 300 itens com mais saída</button>
               <button id="scanAllBtn" class="btn btn-outline">Pesquisar mercado completo</button>
             </div>
+            <p id="marketServerHelper" class="muted">Servidor ativo: Americas · host west.albion-online-data.com</p>
             <div class="progress-wrap">
               <div class="progress-bar"><div id="marketProgressBar"></div></div>
               <p id="marketProgressText" class="muted">Nenhuma varredura iniciada.</p>
@@ -156,6 +165,11 @@
           </div>
           <div class="inline-form">
             <input id="marketItemId" type="text" placeholder="Opcional: digite um item ID direto, ex: T4_BAG ou T6_2H_SPEAR@3" />
+            <select id="itemSellMode" style="max-width:260px;">
+              <option value="best">Melhor dos dois</option>
+              <option value="sell">Revenda direta</option>
+              <option value="buy">Pedido de compra atual</option>
+            </select>
             <button id="loadMarketBtn" class="btn btn-primary">Consultar item</button>
           </div>
           <div id="marketResult" class="result-box muted">Nenhuma consulta feita ainda.</div>
@@ -164,21 +178,90 @@
 
       <section id="craft" class="page-section">
         <div class="card module-card">
-          <h2>Calculadora de Craft</h2>
-          <p class="muted">Modo estável restaurado. Nesta fase ele voltou ao formato manual para não quebrar o site enquanto o módulo automático profissional é reconstruído.</p>
+          <h2>Planejador de Craft</h2>
+          <p class="muted">O craft voltou ao modo mais forte desta base: <strong>manual</strong> para montar a operação completa sem usar código cru, e <strong>automático</strong> para sugerir cidade de craft e venda do item escolhido sem quebrar o site.</p>
           <div class="form-grid">
-            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="100" value="50" /></label>
-            <label><span>Cidade</span>
-              <select id="craftCity">
-                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
-                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option>
+            <label><span>Família</span><select id="craftFamily"></select></label>
+            <label><span>Grupo</span><select id="craftGroup"></select></label>
+            <label><span>Item</span><select id="craftItem"></select></label>
+            <label><span>Tier</span>
+              <select id="craftTier">
+                <option value="4">T4</option><option value="5">T5</option><option value="6">T6</option><option value="7">T7</option><option value="8">T8</option>
               </select>
             </label>
-            <label><span>Custo dos materiais</span><input id="craftCost" type="number" value="12000" /></label>
-            <label><span>Valor de venda</span><input id="craftSell" type="number" value="16500" /></label>
+            <label><span>Encantamento</span>
+              <select id="craftEnchant">
+                <option value="0">Sem encantamento</option>
+                <option value="1">.1</option>
+                <option value="2">.2</option>
+                <option value="3">.3</option>
+                <option value="4">.4</option>
+              </select>
+            </label>
+            <label><span>Qualidade de venda</span>
+              <select id="craftQuality">
+                <option value="1">Normal</option>
+                <option value="2">Bom</option>
+                <option value="3">Excelente</option>
+                <option value="4">Excepcional</option>
+                <option value="5">Obra-prima</option>
+              </select>
+            </label>
+            <label><span>Nível de craft</span><input id="craftLevel" type="number" min="1" max="120" value="50" /></label>
+            <label><span>Cidade de craft</span>
+              <select id="craftCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Brecilien</option>
+              </select>
+            </label>
+            <label><span>Cidade para comprar materiais</span>
+              <select id="craftMaterialCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Brecilien</option>
+              </select>
+            </label>
+            <label><span>Cidade para vender</span>
+              <select id="craftSellCity">
+                <option>Caerleon</option><option>Bridgewatch</option><option>Martlock</option>
+                <option>Lymhurst</option><option>Fort Sterling</option><option>Thetford</option><option>Brecilien</option>
+              </select>
+            </label>
+            <label><span>Modo de venda</span>
+              <select id="craftSellMode">
+                <option value="sell">Ordem de venda</option>
+                <option value="buy">Pedido de compra atual</option>
+              </select>
+            </label>
+            <label><span>Usa foco?</span>
+              <select id="craftFocus"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </label>
+            <label><span>Quantidade</span><input id="craftQuantity" type="number" min="1" value="10" /></label>
           </div>
-          <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Calcular craft</button>
+
+          <div id="craftRecommendationBox" class="helper-box">
+            <strong>Leitura rápida do craft</strong>
+            <span>Escolha um item para o sistema sugerir as cidades com melhor encaixe de bônus nesta fase.</span>
+          </div>
+
+          <div class="helper-box">
+            <strong>Modo manual do crafter</strong>
+            <span>Agora os materiais aparecem em nome legível. Você não precisa decorar código. O sistema usa o valor interno certo por trás, mas mostra o nome do item na tela.</span>
+          </div>
+          <div id="craftMaterialsBox"></div>
+          <div class="inline-form">
+            <button class="btn btn-outline" onclick="AlbionTrader.addCraftMaterialRow()">Adicionar material</button>
+            <button class="btn btn-primary" onclick="AlbionTrader.calcCraft()">Buscar preços do craft</button>
+          </div>
           <div id="craftResult" class="result-box"></div>
+
+          <div class="helper-box" style="margin-top:18px;">
+            <strong>Modo automático do sistema</strong>
+            <span>Ele já olha o item escolhido, seu nível de craft e sugere a cidade de craft com melhor encaixe de bônus e a cidade de venda mais forte do momento. Nesta fase eu não forcei lucro automático sem receita real para não mentir material nem margem.</span>
+          </div>
+          <div class="inline-form">
+            <button id="craftAutoBtn" class="btn btn-outline">Rodar modo automático</button>
+          </div>
+          <div id="craftAutoResult" class="result-box">Nenhuma leitura automática feita ainda.</div>
         </div>
       </section>
 

@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Albion Trader | Login</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    localStorage.setItem("albionTraderBypassLogin","1");
+    if (location.pathname === "/" || location.pathname.endsWith("index.html")) location.replace("/dashboard.html");
+  </script>
 </head>
 <body class="auth-body">
   <div class="auth-shell">

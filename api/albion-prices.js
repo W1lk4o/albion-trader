@@ -12,14 +12,10 @@ module.exports = async (req, res) => {
       server = 'west'
     } = req.query || {};
 
-    const rawItemIds = String(item || items)
+    const itemIds = Array.from(new Set(String(item || items)
       .split(',')
       .map((value) => value.trim())
-      .filter(Boolean);
-
-    const itemIdsList = [...new Set(rawItemIds)].slice(0, 1500);
-    const itemIds = itemIdsList.join(',');
-    const qualityIds = [...new Set(String(qualities).split(',').map((value) => value.trim()).filter(Boolean))].join(',') || '1';
+      .filter(Boolean))).join(',');
 
     if (!itemIds) {
       return res.status(400).json({ error: 'Informe ao menos um item.' });
@@ -32,7 +28,7 @@ module.exports = async (req, res) => {
     };
 
     const base = hostMap[server] || hostMap.west;
-    const endpoint = `${base}/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualityIds)}`;
+    const endpoint = `${base}/api/v2/stats/prices/${encodeURIComponent(itemIds)}.json?locations=${encodeURIComponent(locations)}&qualities=${encodeURIComponent(qualities)}`;
 
     const response = await fetch(endpoint, {
       headers: {
@@ -53,9 +49,7 @@ module.exports = async (req, res) => {
       meta: {
         source: 'albion-data',
         server,
-        itemCount: itemIdsList.length,
-        qualities: qualityIds,
-        host: base
+        itemCount: itemIds.split(',').length
       }
     });
   } catch (error) {
