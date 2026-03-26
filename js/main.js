@@ -10,28 +10,7 @@
     east: 'https://east.albion-online-data.com'
   };
   const DEFAULT_FEE = 6.5;
-  const QUALITY_LABELS = { 1: 'Normal', 2: 'Bom', 3: 'Excelente', 4: 'Excepcional', 5: 'Obra-prima' };
-  const SERVER_LABELS = { west: 'Americas', europe: 'Europe', east: 'Asia' };
-  const CITY_PRODUCTION_BONUSES = {
-    'Bridgewatch': ['Bestas', 'Adagas', 'Cajados amaldiçoados', 'Armaduras de placa', 'Sapatos de pano'],
-    'Martlock': ['Machados', 'Bastões', 'Cajados de gelo', 'Sapatos de placa', 'Off-hands'],
-    'Lymhurst': ['Espadas', 'Arcos', 'Cajados arcanos', 'Capuzes de couro', 'Sapatos de couro'],
-    'Fort Sterling': ['Martelos', 'Lanças', 'Cajados sagrados', 'Capacetes de placa', 'Armaduras de pano'],
-    'Thetford': ['Maças', 'Cajados da natureza', 'Cajados de fogo', 'Armaduras de couro', 'Capuzes de pano'],
-    'Caerleon': ['Ferramentas', 'Comidas', 'Luvas de guerra', 'Cajados metamorfos', 'Equipamentos de coleta'],
-    'Brecilien': ['Capas', 'Bolsas', 'Poções']
-  };
   const opportunityState = { list: [], sortKey: 'totalSafeProfit', sortDir: 'desc', lastMode: 'popular' };
-  const CRAFT_MATERIAL_ROW_TEMPLATE = () => ({ itemId: '', qty: 1 });
-  const craftState = { rows: [CRAFT_MATERIAL_ROW_TEMPLATE(), CRAFT_MATERIAL_ROW_TEMPLATE()] };
-  const CRAFT_FAMILY_CITY_HINTS = {
-    'Armas': ['Bridgewatch', 'Martlock', 'Lymhurst', 'Fort Sterling', 'Thetford', 'Caerleon'],
-    'Armadura de placa': ['Bridgewatch', 'Fort Sterling'],
-    'Armadura de couro': ['Lymhurst', 'Thetford'],
-    'Armadura de pano': ['Bridgewatch', 'Martlock', 'Fort Sterling', 'Thetford'],
-    'Bolsas e capas': ['Brecilien', 'Caerleon'],
-    'Consumíveis': ['Caerleon', 'Brecilien']
-  };
 
   const ITEM_CATALOG = {
     'Bolsas e capas': {
@@ -261,11 +240,6 @@
 
   function bindNav() {
     document.querySelectorAll('[data-target]').forEach((item) => item.addEventListener('click', () => activateSection(item.dataset.target)));
-    document.querySelectorAll('[data-admin-target]').forEach((item) => item.addEventListener('click', () => {
-      const target = item.dataset.adminTarget;
-      document.querySelectorAll('.nav-item[data-admin-target]').forEach((nav) => nav.classList.toggle('active', nav.dataset.adminTarget === target));
-      document.querySelectorAll('.page-section').forEach((section) => section.classList.toggle('active', section.id === target));
-    }));
   }
 
   function formatSilver(value) {
@@ -340,8 +314,8 @@
     return cleaned.filter((row) => {
       const sell = Number(row.sell_price_min || 0);
       const buy = Number(row.buy_price_max || 0);
-      const sellFresh = hoursSince(parseTime(row.sell_price_min_date)) <= 72;
-      const buyFresh = hoursSince(parseTime(row.buy_price_max_date)) <= 72;
+      const sellFresh = hoursSince(parseTime(row.sell_price_min_date)) <= 24;
+      const buyFresh = hoursSince(parseTime(row.buy_price_max_date)) <= 24;
 
       const sellOk = sell > 0 && sellFresh && (!sellMedian || (sell >= sellMedian * 0.2 && sell <= sellMedian * 4));
       const buyOk = buy > 0 && buyFresh && (!buyMedian || (buy >= buyMedian * 0.2 && buy <= buyMedian * 4));
@@ -373,51 +347,12 @@
     return document.getElementById('marketRoute')?.value || 'safe';
   }
 
-  function getRouteLabel(route) {
-    return route === 'safe' ? 'Somente zona azul/amarela' : 'Aceita RED + Black Market';
-  }
-
   function currentLocations() {
     const route = currentRouteMode();
     if (route === 'safe') return SAFE_LOCATIONS;
     return [...SAFE_LOCATIONS, 'Caerleon', BM_LOCATION];
   }
 
-  function qualityLabel(value) {
-    return QUALITY_LABELS[Number(value) || 1] || `Qualidade ${value}`;
-  }
-
-  function normalizePrice(value) {
-    const num = Number(value || 0);
-    return Number.isFinite(num) ? num : 0;
-  }
-
-  function updateServerHelper(meta) {
-    const el = document.getElementById('marketServerHelper');
-    if (!el) return;
-    const server = meta?.server || currentServer();
-    const host = meta?.host || SERVER_HOSTS[server] || SERVER_HOSTS.west;
-    el.textContent = `Servidor ativo: ${SERVER_LABELS[server] || server} · host ${host.replace('https://', '')}`;
-  }
-
-  function getCraftCityHint(city) {
-    const bonuses = CITY_PRODUCTION_BONUSES[city] || [];
-    return bonuses.length ? bonuses.join(', ') : 'sem bônus especial mapeado';
-  }
-
-  function getAllCatalogItems({ tiers = [4, 5, 6, 7, 8], enchants = [0] } = {}) {
-    const ids = [];
-    for (const groups of Object.values(ITEM_CATALOG)) {
-      for (const items of Object.values(groups)) {
-        for (const item of items) {
-          for (const tier of tiers) {
-            for (const enchant of enchants) ids.push(buildItemId(item.template, tier, enchant));
-          }
-        }
-      }
-    }
-    return Array.from(new Set(ids));
-  }
   function estimateDailyVolume(itemId, route) {
     const id = String(itemId || '').toUpperCase();
     let base = 200;
@@ -425,7 +360,8 @@
     else if (/(PLANKS|CLOTH|METALBAR|LEATHER|STONEBLOCK)$/.test(id)) base = 5000;
     else if (/(BAG|CAPE|MEAL|POTION)/.test(id)) base = 1800;
     else if (/(ARMOR|SHOES|HEAD|MAIN_|2H_)/.test(id)) base = 700;
-    if (route !== 'safe') base *= 0.6;
+    if (route === 'black') base *= 0.55;
+    else if (route === 'red') base *= 0.8;
     return Math.max(50, Math.round(base));
   }
 
@@ -449,26 +385,26 @@
 
   function buildSingleItemAnalysis(rows, feePct = DEFAULT_FEE) {
     const cleaned = sanitizeRows(rows);
-    const validSells = cleaned.filter(r => normalizePrice(r.sell_price_min) > 0);
-    const validBuys = cleaned.filter(r => normalizePrice(r.buy_price_max) > 0);
+    const validSells = cleaned.filter(r => Number(r.sell_price_min || 0) > 0);
+    const validBuys = cleaned.filter(r => Number(r.buy_price_max || 0) > 0);
 
     if (!validSells.length || !validBuys.length) {
       return { ok: false, reason: 'Os preços vieram muito velhos, inconsistentes ou sem spread útil.' };
     }
 
-    const cheapest = validSells.reduce((best, row) => normalizePrice(row.sell_price_min) < normalizePrice(best.sell_price_min) ? row : best, validSells[0]);
-    const highest = validBuys.reduce((best, row) => normalizePrice(row.buy_price_max) > normalizePrice(best.buy_price_max) ? row : best, validBuys[0]);
+    const cheapest = validSells.reduce((best, row) => Number(row.sell_price_min) < Number(best.sell_price_min) ? row : best, validSells[0]);
+    const highest = validBuys.reduce((best, row) => Number(row.buy_price_max) > Number(best.buy_price_max) ? row : best, validBuys[0]);
 
-    const buyPrice = normalizePrice(cheapest.sell_price_min);
-    const sellPrice = normalizePrice(highest.buy_price_max);
+    const buyPrice = Number(cheapest.sell_price_min || 0);
+    const sellPrice = Number(highest.buy_price_max || 0);
     const netSell = sellPrice * (1 - feePct / 100);
     const profit = netSell - buyPrice;
     const margin = buyPrice > 0 ? (profit / buyPrice) * 100 : 0;
+    const profitable = profit > 0 && cheapest.city !== highest.city;
 
     return {
       ok: true,
       cleaned,
-      quality: Number(cheapest.quality || highest.quality || 1),
       buyCity: cheapest.city,
       sellCity: highest.city,
       buyPrice,
@@ -476,9 +412,8 @@
       netSell,
       profit,
       margin,
-      buyUpdatedAt: cheapest.sell_price_min_date,
-      sellUpdatedAt: highest.buy_price_max_date,
-      confidence: confidenceLabel(margin, cleaned.length)
+      profitable,
+      confidence: confidenceLabel(Math.max(0, margin), cleaned.length)
     };
   }
 
@@ -486,23 +421,19 @@
     const byItem = new Map();
     prices.forEach((row) => {
       if (!row.item_id) return;
-      const quality = Number(row.quality || 1);
-      const key = `${row.item_id}__Q${quality}`;
-      if (!byItem.has(key)) byItem.set(key, []);
-      byItem.get(key).push(row);
+      if (!byItem.has(row.item_id)) byItem.set(row.item_id, []);
+      byItem.get(row.item_id).push(row);
     });
 
     const opportunities = [];
-    byItem.forEach((rows, key) => {
+    byItem.forEach((rows, itemId) => {
       const analysis = buildSingleItemAnalysis(rows, feePct);
       if (!analysis.ok) return;
       if (analysis.buyCity === analysis.sellCity) return;
       if (route === 'safe' && (analysis.buyCity === 'Caerleon' || analysis.sellCity === 'Caerleon' || analysis.sellCity === BM_LOCATION)) return;
-      if (analysis.profit <= 0 || analysis.margin < 4) return;
-      if (confidenceScore(analysis.confidence) < 2) return;
-      if (Math.max(hoursSince(parseTime(analysis.buyUpdatedAt)), hoursSince(parseTime(analysis.sellUpdatedAt))) > 24) return;
+      if (route === 'red' && analysis.sellCity === BM_LOCATION) return;
+      if (analysis.profit <= 0) return;
 
-      const itemId = String(rows[0]?.item_id || '').trim();
       const safeUnits = estimateSafeUnits({ itemId, buyPrice: analysis.buyPrice, capital, profile, route });
       if (safeUnits <= 0) return;
 
@@ -511,10 +442,8 @@
       if (totalSafeProfit < minimumProfit) return;
 
       opportunities.push({
-        key,
         itemId,
-        quality: analysis.quality,
-        itemName: `${prettyItemName(itemId)} · ${qualityLabel(analysis.quality)}`,
+        itemName: prettyItemName(itemId),
         buyCity: analysis.buyCity,
         sellCity: analysis.sellCity,
         buyPrice: analysis.buyPrice,
@@ -526,73 +455,29 @@
         confidenceScore: confidenceScore(analysis.confidence),
         safeUnits,
         totalSafeProfit,
-        estimatedDailyVolume: estimateDailyVolume(itemId, route),
-        buyUpdatedAt: analysis.buyUpdatedAt,
-        sellUpdatedAt: analysis.sellUpdatedAt
+        estimatedDailyVolume: estimateDailyVolume(itemId, route)
       });
     });
 
     return opportunities;
   }
 
-  function parseItemCode(itemId) {
-    const match = String(itemId || '').match(/^T(\d+)_([A-Z0-9_]+?)(?:@(\d))?$/);
-    if (!match) return null;
-    return { tier: Number(match[1]), token: match[2], enchant: Number(match[3] || 0) };
-  }
-
-  function tokenToPtBrLabel(token) {
-    const labels = {
-      BAG: 'Bolsa',
-      CAPE: 'Capa',
-      CAPEITEM_FW_CAERLEON: 'Capa de Caerleon',
-      CAPEITEM_FW_BRIDGEWATCH: 'Capa de Bridgewatch',
-      CAPEITEM_FW_FORTSTERLING: 'Capa de Fort Sterling',
-      CAPEITEM_FW_LYMHURST: 'Capa de Lymhurst',
-      CAPEITEM_FW_MARTLOCK: 'Capa de Martlock',
-      CAPEITEM_FW_THETFORD: 'Capa de Thetford',
-      WOOD: 'Madeira bruta',
-      FIBER: 'Fibra bruta',
-      ORE: 'Minério bruto',
-      HIDE: 'Couro bruto',
-      ROCK: 'Pedra bruta',
-      PLANKS: 'Tábuas',
-      CLOTH: 'Tecido',
-      METALBAR: 'Barra de metal',
-      LEATHER: 'Couro refinado',
-      STONEBLOCK: 'Bloco de pedra',
-      MEAL_OMELETTE: 'Omelete',
-      MEAL_STEW: 'Ensopado',
-      MEAL_SOUP: 'Sopa',
-      POTION_POISON: 'Poção venenosa',
-      POTION_HEAL: 'Poção de cura',
-      POTION_REVIVE: 'Poção de resistência'
-    };
-    if (labels[token]) return labels[token];
-    return token
-      .replace(/_/g, ' ')
-      .toLowerCase()
-      .replace(/\w/g, (m) => m.toUpperCase());
-  }
-
   function prettyItemName(itemId) {
-    const parsed = parseItemCode(itemId);
-    const clean = String(itemId || '').replace(/@(\d)/, '');
-    for (const [, groups] of Object.entries(ITEM_CATALOG)) {
-      for (const [, items] of Object.entries(groups)) {
+    const clean = itemId.replace(/@(\d)/, '');
+    for (const [family, groups] of Object.entries(ITEM_CATALOG)) {
+      for (const [group, items] of Object.entries(groups)) {
         for (const item of items) {
           for (let tier = 4; tier <= 8; tier++) {
-            if (buildItemId(item.template, tier, 0) === clean) return `${item.label} T${tier}${parsed?.enchant ? `.${parsed.enchant}` : ''}`;
+            if (buildItemId(item.template, tier, 0) === clean) return `${item.label} T${tier}`;
           }
         }
       }
     }
-    if (parsed) return `${tokenToPtBrLabel(parsed.token)} T${parsed.tier}${parsed.enchant ? `.${parsed.enchant}` : ''}`;
     return clean
       .replace(/^T(\d+)_/, 'T$1 ')
       .replace(/_/g, ' ')
       .toLowerCase()
-      .replace(/\w/g, (m) => m.toUpperCase());
+      .replace(/\b\w/g, (m) => m.toUpperCase());
   }
 
   function buildItemId(template, tier, enchant) {
@@ -602,26 +487,24 @@
   }
 
 
-  function getAllCatalogItems(options = {}) {
-    const tiers = options.tiers || [4, 5, 6, 7, 8];
-    const enchants = options.enchants || [0, 1, 2, 3, 4];
+  function buildFullCatalogItems() {
     const items = [];
-    for (const groups of Object.values(ITEM_CATALOG)) {
-      for (const groupItems of Object.values(groups)) {
-        for (const item of groupItems) {
-          for (const tier of tiers) {
-            for (const enchant of enchants) {
+    Object.values(ITEM_CATALOG).forEach((groups) => {
+      Object.values(groups).forEach((entries) => {
+        entries.forEach((item) => {
+          for (let tier = 4; tier <= 8; tier++) {
+            for (let enchant = 0; enchant <= 4; enchant++) {
               items.push(buildItemId(item.template, tier, enchant));
             }
           }
-        }
-      }
-    }
-    return [...new Set(items)];
+        });
+      });
+    });
+    return Array.from(new Set(items));
   }
 
   function currentServer() {
-    return document.getElementById('marketServer')?.value || localStorage.getItem('albionTraderPreferredServer') || 'west';
+    return document.getElementById('marketServer')?.value || 'west';
   }
 
   async function loadMarket() {
@@ -645,7 +528,6 @@
       }
 
       const data = await api(`/api/albion-prices?items=${encodeURIComponent(itemId)}&locations=${encodeURIComponent(DEFAULT_LOCATIONS.join(','))}&qualities=${quality}&server=${currentServer()}`);
-      updateServerHelper(data.meta);
       const rows = data.data || [];
       const analysis = buildSingleItemAnalysis(rows, DEFAULT_FEE);
 
@@ -656,11 +538,14 @@
       }
 
       const itemName = prettyItemName(itemId);
+      const profitabilityNotice = analysis.profitable
+        ? `<div class="helper-box"><strong>Operação válida agora</strong><span>Existe arbitragem lucrativa entre cidades diferentes para este item na qualidade escolhida.</span></div>`
+        : `<div class="warning-box">Sem arbitragem lucrativa no momento para <strong>${itemName}</strong>. O mercado foi lido corretamente, mas o melhor pedido de compra atual não cobre o custo de compra + taxa.</div>`;
       const tableRows = analysis.cleaned.map((row) => {
         const sell = Number(row.sell_price_min || 0);
         const buy = Number(row.buy_price_max || 0);
-        const askValid = sell > 0 && hoursSince(parseTime(row.sell_price_min_date)) <= 72;
-        const buyValid = buy > 0 && hoursSince(parseTime(row.buy_price_max_date)) <= 72;
+        const askValid = sell > 0 && hoursSince(parseTime(row.sell_price_min_date)) <= 24;
+        const buyValid = buy > 0 && hoursSince(parseTime(row.buy_price_max_date)) <= 24;
         return `
           <tr>
             <td>${row.city}</td>
@@ -674,6 +559,7 @@
       }).join('');
 
       box.innerHTML = `
+        ${profitabilityNotice}
         <div class="market-summary">
           <div><strong>${itemName}</strong></div>
           <div><span class="label">Cidade mais barata para comprar:</span> ${analysis.buyCity}</div>
@@ -681,11 +567,11 @@
           <div><span class="label">Melhor cidade para vender:</span> ${analysis.sellCity}</div>
           <div><span class="label">Pedido de compra atual:</span> ${formatSilver(analysis.sellPrice)} prata</div>
           <div><span class="label">Venda líquida estimada após taxa:</span> ${formatSilver(analysis.netSell)} prata</div>
-          <div><span class="label">Lucro líquido estimado por unidade:</span> ${formatSilver(analysis.profit)} prata</div>
-          <div><span class="label">Margem estimada:</span> ${formatPercent(analysis.margin)}</div>
+          <div><span class="label">Lucro líquido estimado por unidade:</span> ${analysis.profit > 0 ? formatSilver(analysis.profit) : '0'} prata</div>
+          <div><span class="label">Resultado real agora:</span> ${analysis.profit > 0 ? 'Lucro' : 'Prejuízo / não operar'}</div>
+          <div><span class="label">Margem estimada:</span> ${analysis.profit > 0 ? formatPercent(analysis.margin) : '0,0%'}</div>
           <div><span class="label">Qualidade analisada:</span> ${document.getElementById('itemQuality').selectedOptions[0].textContent}</div>
           <div><span class="label">Confiança:</span> ${analysis.confidence}</div>
-          <div><span class="label">Servidor consultado:</span> ${SERVER_LABELS[currentServer()] || currentServer()}</div>
         </div>
         <div class="table-wrap">
           <table class="data-table">
@@ -717,13 +603,11 @@
     const profile = document.getElementById('marketProfile').value || 'balanced';
     const route = currentRouteMode();
     const locations = currentLocations();
-    const routeLabel = getRouteLabel(route);
+    const routeLabel = route === 'safe' ? 'Somente zona azul/amarela' : 'Aceita RED + Black Market';
     document.getElementById('profileLabel').textContent =
       profile === 'consistent' ? 'Lucro seguro' : profile === 'max' ? 'Lucro máximo' : 'Equilibrado';
 
-    const items = mode === 'all'
-      ? getAllCatalogItems({ tiers: [4, 5, 6, 7, 8], enchants: [0, 1, 2, 3, 4] })
-      : POPULAR_ITEMS;
+    const items = mode === 'all' ? buildFullCatalogItems() : POPULAR_ITEMS;
     opportunityState.lastMode = mode;
     setProgress(5, 'Preparando consulta do mercado...');
     box.textContent = 'Consultando mercado...';
@@ -731,18 +615,9 @@
 
     try {
       setProgress(25, `Consultando ${items.length} itens em ${locations.length} cidades...`);
-      const chunkSize = 120;
-      const rows = [];
-      for (let index = 0; index < items.length; index += chunkSize) {
-        const chunk = items.slice(index, index + chunkSize);
-        const pct = 25 + Math.round((index / Math.max(items.length, 1)) * 35);
-        setProgress(pct, `Consultando mercado... lote ${Math.floor(index / chunkSize) + 1}/${Math.ceil(items.length / chunkSize)}`);
-        const data = await api(`/api/albion-prices?items=${encodeURIComponent(chunk.join(','))}&locations=${encodeURIComponent(locations.join(','))}&qualities=1,2,3,4,5&server=${currentServer()}`);
-        updateServerHelper(data.meta);
-        rows.push(...(data.data || []));
-      }
+      const data = await api(`/api/albion-prices?items=${encodeURIComponent(items.join(','))}&locations=${encodeURIComponent(locations.join(','))}&qualities=1&server=${currentServer()}`);
       setProgress(65, 'Filtrando preços estranhos, dados velhos e rota ruim...');
-      const opportunities = buildOpportunities(rows, capital, profile, DEFAULT_FEE, route);
+      const opportunities = buildOpportunities(data.data || [], capital, profile, DEFAULT_FEE, route);
       opportunityState.list = opportunities;
       opportunityState.sortKey = 'totalSafeProfit';
       opportunityState.sortDir = 'desc';
@@ -760,12 +635,12 @@
       const best = opportunities.slice().sort((a,b)=>b.totalSafeProfit-a.totalSafeProfit)[0];
       document.getElementById('bestOpportunityName').textContent = best.itemName;
       document.getElementById('bestOpportunityText').textContent =
-        `Comprar em ${best.buyCity}, vender em ${best.sellCity} e mirar ${formatSilver(best.totalSafeProfit)} de lucro total seguro (${opportunityState.lastMode === 'all' ? 'mercado completo' : 'itens populares'}).`;
+        `Comprar em ${best.buyCity}, vender em ${best.sellCity} e mirar ${formatSilver(best.totalSafeProfit)} de lucro total seguro.`;
       document.getElementById('priorityPlan').innerHTML =
         `Melhor rota agora: <strong>${best.itemName}</strong>.<br>
          Compre em <strong>${best.buyCity}</strong> por <strong>${formatSilver(best.buyPrice)}</strong> e venda em <strong>${best.sellCity}</strong> pelo pedido de compra atual de <strong>${formatSilver(best.sellPrice)}</strong>.<br>
          Quantidade segura estimada: <strong>${formatSilver(best.safeUnits)}</strong> unidades. Lucro por unidade: <strong>${formatSilver(best.profit)}</strong>. Lucro total seguro: <strong>${formatSilver(best.totalSafeProfit)}</strong>.<br>
-         Estratégia sugerida: ${route === 'safe' ? 'rotas entre cidades reais, sem entrar em zona vermelha.' : 'aceita RED e Black Market para buscar o melhor spread possível.'}`;
+         Estratégia sugerida: ${route === 'safe' ? 'rotas entre cidades azuis e amarelas, sem RED e sem Black Market.' : 'aceita RED e Black Market para buscar o melhor spread possível.'}`;
 
       renderOpportunityTable();
       setStatus(`AlbionData online · ${opportunities.length} oportunidades confiáveis`, true);
@@ -801,7 +676,6 @@
           <thead>
             <tr>
               <th>Item</th>
-              <th>Qualidade</th>
               <th>Comprar em</th>
               <th><button class="sort-btn" data-sort="buyPrice">Custo ${getSortArrow('buyPrice')}</button></th>
               <th>Vender em</th>
@@ -811,15 +685,12 @@
               <th><button class="sort-btn" data-sort="totalSafeProfit">Lucro total ${getSortArrow('totalSafeProfit')}</button></th>
               <th><button class="sort-btn" data-sort="margin">Margem ${getSortArrow('margin')}</button></th>
               <th><button class="sort-btn" data-sort="confidenceScore">Confiança ${getSortArrow('confidenceScore')}</button></th>
-              <th>Atualização compra</th>
-              <th>Atualização venda</th>
             </tr>
           </thead>
           <tbody>
             ${list.map(op => `
               <tr>
-                <td>${prettyItemName(op.itemId)}</td>
-                <td>${qualityLabel(op.quality)}</td>
+                <td>${op.itemName}</td>
                 <td>${op.buyCity}</td>
                 <td>${formatSilver(op.buyPrice)}</td>
                 <td>${op.sellCity}</td>
@@ -829,8 +700,6 @@
                 <td>${formatSilver(op.totalSafeProfit)}</td>
                 <td>${formatPercent(op.margin)}</td>
                 <td>${op.confidence}</td>
-                <td>${formatBrazilTime(op.buyUpdatedAt)}</td>
-                <td>${formatBrazilTime(op.sellUpdatedAt)}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -871,18 +740,10 @@
     const licenseDate = document.getElementById('licenseDate');
     if (welcomeTitle) welcomeTitle.textContent = `Olá, ${user.nome || user.email}`;
     if (licenseDate) licenseDate.textContent = new Date(user.licencaExpiraEm).toLocaleDateString('pt-BR');
-    document.querySelectorAll('.admin-access-btn').forEach((adminBtn) => {
-      if (user.admin) adminBtn.style.display = 'inline-flex';
-    });
 
     bindLogout();
     bindNav();
     populateItemSelectors();
-    populateCraftSelectors();
-    const marketServer = document.getElementById('marketServer');
-    const preferredServer = localStorage.getItem('albionTraderPreferredServer');
-    if (marketServer && preferredServer) marketServer.value = preferredServer;
-    updateServerHelper();
 
     const loadBtn = document.getElementById('loadMarketBtn');
     if (loadBtn) loadBtn.addEventListener('click', loadMarket);
@@ -890,8 +751,6 @@
     if (popularBtn) popularBtn.addEventListener('click', () => loadOpportunityRadar('popular'));
     const allBtn = document.getElementById('scanAllBtn');
     if (allBtn) allBtn.addEventListener('click', () => loadOpportunityRadar('all'));
-    const autoCraftBtn = document.getElementById('craftAutoBtn');
-    if (autoCraftBtn) autoCraftBtn.addEventListener('click', autoSuggestCraft);
 
     loadOpportunityRadar('popular');
   }
@@ -902,93 +761,26 @@
     const title = document.getElementById('adminTitle');
     if (title) title.textContent = `Painel admin — ${user.nome || user.email}`;
     bindLogout();
-    bindNav();
-
-    async function refreshAdminUsers(message = '') {
-      try {
-        const data = await api('/api/users');
-        const tbody = document.getElementById('adminUsersTable');
-        const count = document.getElementById('adminUserCount');
-        const pendingCount = document.getElementById('adminPendingCount');
-        const notice = document.getElementById('adminNotice');
-        const licensesBody = document.getElementById('adminLicensesTable');
-        if (notice) notice.textContent = message || data.notice || '';
-        if (count) count.textContent = data.users.length;
-        const pendingUsers = (data.users || []).filter((u) => u.firstAccessPending);
-        if (pendingCount) pendingCount.textContent = pendingUsers.length;
-        if (tbody) {
-          tbody.innerHTML = data.users.map((u) => `
-            <tr>
-              <td>${u.nome || '-'}</td>
-              <td>${u.email}</td>
-              <td>${u.telefone || '-'}</td>
-              <td>${u.admin ? 'Admin' : 'Usuário'}</td>
-              <td>${u.licencaDias || '-'} dias</td>
-              <td>${u.firstAccessPending ? 'Primeiro acesso pendente' : 'Ativo'}</td>
-            </tr>`).join('');
-        }
-        if (licensesBody) {
-          licensesBody.innerHTML = data.users.map((u) => {
-            const expire = u.licencaExpiraEm ? new Date(u.licencaExpiraEm) : null;
-            const remaining = expire ? Math.max(0, Math.ceil((expire.getTime() - Date.now()) / 86400000)) : 0;
-            return `
-              <tr>
-                <td>${u.nome || '-'}</td>
-                <td>${u.email}</td>
-                <td>${expire ? expire.toLocaleDateString('pt-BR') : '-'}</td>
-                <td>${remaining}</td>
-                <td>${u.firstAccessPending ? 'Pendente' : 'Ativa'}</td>
-              </tr>`;
-          }).join('');
-        }
-      } catch (error) {
-        const notice = document.getElementById('adminNotice');
-        if (notice) notice.textContent = error.message;
+    try {
+      const data = await api('/api/users');
+      const tbody = document.getElementById('adminUsersTable');
+      const count = document.getElementById('adminUserCount');
+      const notice = document.getElementById('adminNotice');
+      if (notice) notice.textContent = data.notice || '';
+      if (count) count.textContent = data.users.length;
+      if (tbody) {
+        tbody.innerHTML = data.users.map((u) => `
+          <tr>
+            <td>${u.nome || '-'}</td>
+            <td>${u.email}</td>
+            <td>${u.admin ? 'Admin' : 'Usuário'}</td>
+            <td>${u.licenca || '-'}</td>
+          </tr>`).join('');
       }
+    } catch (error) {
+      const notice = document.getElementById('adminNotice');
+      if (notice) notice.textContent = error.message;
     }
-
-    const createForm = document.getElementById('adminCreateUserForm');
-    if (createForm) {
-      createForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const messageEl = document.getElementById('adminCreateMessage');
-        if (messageEl) messageEl.textContent = 'Cadastrando usuário...';
-        try {
-          const payload = {
-            nome: document.getElementById('newUserName')?.value?.trim(),
-            email: document.getElementById('newUserEmail')?.value?.trim(),
-            telefone: document.getElementById('newUserPhone')?.value?.trim(),
-            licencaDias: Number(document.getElementById('newUserLicense')?.value || 30),
-            admin: document.getElementById('newUserRole')?.value === 'admin'
-          };
-          const data = await api('/api/users', { method: 'POST', body: JSON.stringify(payload) });
-          if (messageEl) messageEl.textContent = data.message || 'Usuário cadastrado.';
-          createForm.reset();
-          const licenseEl = document.getElementById('newUserLicense');
-          const roleEl = document.getElementById('newUserRole');
-          if (licenseEl) licenseEl.value = '30';
-          if (roleEl) roleEl.value = 'user';
-          await refreshAdminUsers('Lista atualizada após novo cadastro.');
-        } catch (error) {
-          if (messageEl) messageEl.textContent = error.message;
-        }
-      });
-    }
-
-    const settingsForm = document.getElementById('adminSettingsForm');
-    if (settingsForm) {
-      settingsForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const msg = document.getElementById('adminSettingsMessage');
-        const server = document.getElementById('settingServer')?.value || 'west';
-        const fee = Number(document.getElementById('settingMarketFee')?.value || DEFAULT_FEE);
-        localStorage.setItem('albionTraderPreferredServer', server);
-        localStorage.setItem('albionTraderPreferredFee', String(fee));
-        if (msg) msg.textContent = 'Configurações salvas nesta base local do navegador.';
-      });
-    }
-
-    await refreshAdminUsers();
   }
 
   function setHtml(id, html) {
@@ -998,289 +790,20 @@
 
   function sortByProfitDesc(list) { return list.sort((a, b) => b.profit - a.profit); }
 
-  function getMaterialSelectOptions() {
-    return buildCraftMaterialSuggestionIds().map((id) => ({ id, label: prettyItemName(id) }));
-  }
-
-  function guessBestCraftCities(family, group) {
-    const preferred = new Set(CRAFT_FAMILY_CITY_HINTS[family] || []);
-    const normalizedGroup = String(group || '').toLowerCase();
-    Object.entries(CITY_PRODUCTION_BONUSES).forEach(([city, bonuses]) => {
-      if (bonuses.some((bonus) => normalizedGroup.includes(String(bonus).toLowerCase()) || String(bonus).toLowerCase().includes(normalizedGroup))) {
-        preferred.add(city);
-      }
-    });
-    return Array.from(preferred);
-  }
-
-  function updateCraftRecommendationBox() {
-    const box = document.getElementById('craftRecommendationBox');
-    if (!box) return;
-    const selected = getCraftSelectedItem();
-    if (!selected.itemId) {
-      box.innerHTML = 'Escolha um item no craft para o sistema sugerir a cidade com bonus e o fluxo ideal.';
-      return;
-    }
-    const cities = guessBestCraftCities(selected.family, selected.group);
-    const cityHtml = cities.length ? cities.map((city) => `<strong>${city}</strong>`).join(', ') : 'sem cidade mapeada';
-    box.innerHTML = `<strong>Leitura rapida do craft</strong><br>Item analisado: <strong>${selected.itemName}</strong><br>Cidades com melhor encaixe de bonus nesta fase: ${cityHtml}.<br>Use o modo automatico para o sistema testar venda e compra de materiais nas cidades escolhidas.`;
-  }
-
-  async function autoSuggestCraft() {
-    const selected = getCraftSelectedItem();
-    const level = Number(document.getElementById('craftLevel')?.value || 0);
-    const quantity = Math.max(1, Number(document.getElementById('craftQuantity')?.value || 1));
-    const sellCity = document.getElementById('craftSellCity')?.value || 'Caerleon';
-    const materialCity = document.getElementById('craftMaterialCity')?.value || sellCity;
-    const box = document.getElementById('craftAutoResult');
-    if (!box) return;
-    if (!selected.itemId) {
-      box.innerHTML = 'Selecione um item no planejador de craft antes de usar o modo automatico.';
-      return;
-    }
-    box.innerHTML = 'Analisando melhor cidade de craft e melhor venda para o item selecionado...';
-    try {
-      const candidateCities = guessBestCraftCities(selected.family, selected.group);
-      const locations = Array.from(new Set([...candidateCities, materialCity, sellCity, ...SAFE_LOCATIONS, 'Caerleon']));
-      const sellMode = document.getElementById('craftSellMode')?.value || 'sell';
-      const data = await api(`/api/albion-prices?items=${encodeURIComponent(selected.itemId)}&locations=${encodeURIComponent(locations.join(','))}&qualities=${encodeURIComponent(String(selected.quality || 1))}&server=${currentServer()}`);
-      const rows = sanitizeRows(data.data || []);
-      if (!rows.length) throw new Error('Nao veio preco confiavel do item final.');
-      const bestSellRow = sellMode === 'buy'
-        ? rows.filter((row) => normalizePrice(row.buy_price_max) > 0).sort((a,b) => normalizePrice(b.buy_price_max) - normalizePrice(a.buy_price_max))[0]
-        : rows.filter((row) => normalizePrice(row.sell_price_min) > 0).sort((a,b) => normalizePrice(b.sell_price_min) - normalizePrice(a.sell_price_min))[0];
-      if (!bestSellRow) throw new Error('Nao encontrei venda confiavel para o item final.');
-      const suggestedCraftCity = candidateCities[0] || document.getElementById('craftCity')?.value || sellCity;
-      const masteryText = level >= 100 ? 'muito alta' : level >= 70 ? 'alta' : level >= 40 ? 'media' : 'inicial';
-      box.innerHTML = `<strong>Modo automatico - leitura do dia</strong><br>Item: <strong>${selected.itemName}</strong><br>Cidade mais forte para craftar nesta fase: <strong>${suggestedCraftCity}</strong><br>Melhor cidade de venda detectada agora: <strong>${bestSellRow.city}</strong><br>Preco de saida usado: <strong>${formatSilver(sellMode === 'buy' ? bestSellRow.buy_price_max : bestSellRow.sell_price_min)}</strong> · qualidade <strong>${qualityLabel(selected.quality)}</strong><br>Compra de materiais mantida em: <strong>${materialCity}</strong><br>Seu nivel de craft foi lido como faixa <strong>${masteryText}</strong>.<br><br><strong>Importante:</strong> nesta fase o modo automatico ja sugere a <strong>cidade de craft</strong> e a <strong>cidade de venda</strong>, mas o lucro final continua dependendo da receita preenchida no planejador manual. Eu preferi fazer assim para nao inventar material nem lucro falso.`;
-      const craftCityEl = document.getElementById('craftCity');
-      if (craftCityEl) craftCityEl.value = suggestedCraftCity;
-      const craftSellCityEl = document.getElementById('craftSellCity');
-      if (craftSellCityEl) craftSellCityEl.value = bestSellRow.city;
-      const quantityEl = document.getElementById('craftQuantity');
-      if (quantityEl) quantityEl.value = quantity;
-    } catch (error) {
-      box.innerHTML = `<strong>Modo automatico com erro</strong><br>${error.message}`;
-    }
-  }
-
-  function getCraftSelectedItem() {
-    const family = document.getElementById('craftFamily')?.value;
-    const group = document.getElementById('craftGroup')?.value;
-    const idx = Number(document.getElementById('craftItem')?.value || 0);
-    const tier = Number(document.getElementById('craftTier')?.value || 4);
-    const enchant = Number(document.getElementById('craftEnchant')?.value || 0);
-    const quality = Number(document.getElementById('craftQuality')?.value || 1);
-    const item = ITEM_CATALOG[family]?.[group]?.[idx];
-    const itemId = item ? buildItemId(item.template, tier, enchant) : '';
-    const itemName = item ? `${item.label} T${tier}${enchant ? `.${enchant}` : ''}` : 'Item selecionado';
-    return { family, group, idx, tier, enchant, quality, item, itemId, itemName };
-  }
-
-  function buildCraftMaterialSuggestionIds() {
-    const ids = [];
-    for (let tier = 2; tier <= 8; tier++) {
-      ids.push(`T${tier}_PLANKS`, `T${tier}_CLOTH`, `T${tier}_METALBAR`, `T${tier}_LEATHER`, `T${tier}_STONEBLOCK`);
-      ids.push(`T${tier}_WOOD`, `T${tier}_FIBER`, `T${tier}_ORE`, `T${tier}_HIDE`, `T${tier}_ROCK`);
-      for (let enchant = 1; enchant <= 4; enchant++) {
-        ids.push(`T${tier}_PLANKS@${enchant}`, `T${tier}_CLOTH@${enchant}`, `T${tier}_METALBAR@${enchant}`, `T${tier}_LEATHER@${enchant}`);
-      }
-    }
-    getAllCatalogItems({ tiers: [4, 5, 6, 7, 8], enchants: [0, 1, 2, 3, 4] }).forEach((id) => ids.push(id));
-    return Array.from(new Set(ids)).sort();
-  }
-
-  function renderCraftMaterialRows() {
-    const box = document.getElementById('craftMaterialsBox');
-    if (!box) return;
-    const options = getMaterialSelectOptions();
-    box.innerHTML = craftState.rows.map((row, index) => {
-      const selectOptions = ['<option value="">Selecione um material</option>']
-        .concat(options.map((option) => `<option value="${option.id}" ${option.id === row.itemId ? 'selected' : ''}>${option.label}</option>`))
-        .join('');
-      return `
-      <div class="inline-form" style="margin-bottom:8px; align-items:end;">
-        <label style="flex:2;"><span>Material ${index + 1}</span><select data-craft-material-id="${index}">${selectOptions}</select></label>
-        <label style="width:160px;"><span>Qtd por craft</span><input data-craft-material-qty="${index}" type="number" min="0.01" step="0.01" value="${Number(row.qty || 0)}" /></label>
-        <button class="btn btn-outline" onclick="AlbionTrader.removeCraftMaterialRow(${index})">Remover</button>
-      </div>
-    `;
-    }).join('');
-    box.querySelectorAll('[data-craft-material-id]').forEach((el) => el.addEventListener('change', (event) => {
-      const idx = Number(event.target.dataset.craftMaterialId);
-      if (!craftState.rows[idx]) return;
-      craftState.rows[idx].itemId = event.target.value;
-    }));
-    box.querySelectorAll('[data-craft-material-qty]').forEach((el) => el.addEventListener('input', (event) => {
-      const idx = Number(event.target.dataset.craftMaterialQty);
-      if (!craftState.rows[idx]) return;
-      craftState.rows[idx].qty = Math.max(0, Number(event.target.value || 0));
-    }));
-  }
-
-  function addCraftMaterialRow() {
-    craftState.rows.push(CRAFT_MATERIAL_ROW_TEMPLATE());
-    renderCraftMaterialRows();
-  }
-
-  function removeCraftMaterialRow(index) {
-    if (craftState.rows.length <= 1) return;
-    craftState.rows.splice(index, 1);
-    renderCraftMaterialRows();
-  }
-
-  function getCraftRows() {
-    return craftState.rows
-      .map((row) => ({ itemId: String(row.itemId || '').trim().toUpperCase(), qty: Number(row.qty || 0) }))
-      .filter((row) => row.itemId && row.qty > 0);
-  }
-
-  function buildCraftMarketLookup(rows, itemId) {
-    const ids = rows.map((row) => row.itemId);
-    if (itemId) ids.unshift(itemId);
-    return Array.from(new Set(ids));
-  }
-
-  function pickCityPrice(rows, city, mode = 'sell') {
-    const list = (rows || []).filter((row) => row.city === city);
-    if (!list.length) return null;
-    if (mode === 'buy') {
-      const valid = list.filter((row) => normalizePrice(row.buy_price_max) > 0 && hoursSince(parseTime(row.buy_price_max_date)) <= 24);
-      if (!valid.length) return null;
-      const best = valid.reduce((acc, row) => normalizePrice(row.buy_price_max) > normalizePrice(acc.buy_price_max) ? row : acc, valid[0]);
-      return { price: normalizePrice(best.buy_price_max), date: best.buy_price_max_date, mode: 'Pedido de compra atual' };
-    }
-    const valid = list.filter((row) => normalizePrice(row.sell_price_min) > 0 && hoursSince(parseTime(row.sell_price_min_date)) <= 24);
-    if (!valid.length) return null;
-    const best = valid.reduce((acc, row) => normalizePrice(row.sell_price_min) < normalizePrice(acc.sell_price_min) ? row : acc, valid[0]);
-    return { price: normalizePrice(best.sell_price_min), date: best.sell_price_min_date, mode: 'Ordem de venda' };
-  }
-
-  async function fetchCraftMarketData() {
-    const selected = getCraftSelectedItem();
-    const materialRows = getCraftRows();
-    if (!selected.itemId) throw new Error('Selecione o item que sera craftado.');
-    if (!materialRows.length) throw new Error('Adicione pelo menos um material com item ID e quantidade por craft.');
-    const ids = buildCraftMarketLookup(materialRows, selected.itemId);
-    const sellCity = document.getElementById('craftSellCity')?.value || 'Caerleon';
-    const materialCity = document.getElementById('craftMaterialCity')?.value || sellCity;
-    const qualities = Array.from(new Set([1, selected.quality])).join(',');
-    const data = await api(`/api/albion-prices?items=${encodeURIComponent(ids.join(','))}&locations=${encodeURIComponent([sellCity, materialCity].join(','))}&qualities=${qualities}&server=${currentServer()}`);
-    return { selected, materialRows, rows: data.data || [], meta: data.meta || {} };
-  }
-
-  async function calcCraft() {
+  function calcCraft() {
     const level = Number(document.getElementById('craftLevel').value || 0);
-    const craftCity = document.getElementById('craftCity').value;
-    const materialCity = document.getElementById('craftMaterialCity').value;
-    const sellCity = document.getElementById('craftSellCity').value;
-    const quantity = Math.max(1, Number(document.getElementById('craftQuantity')?.value || 1));
-    const focus = document.getElementById('craftFocus')?.value === 'sim';
-    const sellMode = document.getElementById('craftSellMode')?.value || 'sell';
-    setHtml('craftResult', 'Buscando precos do craft na Albion Data...');
-
-    try {
-      const { selected, materialRows, rows, meta } = await fetchCraftMarketData();
-      updateServerHelper(meta);
-      const outputRows = rows.filter((row) => row.item_id === selected.itemId && Number(row.quality || 1) === Number(selected.quality || 1));
-      const outputPrice = pickCityPrice(outputRows, sellCity, sellMode);
-      if (!outputPrice) throw new Error(`Nao achei preco valido para vender ${selected.itemName} em ${sellCity} na qualidade ${qualityLabel(selected.quality)}.`);
-
-      const materialPlan = materialRows.map((mat) => {
-        const itemRows = rows.filter((row) => row.item_id === mat.itemId);
-        const market = pickCityPrice(itemRows, materialCity, 'sell');
-        return { ...mat, market, totalQty: mat.qty * quantity, totalCost: (market?.price || 0) * mat.qty * quantity };
-      });
-      const missing = materialPlan.filter((mat) => !mat.market);
-      if (missing.length) throw new Error(`Faltou preco de material em ${materialCity}: ${missing.map((mat) => mat.itemId).join(', ')}`);
-
-      const totalMaterialCost = materialPlan.reduce((sum, mat) => sum + mat.totalCost, 0);
-      const unitMaterialCost = totalMaterialCost / quantity;
-      const grossSellUnit = outputPrice.price;
-      const feeUnit = grossSellUnit * (DEFAULT_FEE / 100);
-      const netSellUnit = grossSellUnit - feeUnit;
-      const profitUnit = netSellUnit - unitMaterialCost;
-      const totalProfit = profitUnit * quantity;
-      const margin = unitMaterialCost > 0 ? (profitUnit / unitMaterialCost) * 100 : 0;
-      const masteryText = level >= 100 ? 'muito alta' : level >= 80 ? 'alta' : level >= 50 ? 'media' : 'baixa';
-      const lines = materialPlan.map((mat) => `
-        <tr>
-          <td>${mat.itemId}</td>
-          <td>${mat.qty}</td>
-          <td>${formatSilver(mat.totalQty)}</td>
-          <td>${formatSilver(mat.market.price)}</td>
-          <td>${formatSilver(mat.totalCost)}</td>
-          <td>${formatBrazilTime(mat.market.date)}</td>
-        </tr>
-      `).join('');
-      setHtml('craftResult', `
-        <strong>Plano de craft - ${selected.itemName}</strong><br>
-        Cidade de craft: <strong>${craftCity}</strong> · compra de materiais: <strong>${materialCity}</strong> · venda: <strong>${sellCity}</strong><br>
-        Qualidade analisada: <strong>${qualityLabel(selected.quality)}</strong> · modo de venda: <strong>${outputPrice.mode}</strong><br>
-        Preco de venda por unidade: <strong>${formatSilver(grossSellUnit)}</strong> · taxa por unidade: <strong>${formatSilver(feeUnit)}</strong> · liquido por unidade: <strong>${formatSilver(netSellUnit)}</strong><br>
-        Custo de materiais por unidade: <strong>${formatSilver(unitMaterialCost)}</strong><br>
-        Lucro por unidade: <strong>${formatSilver(profitUnit)}</strong> · lucro do lote: <strong>${formatSilver(totalProfit)}</strong> · margem: <strong>${margin.toFixed(1)}%</strong><br>
-        Atualizacao da venda: <strong>${formatBrazilTime(outputPrice.date)}</strong><br><br>
-        <strong>Shopping list do lote</strong>
-        <div style="overflow:auto; margin-top:8px;">
-          <table class="market-table">
-            <thead>
-              <tr>
-                <th>Material</th>
-                <th>Qtd/craft</th>
-                <th>Qtd total</th>
-                <th>Preco unit.</th>
-                <th>Custo total</th>
-                <th>Atualizacao</th>
-              </tr>
-            </thead>
-            <tbody>${lines}</tbody>
-          </table>
-        </div>
-        <br><strong>Leitura do crafter</strong><br>
-        • Bonus locais da cidade de craft: <strong>${getCraftCityHint(craftCity)}</strong><br>
-        • Seu nivel de craft esta em faixa <strong>${masteryText}</strong> e ${focus ? '<strong>usa foco</strong>' : '<strong>nao usa foco</strong>'}.<br>
-        • Neste patch o calculo esta <strong>conservador</strong>: ele usa preco real do item final e dos materiais na Albion Data, mas <strong>ainda nao desconta automaticamente retorno de recursos/foco</strong> para nao inventar valor.<br>
-        • Para um uso profissional, preencha a receita real do item e compare o lote entre <strong>${materialCity}</strong> e <strong>${sellCity}</strong>.
-      `);
-    } catch (error) {
-      setHtml('craftResult', `<strong>Craft com erro</strong><br>${error.message}`);
-    }
-  }
-
-  function populateCraftSelectors() {
-    const familyEl = document.getElementById('craftFamily');
-    const groupEl = document.getElementById('craftGroup');
-    const itemEl = document.getElementById('craftItem');
-    if (!familyEl || !groupEl || !itemEl) return;
-    const craftFamilies = Object.keys(ITEM_CATALOG).filter((name) => !['Recursos brutos', 'Recursos refinados'].includes(name));
-    familyEl.innerHTML = craftFamilies.map((f) => `<option value="${f}">${f}</option>`).join('');
-    function updateGroups() {
-      const family = familyEl.value;
-      const groups = Object.keys(ITEM_CATALOG[family] || {});
-      groupEl.innerHTML = groups.map((g) => `<option value="${g}">${g}</option>`).join('');
-      updateItems();
-    }
-    function updateItems() {
-      const family = familyEl.value;
-      const group = groupEl.value;
-      const items = ITEM_CATALOG[family]?.[group] || [];
-      itemEl.innerHTML = items.map((it, idx) => `<option value="${idx}">${it.label}</option>`).join('');
-    }
-    familyEl.addEventListener('change', () => { updateGroups(); updateCraftRecommendationBox(); });
-    groupEl.addEventListener('change', () => { updateItems(); updateCraftRecommendationBox(); });
-    itemEl.addEventListener('change', updateCraftRecommendationBox);
-    const tierEl = document.getElementById('craftTier');
-    const enchantEl = document.getElementById('craftEnchant');
-    if (tierEl) tierEl.addEventListener('change', updateCraftRecommendationBox);
-    if (enchantEl) enchantEl.addEventListener('change', updateCraftRecommendationBox);
-    updateGroups();
-    renderCraftMaterialRows();
-    updateCraftRecommendationBox();
+    const city = document.getElementById('craftCity').value;
+    const cost = Number(document.getElementById('craftCost').value || 0);
+    const sell = Number(document.getElementById('craftSell').value || 0);
+    const bonus = level >= 80 ? 1.07 : level >= 50 ? 1.04 : 1.01;
+    const fee = Math.round(sell * 0.065);
+    const adjustedCost = cost / bonus;
+    const lucro = sell - adjustedCost - fee;
+    const margem = cost > 0 ? (lucro / cost) * 100 : 0;
+    setHtml('craftResult', `<strong>Resultado do craft em ${city}</strong><br>Lucro estimado: <strong>${formatSilver(lucro)} prata</strong><br>Margem: <strong>${margem.toFixed(1)}%</strong><br>Leitura: ${lucro > 0 ? 'vale testar itens de giro rápido, como bolsas e capas.' : 'esse craft está apertado; melhore custo dos materiais ou venda.'}`);
   }
 
   function calcRefine() {
-
     const level = Number(document.getElementById('refineLevel').value || 0);
     const city = document.getElementById('refineCity').value;
     const focus = document.getElementById('refineFocus').value === 'sim';
@@ -1342,7 +865,7 @@
     setHtml('wealthResult', `<strong>Plano para sair de ${formatSilver(close)} e buscar ${formatSilver(goal)}</strong><br><br>Precisa gerar em média: <strong>${formatSilver(daily)} prata por dia</strong>.<br>Se você morreu hoje: <strong>${died ? 'sim, o plano ficou mais agressivo para recuperar.' : 'não, seguimos com crescimento normal.'}</strong><br><br>${entries.join('')}<br><div class="helper-box"><strong>Como usar esse plano</strong><span>Faça a operação do dia, volte amanhã e preencha o saldo real de fechamento. Se morreu ou perdeu dinheiro, marque isso no formulário para o próximo plano reagir.</span></div>`);
   }
 
-  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection, addCraftMaterialRow, removeCraftMaterialRow, autoSuggestCraft };
+  window.AlbionTrader = { calcCraft, calcRefine, calcIsland, calcTransport, calcWealth, loadOpportunityRadar, activateSection };
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('loginForm');
