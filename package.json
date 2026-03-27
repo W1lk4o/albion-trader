@@ -1,11 +1,9 @@
 {
-  "name": "albion-trader-vercel",
-  "version": "1.0.0",
+  "name": "albion-flip-pro",
   "private": true,
-  "description": "Albion Trader - versão pronta para Vercel",
-  "type": "commonjs",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2"
+  "version": "1.0.0",
+  "description": "Scanner profissional de flips para Albion Online",
+  "scripts": {
+    "start": "npx serve ."
   }
 }

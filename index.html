@@ -3,17 +3,177 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Albion Trader | Teste</title>
-  <meta http-equiv="refresh" content="0; url=/dashboard.html" />
-  <link rel="stylesheet" href="css/style.css" />
+  <title>Albion Flip Pro</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
-<body class="auth-body">
-  <div class="auth-shell">
-    <div class="auth-card">
-      <h1>Albion Trader</h1>
-      <p class="muted">Modo de teste ativo. Redirecionando para o dashboard...</p>
-    </div>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand-kicker">ALBION FLIP PRO</div>
+        <h1 class="brand-title">Painel</h1>
+      </div>
+
+      <nav class="nav-list">
+        <button class="nav-button active" data-tab="scanner">Scanner de flips</button>
+        <button class="nav-button" data-tab="radar">Radar de item</button>
+        <button class="nav-button" data-tab="roadmap">Roadmap</button>
+      </nav>
+
+      <div class="sidebar-note">
+        Primeiro o núcleo do mercado. Depois craft, banco e IA.
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Projeto novo, limpo e sem login</div>
+          <h2>Scanner profissional de flips</h2>
+        </div>
+        <div id="marketHealthPill" class="pill">AlbionData pronto</div>
+      </header>
+
+      <section class="hero-grid">
+        <article class="hero-card">
+          <span class="card-label">Melhor oportunidade agora</span>
+          <h3 id="bestOpportunityTitle">Nenhuma leitura ainda</h3>
+          <p id="bestOpportunityText">Clique em “Analisar catálogo base” para começar com um scanner conservador e confiável.</p>
+        </article>
+        <article class="hero-card">
+          <span class="card-label">Objetivo desta fase</span>
+          <h3>Núcleo blindado</h3>
+          <p>Sem login, sem craft, sem admin. Só flip e radar de item, com filtro forte contra preço absurdo e lucro fake.</p>
+        </article>
+        <article class="hero-card">
+          <span class="card-label">Princípio do projeto</span>
+          <h3>Conservador antes de tudo</h3>
+          <p>Se o sistema não confiar no dado, ele prefere não mostrar a oportunidade.</p>
+        </article>
+      </section>
+
+      <section class="filters-card">
+        <div class="filters-grid">
+          <label>
+            <span>Servidor</span>
+            <select id="serverSelect"></select>
+          </label>
+          <label>
+            <span>Capital disponível</span>
+            <input id="capitalInput" type="number" min="1000" step="1000" />
+          </label>
+          <label>
+            <span>Rota aceita</span>
+            <select id="routeModeSelect"></select>
+          </label>
+          <label>
+            <span>Modo de saída do scanner</span>
+            <select id="saleModeScanner"></select>
+          </label>
+          <label>
+            <span>Qualidades no scanner</span>
+            <select id="scannerQualityRange"></select>
+          </label>
+        </div>
+
+        <div class="actions-row">
+          <button id="scanBaseButton" class="primary-btn">Analisar catálogo base</button>
+          <button id="scanFullButton" class="secondary-btn">Pesquisar catálogo completo</button>
+        </div>
+
+        <div id="scannerStatus" class="status-line">Pronto.</div>
+      </section>
+
+      <section class="panel active" data-panel="scanner">
+        <div class="section-head">
+          <h3>Scanner de flips</h3>
+          <p>O scanner só mostra oportunidades que passaram por filtro de frescor, coerência e outlier.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qualidade</th>
+                <th>Comprar em</th>
+                <th>Custo</th>
+                <th>Vender em</th>
+                <th>Saída</th>
+                <th>Preço de saída</th>
+                <th>Lucro/unid.</th>
+                <th>Qtd segura</th>
+                <th>Lucro total</th>
+                <th>Margem</th>
+                <th>Confiança</th>
+              </tr>
+            </thead>
+            <tbody id="opportunityTableBody">
+              <tr><td colspan="12" class="table-empty">Nenhuma varredura feita ainda.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="radar">
+        <div class="section-head">
+          <h3>Radar de item</h3>
+          <p>Consulta precisa de um item específico. Mostra leitura segura e também a tabela de mercado bruto por cidade.</p>
+        </div>
+
+        <div class="filters-card compact">
+          <div class="filters-grid three">
+            <label>
+              <span>Família</span>
+              <select id="radarFamily"></select>
+            </label>
+            <label>
+              <span>Grupo</span>
+              <select id="radarGroup"></select>
+            </label>
+            <label>
+              <span>Item</span>
+              <select id="radarItem"></select>
+            </label>
+            <label>
+              <span>Tier</span>
+              <select id="radarTier"></select>
+            </label>
+            <label>
+              <span>Encantamento</span>
+              <select id="radarEnchant"></select>
+            </label>
+            <label>
+              <span>Qualidade</span>
+              <select id="radarQuality"></select>
+            </label>
+            <label>
+              <span>Modo de saída</span>
+              <select id="saleModeRadar"></select>
+            </label>
+          </div>
+          <div class="actions-row">
+            <button id="radarButton" class="primary-btn">Consultar item</button>
+          </div>
+        </div>
+
+        <div id="radarResult" class="result-box">
+          <div class="empty-state">Nenhuma consulta feita ainda.</div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="roadmap">
+        <div class="section-head">
+          <h3>Roadmap profissional</h3>
+          <p>Sem pressa e sem remendo. Cada fase só avança quando a anterior estiver estável.</p>
+        </div>
+        <div class="roadmap-card">
+          <ol id="roadmapNext"></ol>
+        </div>
+      </section>
+    </main>
   </div>
-  <script src="js/main.js?v=core1"></script>
+
+  <script src="/js/catalog.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>
