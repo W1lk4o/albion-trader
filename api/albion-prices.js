@@ -1,70 +1,48 @@
-const HOSTS = {
-  west: 'https://west.albion-online-data.com',
-  europe: 'https://europe.albion-online-data.com',
-  east: 'https://east.albion-online-data.com'
-};
-
-const MAX_ITEMS_PER_CALL = 40;
-
-async function fetchChunk({ itemIds, locations, qualities, server }) {
-  const base = HOSTS[server] || HOSTS.west;
-  const endpoint = `${base}/api/v2/stats/prices/${encodeURIComponent(itemIds.join(','))}.json?locations=${encodeURIComponent(locations.join(','))}&qualities=${encodeURIComponent(qualities.join(','))}`;
-
-  const response = await fetch(endpoint, {
-    headers: {
-      Accept: 'application/json',
-      'Accept-Encoding': 'gzip, deflate, br'
-    }
-  });
-
-  if (!response.ok) {
-    const text = await response.text().catch(() => '');
-    throw new Error(`Albion Data respondeu ${response.status}. ${text}`.trim());
-  }
-
-  return response.json();
-}
-
-module.exports = async (req, res) => {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ ok: false, error: 'Método não permitido.' });
-  }
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const rawItems = String(req.query.items || req.query.item || '').split(',').map((item) => item.trim()).filter(Boolean);
-    const itemIds = [...new Set(rawItems)];
+    const payload = req.method === 'POST' ? req.body : req.query;
+    const server = String(payload.server || 'west');
+    const itemIds = Array.isArray(payload.itemIds) ? payload.itemIds : String(payload.itemIds || '').split(',').filter(Boolean);
+    const qualities = Array.isArray(payload.qualities) ? payload.qualities : String(payload.qualities || '1').split(',').filter(Boolean);
+    const locations = Array.isArray(payload.locations) ? payload.locations : String(payload.locations || '').split(',').filter(Boolean);
 
-    if (!itemIds.length) {
-      return res.status(400).json({ ok: false, error: 'Informe ao menos um item.' });
-    }
+    const hostMap = {
+      west: 'https://west.albion-online-data.com',
+      europe: 'https://europe.albion-online-data.com',
+      east: 'https://east.albion-online-data.com'
+    };
+    const host = hostMap[server] || hostMap.west;
 
-    const qualities = [...new Set(String(req.query.qualities || '1').split(',').map((value) => Number(value.trim())).filter((value) => value >= 1 && value <= 5))];
-    const locations = [...new Set(String(req.query.locations || 'Bridgewatch,Martlock,Lymhurst,Fort Sterling,Thetford,Caerleon').split(',').map((value) => value.trim()).filter(Boolean))];
-    const server = String(req.query.server || 'west').trim();
+    const uniqueItems = [...new Set(itemIds)].filter(Boolean).slice(0, 500);
+    const uniqueQualities = [...new Set(qualities.map((v) => String(v)).filter(Boolean))];
+    const uniqueLocations = [...new Set(locations.map((v) => String(v)).filter(Boolean))];
 
-    const chunks = [];
-    for (let i = 0; i < itemIds.length; i += MAX_ITEMS_PER_CALL) {
-      chunks.push(itemIds.slice(i, i + MAX_ITEMS_PER_CALL));
-    }
+    if (!uniqueItems.length) return res.status(200).json([]);
+    if (!uniqueLocations.length) return res.status(400).json({ error: 'locations ausentes' });
 
-    const allRows = [];
-    for (const chunk of chunks) {
-      const rows = await fetchChunk({ itemIds: chunk, locations, qualities, server });
-      allRows.push(...rows);
-    }
-
-    return res.status(200).json({
-      ok: true,
-      data: allRows,
-      meta: {
-        source: 'albion-data',
-        server,
-        items: itemIds.length,
-        qualities,
-        locations
+    const chunkSize = 12;
+    const out = [];
+    for (let i = 0; i < uniqueItems.length; i += chunkSize) {
+      const chunk = uniqueItems.slice(i, i + chunkSize);
+      const url = `${host}/api/v2/stats/prices/${encodeURIComponent(chunk.join(','))}?locations=${encodeURIComponent(uniqueLocations.join(','))}&qualities=${encodeURIComponent(uniqueQualities.join(','))}`;
+      const response = await fetch(url, {
+        headers: { Accept: 'application/json', 'User-Agent': 'AlbionFlipPro/1.0' }
+      });
+      if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        return res.status(502).json({ error: `Albion Data falhou (${response.status})`, details: text.slice(0, 300) });
       }
-    });
+      const rows = await response.json();
+      if (Array.isArray(rows)) out.push(...rows);
+    }
+
+    return res.status(200).json(out);
   } catch (error) {
-    return res.status(500).json({ ok: false, error: error.message || 'Erro ao consultar Albion Data.' });
+    return res.status(500).json({ error: 'Falha interna ao consultar preços', details: error?.message || String(error) });
   }
-};
+}

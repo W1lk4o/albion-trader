@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Albion Flip Pro</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -76,6 +76,15 @@
           </label>
         </div>
 
+        
+        <div class="progress-wrap" id="scanProgressWrap" hidden>
+          <div class="progress-head">
+            <strong id="scanProgressLabel">Preparando varredura...</strong>
+            <span id="scanProgressText">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="scanProgressFill"></div></div>
+        </div>
+
         <div class="actions-row">
           <button id="scanBaseButton" class="primary-btn">Analisar catálogo base</button>
           <button id="scanFullButton" class="secondary-btn">Pesquisar catálogo completo</button>
@@ -90,21 +99,21 @@
           <p>O scanner só mostra oportunidades que passaram por filtro de frescor, coerência e outlier.</p>
         </div>
         <div class="table-wrap">
-          <table>
+          <table id="opportunityTable">
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Qualidade</th>
-                <th>Comprar em</th>
-                <th>Custo</th>
-                <th>Vender em</th>
-                <th>Saída</th>
-                <th>Preço de saída</th>
-                <th>Lucro/unid.</th>
-                <th>Qtd segura</th>
-                <th>Lucro total</th>
-                <th>Margem</th>
-                <th>Confiança</th>
+                <th data-sort="displayName">Item</th>
+                <th data-sort="quality">Qualidade</th>
+                <th data-sort="buyCity">Comprar em</th>
+                <th data-sort="buyPrice">Custo</th>
+                <th data-sort="sellCity">Vender em</th>
+                <th data-sort="sourceType">Saída</th>
+                <th data-sort="salePrice">Preço de saída</th>
+                <th data-sort="unitProfit">Lucro/unid.</th>
+                <th data-sort="safeQty">Qtd segura</th>
+                <th data-sort="totalProfit">Lucro total</th>
+                <th data-sort="margin">Margem</th>
+                <th data-sort="confidenceRank">Confiança</th>
               </tr>
             </thead>
             <tbody id="opportunityTableBody">
@@ -173,7 +182,7 @@
     </main>
   </div>
 
-  <script src="/js/catalog.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="./js/catalog.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>

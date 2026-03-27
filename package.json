@@ -1,9 +1,5 @@
 {
-  "name": "albion-flip-pro",
+  "name": "albion-flip-pro-v2",
   "private": true,
-  "version": "1.0.0",
-  "description": "Scanner profissional de flips para Albion Online",
-  "scripts": {
-    "start": "npx serve ."
-  }
+  "version": "1.0.0"
 }

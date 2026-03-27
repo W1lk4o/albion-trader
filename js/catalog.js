@@ -273,11 +273,12 @@ window.ALBION_CATALOG = (() => {
   const iconUrl = (itemId, quality = 1) => `https://render.albiononline.com/v1/item/${encodeURIComponent(itemId)}.png?quality=${quality}&size=64`;
 
   const getScannerBaseItems = () => {
-    const preferred = allItems.filter((item) => ['resources-raw','resources-refined','bags-capes','armor-leather','armor-cloth','armor-plate'].includes(item.familyKey));
+    const preferred = allItems.filter((item) => ['resources-raw','resources-refined','bags-capes','armor-leather','armor-cloth','armor-plate','weapons-warrior','weapons-hunter','weapons-mage','offhands','consumables'].includes(item.familyKey));
     const ids = [];
     preferred.forEach((item) => {
-      const tiers = item.familyKey.startsWith('resources') ? [4,5,6] : [4,5,6];
-      const enchants = item.familyKey.startsWith('resources') ? [0] : [0,1];
+      const isResource = item.familyKey.startsWith('resources');
+      const tiers = isResource ? [4,5,6] : [4,5,6,7];
+      const enchants = isResource ? [0] : [0,1];
       tiers.forEach((tier) => {
         if (!item.tiers.includes(tier)) return;
         enchants.forEach((enchant) => {
@@ -287,7 +288,7 @@ window.ALBION_CATALOG = (() => {
             item,
             tier,
             enchantment: enchant,
-            qualityRange: item.qualities === false ? [1] : [1,2,3]
+            qualityRange: item.qualities === false ? [1] : [1,2]
           });
         });
       });
